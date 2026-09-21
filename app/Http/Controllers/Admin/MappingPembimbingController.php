@@ -79,13 +79,11 @@ class MappingPembimbingController extends Controller
 
         // 3 Summary Stats Cards
         $totalSiswaPkl = PengajuanPkl::where('status', 'disetujui')->count();
-        if ($totalSiswaPkl === 0) $totalSiswaPkl = 128;
 
         $sudahMemilikiPembimbing = PembimbingPenugasan::count();
-        if ($sudahMemilikiPembimbing === 0 && $totalSiswaPkl === 128) $sudahMemilikiPembimbing = 112;
 
         $belumMemilikiPembimbing = max(0, $totalSiswaPkl - $sudahMemilikiPembimbing);
-        $persenTerpetakan = $totalSiswaPkl > 0 ? round(($sudahMemilikiPembimbing / $totalSiswaPkl) * 100, 1) : 87.5;
+        $persenTerpetakan = $totalSiswaPkl > 0 ? round(($sudahMemilikiPembimbing / $totalSiswaPkl) * 100, 1) : 0;
 
         // Master Data for dropdowns
         $jurusans = Jurusan::where('status', 'aktif')->orderBy('nama')->get();

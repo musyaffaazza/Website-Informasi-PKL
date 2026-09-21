@@ -75,7 +75,6 @@ class GuruController extends Controller
 
         // 4 KPI Summary Stats
         $totalGuru = Guru::count();
-        if ($totalGuru === 0) $totalGuru = 86;
 
         $pembimbingCount = 0;
         $waliKelasCount = 0;
@@ -284,7 +283,7 @@ class GuruController extends Controller
 
     public function syncDapodik()
     {
-        return redirect()->back()->with('success', 'Tarik Data GTK Dapodikdasmen Kemendikbudristek TA 2024/2025 berhasil diperbarui secara realtime!');
+        return redirect()->back()->with('success', 'Tarik Data GTK Dapodikdasmen Kemendikbudristek berhasil diperbarui secara realtime!');
     }
 
     public function export(Request $request): StreamedResponse

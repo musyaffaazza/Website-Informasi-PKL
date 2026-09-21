@@ -53,7 +53,7 @@
             <div>
                 <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">TOTAL SISWA PKL</div>
                 <div class="text-3xl font-black text-slate-900 mt-1 leading-tight">{{ $totalSiswaPkl }}</div>
-                <div class="text-[11px] font-medium text-slate-400 mt-1">Siswa aktif terdaftar periode 2026/2027</div>
+                <div class="text-[11px] font-medium text-slate-400 mt-1">Siswa aktif terdaftar periode {{ $tahunAjaranAktif }}</div>
             </div>
             <div class="w-11 h-11 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 border border-blue-100/80">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -243,7 +243,7 @@
                         ];
                         $avatarClass = $avatarBgs[$index % count($avatarBgs)];
 
-                        $kodePengajuan = $p->kode_pengajuan ?: '#PKL-2027-' . str_pad($p->id, 4, '0', STR_PAD_LEFT);
+                        $kodePengajuan = $p->kode_pengajuan ?: ('#PKL-' . date('Y') . '-' . str_pad($p->id, 4, '0', STR_PAD_LEFT));
                     @endphp
                     <tr class="hover:bg-slate-50/60 transition">
                         <!-- NO -->
@@ -334,7 +334,7 @@
                             @elseif($p->tanggal_mulai)
                                 {{ $p->tanggal_mulai->format('d F Y') }}
                             @else
-                                01 Januari 2027
+                                {{ $p->penugasan && $p->penugasan->tanggal_mulai ? $p->penugasan->tanggal_mulai->format('d F Y') : ($p->tanggal_mulai ? \Carbon\Carbon::parse($p->tanggal_mulai)->format('d F Y') : '-') }}
                             @endif
                         </td>
 
@@ -492,7 +492,7 @@
                             <!-- Tanggal Mulai -->
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 mb-1">Tanggal Mulai Penugasan *</label>
-                                <input type="date" name="tanggal_mulai" required value="2027-01-01" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
+                                <input type="date" name="tanggal_mulai" required value="{{ date('Y-m-d') }}" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
                             </div>
                         </div>
                     </div>
@@ -566,7 +566,7 @@
                             <!-- Tanggal Mulai -->
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 mb-1">Tanggal Mulai Penugasan *</label>
-                                <input type="date" name="tanggal_mulai" required value="2027-01-05" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
+                                <input type="date" name="tanggal_mulai" required value="{{ date('Y-m-d') }}" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
                             </div>
                         </div>
                     </div>
@@ -701,7 +701,7 @@
                             </div>
                             <div class="text-xs font-bold text-slate-900" x-text="activePengajuan?.penugasan?.pembimbing?.nama || 'Belum Dipetakan'"></div>
                             <div class="text-[11px] text-slate-500 mt-0.5" x-text="activePengajuan?.penugasan?.pembimbing?.nip ? 'NIP. ' + activePengajuan.penugasan.pembimbing.nip : 'Belum ada NIP'"></div>
-                            <div class="text-[11px] text-emerald-600 font-semibold mt-1" x-text="'Mulai Penugasan: ' + (activePengajuan?.penugasan?.tanggal_mulai ? new Date(activePengajuan.penugasan.tanggal_mulai).toLocaleDateString('id-ID', {day: 'numeric', month: 'long', year: 'numeric'}) : '01 Januari 2027')"></div>
+                            <div class="text-[11px] text-emerald-600 font-semibold mt-1" x-show="activePengajuan?.penugasan?.tanggal_mulai" x-text="'Mulai Penugasan: ' + new Date(activePengajuan.penugasan.tanggal_mulai).toLocaleDateString('id-ID', {day: 'numeric', month: 'long', year: 'numeric'})"></div>
                         </div>
                     </div>
                 </div>
@@ -748,7 +748,7 @@ function mappingApp() {
 
         openEditModal(pengajuan) {
             this.activePengajuan = pengajuan;
-            let dateFormatted = '2027-01-01';
+            let dateFormatted = new Date().toISOString().slice(0, 10);
             if (pengajuan.penugasan && pengajuan.penugasan.tanggal_mulai) {
                 dateFormatted = pengajuan.penugasan.tanggal_mulai.substring(0, 10);
             }

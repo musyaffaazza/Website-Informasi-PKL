@@ -11,7 +11,7 @@
         <div class="text-[11px] font-semibold text-slate-400 mb-1.5 flex items-center gap-1.5">
             <span>Pengaturan &amp; Master Data</span>
             <span class="text-slate-300">&gt;</span>
-            <span class="text-slate-600">Data Tenaga Pendidik (TA 2024/2025)</span>
+            <span class="text-slate-600">Data Tenaga Pendidik (TA {{ $tahunAjaranAktif }})</span>
         </div>
 
         <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
@@ -1010,7 +1010,7 @@
                             </svg>
                         </div>
                         <p class="text-xs text-slate-600">
-                            Tarik data resmi Pendidik dan Tenaga Kependidikan (GTK) langsung dari server Dapodikdasmen Kemdikbudristek RI untuk Tahun Ajaran 2024/2025.
+                            Tarik data resmi Pendidik dan Tenaga Kependidikan (GTK) langsung dari server Dapodikdasmen Kemdikbudristek RI untuk Tahun Ajaran {{ $tahunAjaranAktif }}.
                         </p>
                     </div>
 

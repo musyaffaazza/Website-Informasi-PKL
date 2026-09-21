@@ -11,7 +11,7 @@
         <div class="text-[11px] font-semibold text-slate-400 mb-1.5 flex items-center gap-1.5">
             <span>Data Master</span>
             <span class="text-slate-300">&gt;</span>
-            <span class="text-slate-600">Master Data Siswa (TA 2026/2027)</span>
+            <span class="text-slate-600">Master Data Siswa (TA {{ $tahunAjaranAktif }})</span>
         </div>
 
         <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
@@ -94,7 +94,7 @@
                 </div>
             </div>
             <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px]">
-                <span class="text-slate-400">Seluruh Tingkat XI &amp; XII</span>
+                <span class="text-slate-400">Seluruh Tingkat XII</span>
                 <span class="inline-flex items-center gap-1 font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
                     <svg class="w-3 h-3 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
@@ -119,7 +119,7 @@
             </div>
             <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px]">
                 <span class="text-slate-400">6 Konsentrasi Keahlian</span>
-                <span class="text-slate-600 font-semibold">Periode 2026/2027</span>
+                <span class="text-slate-600 font-semibold">Periode {{ $tahunAjaranAktif }}</span>
             </div>
         </div>
 
@@ -197,11 +197,8 @@
                     <select name="tingkat" 
                             onchange="document.getElementById('filterForm').submit()"
                             class="w-full px-3.5 py-2.5 bg-slate-50/80 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition appearance-none cursor-pointer">
-                        <option value="all" {{ request('tingkat') == 'all' ? 'selected' : '' }}>Semua Tingkat/Kelas</option>
-                        <option value="XII" {{ request('tingkat', 'XII') == 'XII' ? 'selected' : '' }}>Tingkat XII (Siap PKL)</option>
-                        <option value="XI" {{ request('tingkat') == 'XI' ? 'selected' : '' }}>Tingkat XI (Persiapan)</option>
-                        <option value="X" {{ request('tingkat') == 'X' ? 'selected' : '' }}>Tingkat X</option>
-                        @foreach($rombels->where('tingkat', 'XII') as $r)
+                        <option value="XII" {{ request('tingkat', 'XII') == 'XII' ? 'selected' : '' }}>Semua Kelas (Tingkat XII)</option>
+                        @foreach($rombels as $r)
                             <option value="{{ $r->id }}" {{ request('tingkat') == $r->id ? 'selected' : '' }}>{{ $r->nama_rombel }}</option>
                         @endforeach
                     </select>
@@ -977,7 +974,7 @@
                             </svg>
                         </div>
                         <p class="text-xs text-slate-600">
-                            Sinkronisasi dan tarik data resmi peserta didik langsung dari server Dapodikdasmen Kemendikbudristek RI untuk Tahun Ajaran 2026/2027.
+                            Sinkronisasi dan tarik data resmi peserta didik langsung dari server Dapodikdasmen Kemendikbudristek RI untuk Tahun Ajaran {{ $tahunAjaranAktif }}.
                         </p>
                     </div>
 

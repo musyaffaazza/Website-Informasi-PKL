@@ -96,7 +96,7 @@
                 </div>
             </div>
             <div class="mt-4 text-xs text-slate-400">
-                Tingkat XII (Semester Genap 2024)
+                Tingkat XII ({{ $semesterAktif }} {{ $tahunAjaranAktif }})
             </div>
         </div>
 

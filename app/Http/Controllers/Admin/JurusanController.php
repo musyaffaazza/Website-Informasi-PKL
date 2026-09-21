@@ -58,25 +58,15 @@ class JurusanController extends Controller
         $totalPrograms = Jurusan::where('status', 'aktif')->count();
         $allMajors = Jurusan::where('status', 'aktif')->with('rombels')->get();
 
-        $totalSiswaMagang = $allMajors->sum(function($j) {
-            return match(strtoupper($j->kode)) {
-                'RPL' => 108,
-                'TOI' => 72,
-                'TP'  => 72,
-                'KA'  => 70,
-                'TPL' => 36,
-                default => ($j->rombels ? $j->rombels->count() * 36 : 0)
-            };
-        });
+        $totalSiswaMagang = Siswa::whereHas('rombel', function ($q) {
+            $q->where('tingkat', 'XII');
+        })->count();
 
-        $totalKemitraan = Industri::count() > 0 ? Industri::count() : 48;
-        if ($totalKemitraan < 48) {
-            $totalKemitraan = 48;
-        }
+        $totalKemitraan = Industri::count();
 
         $totalKuota = $allMajors->sum('kuota_industri');
         $totalTerisi = $allMajors->sum('kuota_terisi');
-        $persentaseKeterserapan = $totalKuota > 0 ? round(($totalTerisi / $totalKuota) * 100, 1) : 96.2;
+        $persentaseKeterserapan = $totalKuota > 0 ? round(($totalTerisi / $totalKuota) * 100, 1) : 0;
 
         // Filter options
         $bidangList = Jurusan::whereNotNull('bidang')->select('bidang')->distinct()->pluck('bidang');

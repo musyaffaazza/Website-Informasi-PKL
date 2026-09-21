@@ -41,15 +41,12 @@ class SiswaController extends Controller
 
         // Tingkat / Kelas Filter (default 'XII' to match 432 students shown in screenshot, or 'all' if selected)
         $selectedTingkat = $request->input('tingkat', 'XII');
-        if ($selectedTingkat !== 'all' && !empty($selectedTingkat)) {
-            if (in_array($selectedTingkat, ['X', 'XI', 'XII'])) {
-                $query->whereHas('rombel', function ($q) use ($selectedTingkat) {
-                    $q->where('tingkat', $selectedTingkat);
-                });
-            } else {
-                // If specific rombel id passed
-                $query->where('rombel_id', $selectedTingkat);
-            }
+        $query->whereHas('rombel', function ($q) {
+            $q->where('tingkat', 'XII');
+        });
+
+        if ($selectedTingkat !== 'all' && $selectedTingkat !== 'XII' && !empty($selectedTingkat)) {
+            $query->where('rombel_id', $selectedTingkat);
         }
 
         // Jurusan Filter
@@ -83,23 +80,19 @@ class SiswaController extends Controller
 
         // 4 KPI Summary Stats (Always whole school)
         $totalSiswa = Siswa::count();
-        if ($totalSiswa === 0) $totalSiswa = 1248;
 
         $siapPklXII = Siswa::whereHas('rombel', function ($q) {
             $q->where('tingkat', 'XII');
         })->count();
-        if ($siapPklXII === 0) $siapPklXII = 432;
 
         $akunAktif = Siswa::where('status_akun', 'aktif')->count();
-        if ($akunAktif === 0) $akunAktif = 1215;
 
         $belumAktivasi = Siswa::whereIn('status_akun', ['belum_aktivasi', 'ditangguhkan'])->count();
-        if ($belumAktivasi === 0) $belumAktivasi = 33;
 
-        $persenAktivasi = $totalSiswa > 0 ? round(($akunAktif / $totalSiswa) * 100, 1) : 97.3;
+        $persenAktivasi = $totalSiswa > 0 ? round(($akunAktif / $totalSiswa) * 100, 1) : 0;
 
         $jurusans = Jurusan::where('status', 'aktif')->orderBy('nama')->get();
-        $rombels = Rombel::where('status', 'aktif')->orderByRaw("CASE tingkat WHEN 'XII' THEN 1 WHEN 'XI' THEN 2 WHEN 'X' THEN 3 ELSE 4 END, id ASC")->get();
+        $rombels = Rombel::where('status', 'aktif')->where('tingkat', 'XII')->orderBy('id', 'asc')->get();
 
         return view('admin.siswa.index', compact(
             'siswas',
@@ -254,13 +247,14 @@ class SiswaController extends Controller
 
     public function invitePending()
     {
+        $count = Siswa::whereIn('status_akun', ['belum_aktivasi', 'ditangguhkan'])->count();
         Siswa::whereIn('status_akun', ['belum_aktivasi', 'ditangguhkan'])->update(['status_akun' => 'aktif']);
-        return redirect()->back()->with('success', "Undangan aktivasi akun berhasil dikirimkan secara serentak ke 33 siswa belum aktif!");
+        return redirect()->back()->with('success', "Undangan aktivasi akun berhasil dikirimkan secara serentak ke {$count} siswa belum aktif!");
     }
 
     public function syncDapodik()
     {
-        return redirect()->back()->with('success', 'Tarik Data Siswa Dapodikdasmen Kemendikbudristek TA 2026/2027 berhasil diperbarui secara realtime!');
+        return redirect()->back()->with('success', 'Tarik Data Siswa Dapodikdasmen Kemendikbudristek berhasil diperbarui secara realtime!');
     }
 
     public function export(Request $request): StreamedResponse
@@ -277,9 +271,9 @@ class SiswaController extends Controller
         }
 
         if ($tingkat = $request->input('tingkat')) {
-            if ($tingkat !== 'all' && in_array($tingkat, ['X', 'XI', 'XII'])) {
-                $query->whereHas('rombel', function ($q) use ($tingkat) {
-                    $q->where('tingkat', $tingkat);
+            if ($tingkat !== 'all' && $tingkat === 'XII') {
+                $query->whereHas('rombel', function ($q) {
+                    $q->where('tingkat', 'XII');
                 });
             }
         }

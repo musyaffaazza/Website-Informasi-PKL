@@ -78,20 +78,15 @@ class IndustriController extends Controller
 
         // 4 KPI Summary Stats (Always whole school)
         $totalMitra = Industri::count();
-        if ($totalMitra === 0) $totalMitra = 48;
 
         $totalKuota = Industri::sum('kuota');
-        if ($totalKuota === 0) $totalKuota = 216;
 
         $totalTerisi = Industri::sum('kuota_terisi');
-        if ($totalTerisi === 0) $totalTerisi = 181;
-        $persenKapasitas = $totalKuota > 0 ? round(($totalTerisi / $totalKuota) * 100) : 84;
+        $persenKapasitas = $totalKuota > 0 ? round(($totalTerisi / $totalKuota) * 100) : 0;
 
         $mitraPenuh = Industri::where('kuota_terisi', '>=', DB::raw('kuota'))->count();
-        if ($mitraPenuh === 0) $mitraPenuh = 18;
 
         $kemitraanBaru = Industri::where('status_kemitraan', 'baru')->count();
-        if ($kemitraanBaru === 0) $kemitraanBaru = 6;
 
         // Filter Counts for Tabs
         $countSemua = $totalMitra;
@@ -292,7 +287,7 @@ class IndustriController extends Controller
                     $ind->nama,
                     $ind->bidang_usaha ?: '-',
                     $ind->no_mou ?: '-',
-                    $ind->mou_berlaku_sampai ? $ind->mou_berlaku_sampai->format('d/m/Y') : 's/d 2027',
+                    $ind->mou_berlaku_sampai ? $ind->mou_berlaku_sampai->format('d/m/Y') : '-',
                     $ind->alamat ?: '-',
                     $ind->wilayah ?: 'Bogor',
                     $ind->kontak_nama ?: '-',

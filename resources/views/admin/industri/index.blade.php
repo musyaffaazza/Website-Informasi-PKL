@@ -11,7 +11,7 @@
         <div class="text-[11px] font-semibold text-slate-400 mb-1.5 flex items-center gap-1.5">
             <span>Pengaturan &amp; Master Data</span>
             <span class="text-slate-300">&gt;</span>
-            <span class="text-slate-600">Direktori Kemitraan DU/DI (TA 2024/2025)</span>
+            <span class="text-slate-600">Direktori Kemitraan DU/DI (TA {{ $tahunAjaranAktif }})</span>
         </div>
 
         <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
@@ -74,7 +74,7 @@
             <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px]">
                 <span class="text-slate-400">Seluruh Wilayah &amp; Jurusan</span>
                 <span class="inline-flex items-center gap-1 font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
-                    <span>•</span> 100% Terverifikasi
+                    <span>•</span> {{ $totalMitra }} Mitra Terdata
                 </span>
             </div>
         </div>
@@ -364,7 +364,7 @@
                                 {{ $ind->no_mou ?: '421.5/MOU-DUDI/SMKELL/2024' }}
                             </div>
                             <div class="text-[10px] text-slate-400 mt-0.5">
-                                Berlaku s/d: <span class="font-medium text-slate-600">{{ $ind->mou_berlaku_sampai ? $ind->mou_berlaku_sampai->format('d F Y') : '31 Desember 2027' }}</span>
+                                Berlaku s/d: <span class="font-medium text-slate-600">{{ $ind->mou_berlaku_sampai ? $ind->mou_berlaku_sampai->format('d F Y') : '-' }}</span>
                             </div>
                         </div>
                     </div>
@@ -735,7 +735,7 @@
                             <!-- Masa Berlaku MoU -->
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 mb-1">Masa Berlaku MoU Sampai</label>
-                                <input type="date" name="mou_berlaku_sampai" value="2027-12-31" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
+                                <input type="date" name="mou_berlaku_sampai" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
                             </div>
 
                             <!-- Jurusan Afiliasi Checkboxes -->
@@ -857,7 +857,7 @@
                             </div>
                             <div class="text-xs font-bold text-slate-900" x-text="activeIndustri?.no_mou || '421.5/MOU-DUDI/SMKELL/2024'"></div>
                             <div class="text-[11px] text-slate-500 mt-1">
-                                Masa Berlaku: <span class="font-semibold text-slate-800" x-text="activeIndustri?.mou_berlaku_sampai ? new Date(activeIndustri.mou_berlaku_sampai).toLocaleDateString('id-ID', {day: 'numeric', month: 'long', year: 'numeric'}) : '31 Desember 2027'"></span>
+                                Masa Berlaku: <span class="font-semibold text-slate-800" x-text="activeIndustri?.mou_berlaku_sampai ? new Date(activeIndustri.mou_berlaku_sampai).toLocaleDateString('id-ID', {day: 'numeric', month: 'long', year: 'numeric'}) : '-'"></span>
                             </div>
                             <div class="text-[11px] text-emerald-600 font-semibold mt-0.5">
                                 Status Dokumen: MoU Terdaftar Resmi

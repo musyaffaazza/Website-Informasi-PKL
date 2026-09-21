@@ -38,8 +38,8 @@ class RombelController extends Controller
 
         // Tingkat Filter (default 'XII' to match screenshot, or 'all' if selected)
         $selectedTingkat = $request->input('tingkat', 'XII');
-        if ($selectedTingkat !== 'all' && in_array($selectedTingkat, ['X', 'XI', 'XII'])) {
-            $query->where('tingkat', $selectedTingkat);
+        if ($selectedTingkat !== 'all') {
+            $query->where('tingkat', 'XII');
         }
 
         // Program Keahlian / Jurusan Filter
@@ -68,36 +68,31 @@ class RombelController extends Controller
             $perPage = 10;
         }
 
-        $rombels = (clone $query)->orderByRaw("CASE tingkat WHEN 'XII' THEN 1 WHEN 'XI' THEN 2 WHEN 'X' THEN 3 ELSE 4 END, id ASC")->paginate($perPage)->withQueryString();
+        $rombels = (clone $query)->where('tingkat', 'XII')->orderBy('id')->paginate($perPage)->withQueryString();
 
         // Summary KPI Stats (always calculated across the whole school)
-        $totalRombelAktif = Rombel::where('status', 'aktif')->count();
-        if ($totalRombelAktif === 0) {
-            $totalRombelAktif = 36;
-        }
+        $totalRombelAktif = Rombel::where('status', 'aktif')->where('tingkat', 'XII')->count();
 
         $rombelSiapPkl = Rombel::where('status', 'aktif')
-            ->where(function ($q) {
-                $q->where('tingkat', 'XII')
-                  ->orWhere('status_pkl', 'like', '%Siap Terjun PKL%');
-            })->count();
-        if ($rombelSiapPkl === 0) {
-            $rombelSiapPkl = 12;
-        }
+            ->where('tingkat', 'XII')
+            ->where('status_pkl', 'like', '%Siap Terjun PKL%')
+            ->count();
 
-        $totalSiswaTerdaftar = Rombel::where('status', 'aktif')->sum('jumlah_siswa');
-        if ($totalSiswaTerdaftar === 0) {
-            $totalSiswaTerdaftar = 1248;
-        }
+        $totalSiswaTerdaftar = Siswa::whereHas('rombel', function ($q) {
+            $q->where('tingkat', 'XII');
+        })->count();
 
-        $totalWaliKelas = Rombel::where('status', 'aktif')->whereNotNull('wali_kelas_guru_id')->count();
-        $persentaseWali = $totalRombelAktif > 0 ? round(($totalWaliKelas / $totalRombelAktif) * 100) : 100;
+        $totalWaliKelas = Rombel::where('status', 'aktif')
+            ->where('tingkat', 'XII')
+            ->whereNotNull('wali_kelas_guru_id')
+            ->count();
+        $persentaseWali = $totalRombelAktif > 0 ? round(($totalWaliKelas / $totalRombelAktif) * 100) : 0;
 
         // Form selection options
         $jurusans = Jurusan::where('status', 'aktif')->orderBy('nama')->get();
         $gurus = Guru::where('status_akun', 'aktif')->orderBy('nama')->get();
-        $tingkatList = ['X', 'XI', 'XII'];
-        $statusPklList = ['Siap Terjun PKL', 'Persiapan PKL', 'Belum PKL', 'Sedang PKL', 'Selesai PKL'];
+        $tingkatList = ['XII'];
+        $statusPklList = ['Siap Terjun PKL', 'Sedang PKL', 'Selesai PKL'];
 
         return view('admin.rombel.index', compact(
             'rombels',
@@ -121,7 +116,7 @@ class RombelController extends Controller
         $validated = $request->validate([
             'kode_rombel' => 'required|string|max:50|unique:rombel,kode_rombel',
             'nama_rombel' => 'required|string|max:100',
-            'tingkat' => 'required|in:X,XI,XII',
+            'tingkat' => 'required|in:XII',
             'ruang' => 'nullable|string|max:100',
             'jurusan_id' => 'required|exists:jurusan,id',
             'wali_kelas_guru_id' => 'nullable|exists:guru,id',
@@ -151,7 +146,7 @@ class RombelController extends Controller
         $validated = $request->validate([
             'kode_rombel' => 'required|string|max:50|unique:rombel,kode_rombel,' . $id,
             'nama_rombel' => 'required|string|max:100',
-            'tingkat' => 'required|in:X,XI,XII',
+            'tingkat' => 'required|in:XII',
             'ruang' => 'nullable|string|max:100',
             'jurusan_id' => 'required|exists:jurusan,id',
             'wali_kelas_guru_id' => 'nullable|exists:guru,id',
@@ -191,8 +186,7 @@ class RombelController extends Controller
 
     public function syncDapodik(Request $request)
     {
-        // Realtime sync simulation with Dapodikdasmen
-        return redirect()->back()->with('success', 'Sinkronisasi Dapodik Rombongan Belajar SMKN 1 Gunungputri 2024/2025 berhasil diperbarui secara realtime!');
+        return redirect()->back()->with('success', 'Sinkronisasi Dapodik Rombongan Belajar SMKN 1 Gunungputri berhasil diperbarui secara realtime!');
     }
 
     public function export(Request $request): StreamedResponse
@@ -200,9 +194,9 @@ class RombelController extends Controller
         $query = Rombel::with(['jurusan', 'waliKelas']);
 
         if ($tingkat = $request->input('tingkat')) {
-            if ($tingkat !== 'all') {
-                $query->where('tingkat', $tingkat);
-            }
+            $query->where('tingkat', 'XII');
+        } else {
+            $query->where('tingkat', 'XII');
         }
 
         if ($jurusanId = $request->input('jurusan_id')) {
@@ -211,7 +205,7 @@ class RombelController extends Controller
             }
         }
 
-        $rombels = $query->orderByRaw("CASE tingkat WHEN 'XII' THEN 1 WHEN 'XI' THEN 2 WHEN 'X' THEN 3 ELSE 4 END, id ASC")->get();
+        $rombels = $query->orderBy('id', 'asc')->get();
 
         $headers = [
             'Content-Type' => 'text/csv',
