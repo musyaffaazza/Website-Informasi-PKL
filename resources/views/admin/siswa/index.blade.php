@@ -576,11 +576,11 @@
          x-cloak
          class="fixed inset-0 z-50 overflow-y-auto"
          aria-labelledby="modal-title" role="dialog" aria-modal="true">
-        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div x-show="isCreateModalOpen" @click="isCreateModalOpen = false" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs transition-opacity"></div>
-            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+        <!-- Backdrop -->
+        <div class="fixed inset-0 bg-slate-900/60 transition-opacity" @click="isCreateModalOpen = false"></div>
 
-            <div x-show="isCreateModalOpen" class="inline-block align-bottom bg-white rounded-3xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full border border-slate-100">
+        <div class="flex min-h-screen items-center justify-center p-4 text-center sm:p-6">
+            <div class="relative z-10 w-full max-w-2xl transform overflow-hidden rounded-3xl bg-white text-left shadow-2xl transition-all border border-slate-100">
                 <form action="{{ route('admin.siswa.store') }}" method="POST">
                     @csrf
                     <div class="p-6 bg-slate-50/70 border-b border-slate-100 flex items-center justify-between">
@@ -698,11 +698,11 @@
          x-cloak
          class="fixed inset-0 z-50 overflow-y-auto"
          aria-labelledby="modal-title" role="dialog" aria-modal="true">
-        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div x-show="isEditModalOpen" @click="isEditModalOpen = false" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs transition-opacity"></div>
-            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+        <!-- Backdrop -->
+        <div class="fixed inset-0 bg-slate-900/60 transition-opacity" @click="isEditModalOpen = false"></div>
 
-            <div x-show="isEditModalOpen" class="inline-block align-bottom bg-white rounded-3xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full border border-slate-100">
+        <div class="flex min-h-screen items-center justify-center p-4 text-center sm:p-6">
+            <div class="relative z-10 w-full max-w-2xl transform overflow-hidden rounded-3xl bg-white text-left shadow-2xl transition-all border border-slate-100">
                 <form :action="'{{ url('admin/siswa') }}/' + editData.id" method="POST">
                     @csrf
                     @method('PUT')
@@ -822,11 +822,11 @@
          x-cloak
          class="fixed inset-0 z-50 overflow-y-auto"
          aria-labelledby="modal-title" role="dialog" aria-modal="true">
-        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div x-show="isDetailModalOpen" @click="isDetailModalOpen = false" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs transition-opacity"></div>
-            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+        <!-- Backdrop -->
+        <div class="fixed inset-0 bg-slate-900/60 transition-opacity" @click="isDetailModalOpen = false"></div>
 
-            <div x-show="isDetailModalOpen" class="inline-block align-bottom bg-white rounded-3xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-xl sm:w-full border border-slate-100">
+        <div class="flex min-h-screen items-center justify-center p-4 text-center sm:p-6">
+            <div class="relative z-10 w-full max-w-xl transform overflow-hidden rounded-3xl bg-white text-left shadow-2xl transition-all border border-slate-100">
                 <div class="p-6 bg-slate-50/70 border-b border-slate-100 flex items-center justify-between">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center font-bold">
@@ -901,11 +901,11 @@
          x-cloak
          class="fixed inset-0 z-50 overflow-y-auto"
          aria-labelledby="modal-title" role="dialog" aria-modal="true">
-        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div x-show="isBulkRombelModalOpen" @click="isBulkRombelModalOpen = false" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs transition-opacity"></div>
-            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+        <!-- Backdrop -->
+        <div class="fixed inset-0 bg-slate-900/60 transition-opacity" @click="isBulkRombelModalOpen = false"></div>
 
-            <div x-show="isBulkRombelModalOpen" class="inline-block align-bottom bg-white rounded-3xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md sm:w-full border border-slate-100">
+        <div class="flex min-h-screen items-center justify-center p-4 text-center sm:p-6">
+            <div class="relative z-10 w-full max-w-md transform overflow-hidden rounded-3xl bg-white text-left shadow-2xl transition-all border border-slate-100">
                 <form action="{{ route('admin.siswa.bulkRombel') }}" method="POST">
                     @csrf
                     <template x-for="id in selectedIds" :key="id">
@@ -954,11 +954,11 @@
          x-cloak
          class="fixed inset-0 z-50 overflow-y-auto"
          aria-labelledby="modal-title" role="dialog" aria-modal="true">
-        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div x-show="isImportModalOpen" @click="isImportModalOpen = false" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs transition-opacity"></div>
-            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+        <!-- Backdrop -->
+        <div class="fixed inset-0 bg-slate-900/60 transition-opacity" @click="isImportModalOpen = false"></div>
 
-            <div x-show="isImportModalOpen" class="inline-block align-bottom bg-white rounded-3xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md sm:w-full border border-slate-100">
+        <div class="flex min-h-screen items-center justify-center p-4 text-center sm:p-6">
+            <div class="relative z-10 w-full max-w-md transform overflow-hidden rounded-3xl bg-white text-left shadow-2xl transition-all border border-slate-100">
                 <form action="{{ route('admin.siswa.syncDapodik') }}" method="POST">
                     @csrf
                     <div class="p-6 bg-slate-50/70 border-b border-slate-100 flex items-center justify-between">
@@ -999,11 +999,11 @@
          x-cloak
          class="fixed inset-0 z-50 overflow-y-auto"
          aria-labelledby="modal-title" role="dialog" aria-modal="true">
-        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div x-show="isDeleteModalOpen" @click="isDeleteModalOpen = false" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs transition-opacity"></div>
-            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+        <!-- Backdrop -->
+        <div class="fixed inset-0 bg-slate-900/60 transition-opacity" @click="isDeleteModalOpen = false"></div>
 
-            <div x-show="isDeleteModalOpen" class="inline-block align-bottom bg-white rounded-3xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md sm:w-full border border-slate-100">
+        <div class="flex min-h-screen items-center justify-center p-4 text-center sm:p-6">
+            <div class="relative z-10 w-full max-w-md transform overflow-hidden rounded-3xl bg-white text-left shadow-2xl transition-all border border-slate-100">
                 <form :action="'{{ url('admin/siswa') }}/' + deleteId" method="POST">
                     @csrf
                     @method('DELETE')

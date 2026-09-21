@@ -19,7 +19,6 @@ class IndustriDisplaySeeder extends Seeder
 
         // Get Jurusans
         $rpl = Jurusan::where('kode', 'RPL')->first();
-        $tkj = Jurusan::where('kode', 'TKJ')->first();
         $toi = Jurusan::where('kode', 'TOI')->first();
         $tp  = Jurusan::where('kode', 'TP')->first();
         $ka  = Jurusan::where('kode', 'KA')->first();
@@ -74,12 +73,12 @@ class IndustriDisplaySeeder extends Seeder
                 'kontak_jabatan' => 'Fiber Optic Maintenance Manager',
                 'kontak_no_hp' => '+62 821-1122-3344',
                 'kontak_email' => 'pkl.bogor@telkomakses.co.id',
-                'pembimbing_nama' => 'Ahmad Fauzi, S.Pd., Gr. (TKJ)',
+                'pembimbing_nama' => 'Ahmad Fauzi, S.Pd., Gr. (RPL)',
                 'kuota' => 8,
                 'kuota_terisi' => 5,
                 'status' => 'aktif',
                 'status_kemitraan' => 'aktif',
-                'jurusans' => [$tkj?->id],
+                'jurusans' => [$rpl?->id],
             ],
             [
                 'nama' => 'PT Indocyber Global Teknologi',
@@ -126,21 +125,21 @@ class IndustriDisplaySeeder extends Seeder
             ['nama' => 'PT Paragon Technology and Innovation', 'bidang' => 'Industri Kimia & Kosmetik', 'wilayah' => 'Jakarta', 'kuota' => 5, 'terisi' => 5, 'status' => 'penuh', 'jur' => [$ka?->id], 'pem' => 'Dra. Hj. Nurhayati, M.Pd. (KA)'],
             ['nama' => 'PT Toyota Motor Manufacturing Indonesia', 'bidang' => 'Otomotif & Manufaktur', 'wilayah' => 'Karawang', 'kuota' => 8, 'terisi' => 8, 'status' => 'penuh', 'jur' => [$tp?->id, $toi?->id], 'pem' => 'Budi Santoso, S.Pd. (TP)'],
             ['nama' => 'PT Bukalapak.com Tbk', 'bidang' => 'Software House & E-Commerce', 'wilayah' => 'Jakarta', 'kuota' => 4, 'terisi' => 3, 'status' => 'aktif', 'jur' => [$rpl?->id], 'pem' => 'Ir. Dian Hendrawan, S.Kom., M.T. (RPL)'],
-            ['nama' => 'PT Indosat Ooredoo Hutchison', 'bidang' => 'Telekomunikasi & Jaringan', 'wilayah' => 'Jakarta', 'kuota' => 4, 'terisi' => 3, 'status' => 'aktif', 'jur' => [$tkj?->id], 'pem' => 'Hendro Susanto, S.T. (TKJ)'],
+            ['nama' => 'PT Indosat Ooredoo Hutchison', 'bidang' => 'Telekomunikasi & Jaringan', 'wilayah' => 'Jakarta', 'kuota' => 4, 'terisi' => 3, 'status' => 'aktif', 'jur' => [$rpl?->id], 'pem' => 'Hendro Susanto, S.T. (RPL)'],
             ['nama' => 'PT Surya Toto Indonesia Tbk', 'bidang' => 'Teknik Fabrikasi & Pemesinan', 'wilayah' => 'Bogor', 'kuota' => 5, 'terisi' => 5, 'status' => 'penuh', 'jur' => [$tpl?->id, $tp?->id], 'pem' => 'Suryadi, S.T. (TPL)'],
             ['nama' => 'PT Panasonic Manufacturing Indonesia', 'bidang' => 'Elektronika & Otomasi Industri', 'wilayah' => 'Jakarta', 'kuota' => 6, 'terisi' => 5, 'status' => 'aktif', 'jur' => [$toi?->id], 'pem' => 'Drs. H. Suryana, M.Pd. (TOI)'],
             ['nama' => 'PT United Tractors Tbk', 'bidang' => 'Alat Berat & Pemesinan', 'wilayah' => 'Jakarta', 'kuota' => 5, 'terisi' => 5, 'status' => 'penuh', 'jur' => [$tp?->id], 'pem' => 'Budi Santoso, S.Pd. (TP)'],
             ['nama' => 'PT Dexa Medica', 'bidang' => 'Farmasi & Kimia Analisis', 'wilayah' => 'Bogor', 'kuota' => 4, 'terisi' => 4, 'status' => 'penuh', 'jur' => [$ka?->id], 'pem' => 'Dra. Hj. Nurhayati, M.Pd. (KA)'],
             ['nama' => 'PT Kalbe Farma Tbk', 'bidang' => 'Farmasi & Kimia Analisis', 'wilayah' => 'Bekasi', 'kuota' => 5, 'terisi' => 5, 'status' => 'penuh', 'jur' => [$ka?->id], 'pem' => 'Dra. Hj. Nurhayati, M.Pd. (KA)'],
-            ['nama' => 'PT Bank Mandiri (Persero) Tbk - IT Center', 'bidang' => 'Financial Technology & IT Support', 'wilayah' => 'Jakarta', 'kuota' => 4, 'terisi' => 3, 'status' => 'aktif', 'jur' => [$rpl?->id, $tkj?->id], 'pem' => 'Ahmad Fauzi, S.Pd., M.Kom. (RPL)'],
-            ['nama' => 'PT XL Axiata Tbk', 'bidang' => 'Telekomunikasi & Cloud Computing', 'wilayah' => 'Jakarta', 'kuota' => 4, 'terisi' => 3, 'status' => 'aktif', 'jur' => [$tkj?->id], 'pem' => 'Hendro Susanto, S.T. (TKJ)'],
+            ['nama' => 'PT Bank Mandiri (Persero) Tbk - IT Center', 'bidang' => 'Financial Technology & IT Support', 'wilayah' => 'Jakarta', 'kuota' => 4, 'terisi' => 3, 'status' => 'aktif', 'jur' => [$rpl?->id], 'pem' => 'Ahmad Fauzi, S.Pd., M.Kom. (RPL)'],
+            ['nama' => 'PT XL Axiata Tbk', 'bidang' => 'Telekomunikasi & Cloud Computing', 'wilayah' => 'Jakarta', 'kuota' => 4, 'terisi' => 3, 'status' => 'aktif', 'jur' => [$rpl?->id], 'pem' => 'Hendro Susanto, S.T. (RPL)'],
             ['nama' => 'PT Astra Otoparts Tbk', 'bidang' => 'Manufaktur Komponen Otomotif', 'wilayah' => 'Bogor', 'kuota' => 6, 'terisi' => 6, 'status' => 'penuh', 'jur' => [$tp?->id, $toi?->id], 'pem' => 'Drs. Bambang Wijaya, M.Pd. (TP)'],
             ['nama' => 'PT Siemens Indonesia', 'bidang' => 'Otomasi Industri & Power Grid', 'wilayah' => 'Jakarta', 'kuota' => 4, 'terisi' => 4, 'status' => 'penuh', 'jur' => [$toi?->id], 'pem' => 'Drs. H. Suryana, M.Pd. (TOI)'],
             ['nama' => 'PT LG Electronics Indonesia', 'bidang' => 'Manufaktur Elektronika', 'wilayah' => 'Bekasi', 'kuota' => 5, 'terisi' => 5, 'status' => 'penuh', 'jur' => [$toi?->id], 'pem' => 'Mulyadi, M.Pd. (TOI)'],
             ['nama' => 'PT Tokopedia (GoTo Group)', 'bidang' => 'IT Software & Mobile Apps', 'wilayah' => 'Jakarta', 'kuota' => 4, 'terisi' => 3, 'status' => 'aktif', 'jur' => [$rpl?->id], 'pem' => 'Ir. Dian Hendrawan, S.Kom., M.T. (RPL)'],
             ['nama' => 'PT Shopee International Indonesia', 'bidang' => 'E-Commerce & Logistik IT', 'wilayah' => 'Jakarta', 'kuota' => 4, 'terisi' => 3, 'status' => 'aktif', 'jur' => [$rpl?->id], 'pem' => 'Rina Marlina, S.T. (RPL)'],
-            ['nama' => 'PT Cybertrend Intrabuana', 'bidang' => 'Data Science & Cyber Security', 'wilayah' => 'Jakarta', 'kuota' => 3, 'terisi' => 2, 'status' => 'aktif', 'jur' => [$rpl?->id, $tkj?->id], 'pem' => 'Siti Rahmawati, S.Kom. (RPL)'],
-            ['nama' => 'PT Lintasarta', 'bidang' => 'Network Infrastructure & ISP', 'wilayah' => 'Jakarta', 'kuota' => 4, 'terisi' => 3, 'status' => 'aktif', 'jur' => [$tkj?->id], 'pem' => 'Hendro Susanto, S.T. (TKJ)'],
+            ['nama' => 'PT Cybertrend Intrabuana', 'bidang' => 'Data Science & Cyber Security', 'wilayah' => 'Jakarta', 'kuota' => 3, 'terisi' => 2, 'status' => 'aktif', 'jur' => [$rpl?->id], 'pem' => 'Siti Rahmawati, S.Kom. (RPL)'],
+            ['nama' => 'PT Lintasarta', 'bidang' => 'Network Infrastructure & ISP', 'wilayah' => 'Jakarta', 'kuota' => 4, 'terisi' => 3, 'status' => 'aktif', 'jur' => [$rpl?->id], 'pem' => 'Hendro Susanto, S.T. (RPL)'],
             ['nama' => 'PT Enkei Indonesia', 'bidang' => 'Pengecoran & Pemesinan Velg', 'wilayah' => 'Bekasi', 'kuota' => 5, 'terisi' => 5, 'status' => 'penuh', 'jur' => [$tp?->id], 'pem' => 'Budi Santoso, S.Pd. (TP)'],
             ['nama' => 'PT Showa Indonesia Manufacturing', 'bidang' => 'Komponen Peredam Kejut', 'wilayah' => 'Bekasi', 'kuota' => 5, 'terisi' => 5, 'status' => 'penuh', 'jur' => [$tp?->id], 'pem' => 'Ir. Joko Waskito (TP)'],
             ['nama' => 'PT Yamaha Motor Parts Manufacturing Indonesia', 'bidang' => 'Manufaktur Presisi Logam', 'wilayah' => 'Karawang', 'kuota' => 6, 'terisi' => 6, 'status' => 'penuh', 'jur' => [$tp?->id, $tpl?->id], 'pem' => 'Suryadi, S.T. (TPL)'],
@@ -153,8 +152,8 @@ class IndustriDisplaySeeder extends Seeder
             ['nama' => 'PT Omron Manufacturing of Indonesia', 'bidang' => 'Komponen Otomasi & Sensor', 'wilayah' => 'Bekasi', 'kuota' => 4, 'terisi' => 3, 'status' => 'aktif', 'jur' => [$toi?->id], 'pem' => 'Mulyadi, M.Pd. (TOI)'],
             ['nama' => 'PT Meiji Indonesian Pharmaceutical', 'bidang' => 'Laboratorium Farmasi & Kimia', 'wilayah' => 'Depok', 'kuota' => 3, 'terisi' => 2, 'status' => 'aktif', 'jur' => [$ka?->id], 'pem' => 'Dra. Hj. Nurhayati, M.Pd. (KA)'],
             ['nama' => 'PT Kimia Farma (Persero) Tbk', 'bidang' => 'Pengujian Kimia Farmasi', 'wilayah' => 'Depok', 'kuota' => 3, 'terisi' => 2, 'status' => 'aktif', 'jur' => [$ka?->id], 'pem' => 'Dra. Hj. Nurhayati, M.Pd. (KA)'],
-            ['nama' => 'PT Biznet Networks', 'bidang' => 'Fiber Optic & Data Center', 'wilayah' => 'Bogor', 'kuota' => 4, 'terisi' => 3, 'status' => 'aktif', 'jur' => [$tkj?->id], 'pem' => 'Hendro Susanto, S.T. (TKJ)'],
-            ['nama' => 'PT First Media Tbk', 'bidang' => 'Broadband Network & Troubleshooting', 'wilayah' => 'Jakarta', 'kuota' => 3, 'terisi' => 2, 'status' => 'aktif', 'jur' => [$tkj?->id], 'pem' => 'Nurhayati, M.Pd. (TKJ)'],
+            ['nama' => 'PT Biznet Networks', 'bidang' => 'Fiber Optic & Data Center', 'wilayah' => 'Bogor', 'kuota' => 4, 'terisi' => 3, 'status' => 'aktif', 'jur' => [$rpl?->id], 'pem' => 'Hendro Susanto, S.T. (RPL)'],
+            ['nama' => 'PT First Media Tbk', 'bidang' => 'Broadband Network & Troubleshooting', 'wilayah' => 'Jakarta', 'kuota' => 3, 'terisi' => 2, 'status' => 'aktif', 'jur' => [$rpl?->id], 'pem' => 'Nurhayati, M.Pd. (RPL)'],
             ['nama' => 'PT Jatis Mobile', 'bidang' => 'Digital Messaging & Software', 'wilayah' => 'Jakarta', 'kuota' => 3, 'terisi' => 2, 'status' => 'aktif', 'jur' => [$rpl?->id], 'pem' => 'Ahmad Fauzi, S.Pd., M.Kom. (RPL)'],
             ['nama' => 'PT Walden Global Services (WGS)', 'bidang' => 'Software Enterprise Development', 'wilayah' => 'Depok', 'kuota' => 3, 'terisi' => 2, 'status' => 'aktif', 'jur' => [$rpl?->id], 'pem' => 'Siti Rahmawati, S.Kom. (RPL)'],
             ['nama' => 'PT Denso Indonesia', 'bidang' => 'Komponen Elektronik & Radiator', 'wilayah' => 'Bekasi', 'kuota' => 5, 'terisi' => 4, 'status' => 'aktif', 'jur' => [$tp?->id, $toi?->id], 'pem' => 'Drs. Bambang Wijaya, M.Pd. (TP)'],
@@ -162,8 +161,8 @@ class IndustriDisplaySeeder extends Seeder
             ['nama' => 'PT Bridgestone Tire Indonesia', 'bidang' => 'Pemesinan Mesin Cetak Ban', 'wilayah' => 'Karawang', 'kuota' => 4, 'terisi' => 3, 'status' => 'aktif', 'jur' => [$tp?->id], 'pem' => 'Ir. Joko Waskito (TP)'],
             ['nama' => 'PT Gajah Tunggal Tbk', 'bidang' => 'Teknik Pengelasan & Maintenance', 'wilayah' => 'Karawang', 'kuota' => 4, 'terisi' => 3, 'status' => 'aktif', 'jur' => [$tpl?->id], 'pem' => 'Suryadi, S.T. (TPL)'],
             ['nama' => 'PT Krakatau Posco', 'bidang' => 'Metalurgi & Pengelasan Busur Listrik', 'wilayah' => 'Bekasi', 'kuota' => 4, 'terisi' => 3, 'status' => 'aktif', 'jur' => [$tpl?->id], 'pem' => 'Suryadi, S.T. (TPL)'],
-            ['nama' => 'PT Bank Central Asia Tbk - Halo BCA Tech', 'bidang' => 'Infrastruktur Jaringan & Server', 'wilayah' => 'Bogor', 'kuota' => 3, 'terisi' => 2, 'status' => 'aktif', 'jur' => [$tkj?->id], 'pem' => 'Hendro Susanto, S.T. (TKJ)'],
-            ['nama' => 'PT NTT Indonesia Technology', 'bidang' => 'Cloud & Enterprise Network', 'wilayah' => 'Jakarta', 'kuota' => 3, 'terisi' => 2, 'status' => 'aktif', 'jur' => [$tkj?->id], 'pem' => 'Nurhayati, M.Pd. (TKJ)'],
+            ['nama' => 'PT Bank Central Asia Tbk - Halo BCA Tech', 'bidang' => 'Infrastruktur Jaringan & Server', 'wilayah' => 'Bogor', 'kuota' => 3, 'terisi' => 2, 'status' => 'aktif', 'jur' => [$rpl?->id], 'pem' => 'Hendro Susanto, S.T. (RPL)'],
+            ['nama' => 'PT NTT Indonesia Technology', 'bidang' => 'Cloud & Enterprise Network', 'wilayah' => 'Jakarta', 'kuota' => 3, 'terisi' => 2, 'status' => 'aktif', 'jur' => [$rpl?->id], 'pem' => 'Nurhayati, M.Pd. (RPL)'],
         ];
 
         $idx = 4;

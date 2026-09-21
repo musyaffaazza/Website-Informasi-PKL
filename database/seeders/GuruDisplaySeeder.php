@@ -16,7 +16,6 @@ class GuruDisplaySeeder extends Seeder
 
         // Get Jurusan IDs
         $rpl = Jurusan::where('kode', 'RPL')->first();
-        $tkj = Jurusan::where('kode', 'TKJ')->first();
         $toi = Jurusan::where('kode', 'TOI')->first();
         $tp  = Jurusan::where('kode', 'TP')->first();
         $ka  = Jurusan::where('kode', 'KA')->first();
@@ -103,32 +102,6 @@ class GuruDisplaySeeder extends Seeder
                 'jurusan_id' => $rpl ? $rpl->id : null,
             ],
             [
-                'nip' => '198207192008011010',
-                'nuptk' => '5642 7606 6120 0015',
-                'nama' => 'Hendro Susanto, S.T.',
-                'jenis_kelamin' => 'Laki-laki',
-                'pendidikan' => 'S1 Teknik Komputer',
-                'avatar_url' => null,
-                'roles_list' => ['Kaprog TKJ', 'Pembimbing PKL'],
-                'kelas_diampu' => 'Teknik Komputer & Jaringan',
-                'keterangan_diampu' => 'XII TKJ 1, 2, 3 • Supervisi 18 Mitra',
-                'status_akun' => 'aktif',
-                'jurusan_id' => $tkj ? $tkj->id : null,
-            ],
-            [
-                'nip' => '198606112010012018',
-                'nuptk' => '7458 7646 6530 0022',
-                'nama' => 'Nurhayati, M.Pd.',
-                'jenis_kelamin' => 'Perempuan',
-                'pendidikan' => 'S2 Pendidikan Bahasa',
-                'avatar_url' => null,
-                'roles_list' => ['Wali Kelas XII TKJ 1'],
-                'kelas_diampu' => 'XII TKJ 1 (Wali Kelas)',
-                'keterangan_diampu' => '36 Siswa Binaan',
-                'status_akun' => 'belum_aktivasi',
-                'jurusan_id' => $tkj ? $tkj->id : null,
-            ],
-            [
                 'nip' => '199109032019031008',
                 'nuptk' => '9042 7696 7020 0008',
                 'nama' => 'Budi Santoso, S.Pd.',
@@ -196,7 +169,7 @@ class GuruDisplaySeeder extends Seeder
             ]);
         }
 
-        // Remaining Kaprogs (Total 6 Kaprogs: RPL, TKJ, TOI, TP, KA, TPL)
+        // Remaining Kaprogs (Total 5 Kaprogs: RPL, TOI, TP, KA, TPL)
         $otherKaprogs = [
             [
                 'nip' => '197011051998022001',
@@ -289,15 +262,15 @@ class GuruDisplaySeeder extends Seeder
         // We need:
         // - Total Pembimbing PKL: 34 (We currently have 11 with Pembimbing PKL. Need 23 more)
         // - Total Wali Kelas (Tingkat XII): 18 (We currently have 5 with Wali Kelas XII. Need 13 more)
-        // - Total Kaprog: 6 (We already have 6: RPL, TKJ, TOI, TP, KA, TPL)
+        // - Total Kaprog: 5 (We already have 5: RPL, TOI, TP, KA, TPL)
 
         $firstNamesM = ['Agus', 'Bambang', 'Cahyono', 'Denny', 'Eko', 'Ferry', 'Gunawan', 'Hendra', 'Iwan', 'Junaedi', 'Kurniawan', 'Lukman', 'Maulana', 'Nugroho', 'Oki', 'Panji', 'Raden', 'Samsul', 'Tri', 'Untung', 'Wahyu', 'Yanto', 'Zaenal', 'Arief', 'Bagus', 'Dharma'];
         $firstNamesF = ['Anisa', 'Citra', 'Dian', 'Endang', 'Fitri', 'Gita', 'Hani', 'Intan', 'Juita', 'Kartika', 'Lia', 'Mega', 'Nita', 'Putri', 'Ratna', 'Sari', 'Tari', 'Utari', 'Vina', 'Wulan', 'Yulia', 'Zulfa', 'Desi', 'Eka', 'Febri', 'Grace'];
         $lastNames = ['Pratama', 'Hidayat', 'Kusuma', 'Saputra', 'Wibowo', 'Nugraha', 'Setiawan', 'Wijaya', 'Siregar', 'Lestari', 'Utami', 'Purnomo', 'Syahputra', 'Santoso', 'Ramadhan', 'Firmansyah', 'Budiman', 'Hakim', 'Nasution', 'Kurnia', 'Suryadi', 'Handayani'];
         $degrees = ['S.Pd.', 'S.Kom.', 'S.T.', 'M.Pd.', 'M.Kom.', 'S.Si.', 'M.T.'];
 
-        $jurusanIds = [$rpl?->id, $tkj?->id, $toi?->id, $tp?->id, $ka?->id, $tpl?->id];
-        $jurusanNames = ['Rekayasa Perangkat Lunak', 'Teknik Komputer & Jaringan', 'Teknik Otomasi Industri', 'Teknik Pemesinan', 'Kimia Analisis', 'Teknik Pengelasan & Fabrikasi'];
+        $jurusanIds = [$rpl?->id, $toi?->id, $tp?->id, $ka?->id, $tpl?->id];
+        $jurusanNames = ['Rekayasa Perangkat Lunak', 'Teknik Otomasi Industri', 'Teknik Pemesinan', 'Kimia Analisis', 'Teknik Pengelasan & Fabrikasi'];
 
         $pembimbingTarget = 34;
         $waliKelasTarget = 18;
@@ -329,7 +302,7 @@ class GuruDisplaySeeder extends Seeder
             if ($savedCount <= 27) {
                 // Add Wali Kelas XII to reach 18
                 $rombelNum = ($savedCount % 3) + 1;
-                $jurShort = ['RPL', 'TKJ', 'TOI', 'TP', 'KA', 'TPL'][$jIdx];
+                $jurShort = ['RPL', 'TOI', 'TP', 'KA', 'TPL'][$jIdx];
                 $roles[] = 'Wali Kelas XII ' . $jurShort . ' ' . $rombelNum;
                 $kelasDiampu = 'XII ' . $jurShort . ' ' . $rombelNum . ' (Wali Kelas)';
                 $ketDiampu = '35 Siswa Binaan';
@@ -343,7 +316,7 @@ class GuruDisplaySeeder extends Seeder
                     $ketDiampu = 'Supervisi ' . rand(10, 20) . ' Siswa DUDI Mitra';
                 }
             } elseif ($savedCount <= 50) {
-                $roles[] = 'Guru Kejuruan ' . ['RPL', 'TKJ', 'TOI', 'TP', 'KA', 'TPL'][$jIdx];
+                $roles[] = 'Guru Kejuruan ' . ['RPL', 'TOI', 'TP', 'KA', 'TPL'][$jIdx];
                 $kelasDiampu = $currentJName;
                 $ketDiampu = 'Pengampu Mata Pelajaran Produktif';
             } elseif ($savedCount <= 70) {

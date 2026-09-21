@@ -106,8 +106,9 @@
                     </a>
 
                     <!-- Mapping Pembimbing -->
-                    <a href="#" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100/80 font-medium text-xs transition">
-                        <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <a href="{{ route('admin.mapping-pembimbing.index') }}" 
+                       class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition {{ request()->routeIs('admin.mapping-pembimbing.*') ? 'bg-[#0f2942] text-white shadow-xs' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/80' }}">
+                        <svg class="w-4 h-4 {{ request()->routeIs('admin.mapping-pembimbing.*') ? 'text-white' : 'text-slate-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
                         </svg>
                         <span>Mapping Pembimbing</span>
@@ -163,6 +164,8 @@
                     $searchAction = route('admin.jurusan.index');
                     if (request()->routeIs('admin.industri.*')) {
                         $searchAction = route('admin.industri.index');
+                    } elseif (request()->routeIs('admin.mapping-pembimbing.*')) {
+                        $searchAction = route('admin.mapping-pembimbing.index');
                     } elseif (request()->routeIs('admin.siswa.*')) {
                         $searchAction = route('admin.siswa.index');
                     } elseif (request()->routeIs('admin.guru.*')) {
@@ -186,7 +189,7 @@
                     <input type="text" 
                            name="search"
                            value="{{ request('search') }}"
-                           placeholder="@yield('header_search_placeholder', 'Cari rombel, wali kelas, atau ruang...')" 
+                           placeholder="@yield('header_search_placeholder', 'Cari siswa, NIS, atau pembimbing...')" 
                            class="w-full pl-10 pr-4 py-2 bg-slate-50/80 border border-slate-200 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition">
                 </form>
             </div>
@@ -266,7 +269,7 @@
     <div x-show="sidebarOpen" 
          @click="sidebarOpen = false"
          x-cloak
-         class="fixed inset-0 bg-slate-900/40 z-20 lg:hidden backdrop-blur-xs"></div>
+         class="fixed inset-0 bg-slate-900/60 z-20 lg:hidden"></div>
 
     @stack('scripts')
 </body>

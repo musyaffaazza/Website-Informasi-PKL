@@ -12,6 +12,10 @@ Route::get('/', function () {
 });
 
 Route::prefix('admin')->name('admin.')->group(function () {
+    Route::get('/', function () {
+        return redirect()->route('admin.jurusan.index');
+    });
+
     // Jurusan Routes
     Route::get('/jurusan', [JurusanController::class, 'index'])->name('jurusan.index');
     Route::post('/jurusan', [JurusanController::class, 'store'])->name('jurusan.store');
@@ -59,6 +63,13 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::delete('/industri/{id}', [IndustriController::class, 'destroy'])->name('industri.destroy');
     Route::post('/industri/{id}/update-kuota', [IndustriController::class, 'updateKuota'])->name('industri.updateKuota');
     Route::get('/industri-export', [IndustriController::class, 'export'])->name('industri.export');
+    
+    // Mapping Pembimbing Routes
+    Route::get('/mapping-pembimbing', [\App\Http\Controllers\Admin\MappingPembimbingController::class, 'index'])->name('mapping-pembimbing.index');
+    Route::post('/mapping-pembimbing', [\App\Http\Controllers\Admin\MappingPembimbingController::class, 'store'])->name('mapping-pembimbing.store');
+    Route::put('/mapping-pembimbing/{id}', [\App\Http\Controllers\Admin\MappingPembimbingController::class, 'update'])->name('mapping-pembimbing.update');
+    Route::delete('/mapping-pembimbing/{id}', [\App\Http\Controllers\Admin\MappingPembimbingController::class, 'destroy'])->name('mapping-pembimbing.destroy');
+    Route::get('/mapping-pembimbing-export', [\App\Http\Controllers\Admin\MappingPembimbingController::class, 'export'])->name('mapping-pembimbing.export');
     
     // Global Dapodik Sync Route
     Route::post('/dapodik/sync', function () {

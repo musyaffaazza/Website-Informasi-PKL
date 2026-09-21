@@ -45,7 +45,13 @@ class JurusanController extends Controller
             }
         }
 
-        $allJurusans = (clone $query)->orderByRaw("FIELD(kode, 'RPL', 'TOI', 'TP', 'KA', 'TPL'), id")->get();
+        $allJurusans = (clone $query)->orderByRaw("CASE kode 
+            WHEN 'RPL' THEN 1 
+            WHEN 'TOI' THEN 2 
+            WHEN 'TP' THEN 3 
+            WHEN 'KA' THEN 4 
+            WHEN 'TPL' THEN 5 
+            ELSE 6 END, id")->get();
         $jurusans = $allJurusans;
 
         // KPI stats

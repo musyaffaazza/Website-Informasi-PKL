@@ -68,7 +68,7 @@ class RombelController extends Controller
             $perPage = 10;
         }
 
-        $rombels = (clone $query)->orderByRaw("FIELD(tingkat, 'XII', 'XI', 'X'), id ASC")->paginate($perPage)->withQueryString();
+        $rombels = (clone $query)->orderByRaw("CASE tingkat WHEN 'XII' THEN 1 WHEN 'XI' THEN 2 WHEN 'X' THEN 3 ELSE 4 END, id ASC")->paginate($perPage)->withQueryString();
 
         // Summary KPI Stats (always calculated across the whole school)
         $totalRombelAktif = Rombel::where('status', 'aktif')->count();
@@ -211,7 +211,7 @@ class RombelController extends Controller
             }
         }
 
-        $rombels = $query->orderByRaw("FIELD(tingkat, 'XII', 'XI', 'X'), id ASC")->get();
+        $rombels = $query->orderByRaw("CASE tingkat WHEN 'XII' THEN 1 WHEN 'XI' THEN 2 WHEN 'X' THEN 3 ELSE 4 END, id ASC")->get();
 
         $headers = [
             'Content-Type' => 'text/csv',

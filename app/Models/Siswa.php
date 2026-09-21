@@ -43,6 +43,16 @@ class Siswa extends Model
         return $this->belongsTo(Jurusan::class, 'jurusan_id');
     }
 
+    public function pengajuanPkl()
+    {
+        return $this->hasOne(PengajuanPkl::class, 'siswa_id');
+    }
+
+    public function penugasanPembimbing()
+    {
+        return $this->hasOne(PembimbingPenugasan::class, 'siswa_id');
+    }
+
     public function getInitialsAttribute()
     {
         $words = explode(' ', preg_replace('/[^a-zA-Z\s]/', '', $this->nama));

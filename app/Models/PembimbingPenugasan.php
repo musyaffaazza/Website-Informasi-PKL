@@ -17,6 +17,13 @@ class PembimbingPenugasan extends Model
         'tanggal_mulai',
     ];
 
+    protected function casts(): array
+    {
+        return [
+            'tanggal_mulai' => 'date',
+        ];
+    }
+
     public function siswa()
     {
         return $this->belongsTo(Siswa::class, 'siswa_id');

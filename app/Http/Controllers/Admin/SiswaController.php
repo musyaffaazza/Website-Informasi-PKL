@@ -99,7 +99,7 @@ class SiswaController extends Controller
         $persenAktivasi = $totalSiswa > 0 ? round(($akunAktif / $totalSiswa) * 100, 1) : 97.3;
 
         $jurusans = Jurusan::where('status', 'aktif')->orderBy('nama')->get();
-        $rombels = Rombel::where('status', 'aktif')->orderByRaw("FIELD(tingkat, 'XII', 'XI', 'X'), id ASC")->get();
+        $rombels = Rombel::where('status', 'aktif')->orderByRaw("CASE tingkat WHEN 'XII' THEN 1 WHEN 'XI' THEN 2 WHEN 'X' THEN 3 ELSE 4 END, id ASC")->get();
 
         return view('admin.siswa.index', compact(
             'siswas',
