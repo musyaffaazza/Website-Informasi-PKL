@@ -50,7 +50,7 @@ class GantiSiswaSeeder extends Seeder
 
         $siswaBaru = [
             [
-                'username'       => 'azza.musyaffa',
+                'username'       => 'aza.musyaffa',
                 'email'          => 'azza.musyaffa@smkn1gunungputri.sch.id',
                 'nis'            => '2026001',
                 'nisn'           => '0080000001',
