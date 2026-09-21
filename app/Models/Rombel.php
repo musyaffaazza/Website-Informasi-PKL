@@ -8,15 +8,29 @@ class Rombel extends Model
 {
     protected $table = 'rombel';
 
-    public $timestamps = false;
-
     protected $fillable = [
+        'kode_rombel',
         'nama_kode',
+        'nama_rombel',
+        'tingkat',
+        'ruang',
         'jurusan_id',
         'wali_kelas_guru_id',
+        'jumlah_siswa',
+        'siswa_terdata',
+        'status_pkl',
         'tahun_ajaran',
+        'semester',
         'status',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'jumlah_siswa' => 'integer',
+            'siswa_terdata' => 'integer',
+        ];
+    }
 
     public function jurusan()
     {
@@ -31,5 +45,15 @@ class Rombel extends Model
     public function siswas()
     {
         return $this->hasMany(Siswa::class, 'rombel_id');
+    }
+
+    public function getKodeAttribute()
+    {
+        return $this->kode_rombel ?: $this->nama_kode;
+    }
+
+    public function getNamaAttribute()
+    {
+        return $this->nama_rombel ?: $this->nama_kode;
     }
 }

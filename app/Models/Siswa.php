@@ -8,8 +8,6 @@ class Siswa extends Model
 {
     protected $table = 'siswa';
 
-    public $timestamps = false;
-
     protected $fillable = [
         'user_id',
         'nis',
@@ -17,15 +15,23 @@ class Siswa extends Model
         'nama',
         'rombel_id',
         'jurusan_id',
+        'kampus',
         'jenis_kelamin',
         'tanggal_lahir',
+        'kota',
         'no_hp',
         'email',
         'nama_ortu',
         'kontak_darurat',
         'foto_url',
         'status_akun',
+        'status_pkl',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
 
     public function rombel()
     {
@@ -35,5 +41,21 @@ class Siswa extends Model
     public function jurusan()
     {
         return $this->belongsTo(Jurusan::class, 'jurusan_id');
+    }
+
+    public function getInitialsAttribute()
+    {
+        $words = explode(' ', preg_replace('/[^a-zA-Z\s]/', '', $this->nama));
+        $initials = '';
+        $count = 0;
+        foreach ($words as $w) {
+            $w = trim($w);
+            if (!empty($w)) {
+                $initials .= strtoupper($w[0]);
+                $count++;
+                if ($count >= 2) break;
+            }
+        }
+        return $initials ?: strtoupper(substr($this->nama, 0, 2));
     }
 }
