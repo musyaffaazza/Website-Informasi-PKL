@@ -20,6 +20,7 @@ class AdminPagesTest extends TestCase
             '/admin/guru',
             '/admin/industri',
             '/admin/mapping-pembimbing',
+            '/admin/log-aktivitas',
         ];
 
         foreach ($routes as $route) {

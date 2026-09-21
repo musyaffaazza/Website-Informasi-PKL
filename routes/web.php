@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\JurusanController;
 use App\Http\Controllers\Admin\RombelController;
 use App\Http\Controllers\Admin\GuruController;
 use App\Http\Controllers\Admin\SiswaController;
+use App\Http\Controllers\Admin\LogAktivitasController;
 use App\Http\Controllers\Admin\IndustriController;
 use Illuminate\Support\Facades\Route;
 
@@ -71,6 +72,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::delete('/mapping-pembimbing/{id}', [\App\Http\Controllers\Admin\MappingPembimbingController::class, 'destroy'])->name('mapping-pembimbing.destroy');
     Route::get('/mapping-pembimbing-export', [\App\Http\Controllers\Admin\MappingPembimbingController::class, 'export'])->name('mapping-pembimbing.export');
     
+
+    // Log Aktivitas Routes
+    Route::get('/log-aktivitas', [LogAktivitasController::class, 'index'])->name('log-aktivitas.index');
+    Route::get('/log-aktivitas-export', [LogAktivitasController::class, 'export'])->name('log-aktivitas.export');
     // Global Dapodik Sync Route
     Route::post('/dapodik/sync', function () {
         return redirect()->back()->with('success', 'Sinkronisasi Dapodik Kemdikbudristek 2024 berhasil diperbarui secara realtime!');
