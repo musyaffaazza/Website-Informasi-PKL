@@ -1,7 +1,14 @@
 @extends('layouts.admin')
 
+@section('title', 'SIPRAK SMKN 1 GUNUNGPUTRI - Master Data Jurusan')
+
 @section('content')
 <div x-data="jurusanApp()" class="space-y-6">
+    <div class="text-[11px] font-semibold text-slate-400 flex items-center gap-1.5">
+        <span>Data Master</span>
+        <span class="text-slate-300">&gt;</span>
+        <span class="text-slate-600">Master Data Jurusan</span>
+    </div>
 
     <!-- Page Header & Action Buttons -->
     <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
@@ -47,12 +54,12 @@
                 <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
                 </svg>
-                <span>+ Tambah Jurusan</span>
+                <span>Tambah Jurusan</span>
             </button>
         </div>
     </div>
     <!-- 4 KPI Summary Cards -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <!-- Card 1: Total Program Keahlian -->
         <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-2xs flex flex-col justify-between">
             <div class="flex items-start justify-between">
@@ -147,7 +154,7 @@
 
     <!-- Search & Filter Bar -->
     <div class="bg-white rounded-2xl border border-slate-200/80 p-3 shadow-2xs flex flex-wrap items-center justify-between gap-4">
-        <div class="relative flex-1 min-w-[280px]">
+        <div class="relative flex-1 w-full sm:min-w-[280px]">
             <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -467,13 +474,14 @@
 
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 mb-1">Warna Badge</label>
-                                <select name="badge_color" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white">
-                                    <option value="blue">Biru (RPL)</option>
-                                    <option value="amber">Amber/Kuning (TOI)</option>
-                                    <option value="purple">Ungu (TP)</option>
-                                    <option value="emerald">Hijau Emerald (KA)</option>
-                                    <option value="orange">Oranye (TPL)</option>
-                                </select>
+                                <div class="flex items-center gap-2 flex-wrap mt-1">
+                                    @foreach(['blue'=>['bg-blue-500','Biru'],'emerald'=>['bg-emerald-500','Hijau'],'purple'=>['bg-purple-500','Ungu'],'amber'=>['bg-amber-500','Kuning'],'orange'=>['bg-orange-500','Oranye'],'rose'=>['bg-rose-500','Merah'],'indigo'=>['bg-indigo-500','Indigo'],'cyan'=>['bg-cyan-500','Cyan']] as $val=>$meta)
+                                    <label class="cursor-pointer" title="{{ $meta[1] }}">
+                                        <input type="radio" name="badge_color" value="{{ $val }}" class="sr-only peer" {{ $val === 'blue' ? 'checked' : '' }}>
+                                        <span class="block w-7 h-7 rounded-full {{ $meta[0] }} ring-2 ring-transparent ring-offset-2 peer-checked:ring-slate-900 transition-all"></span>
+                                    </label>
+                                    @endforeach
+                                </div>
                             </div>
 
                             <div>
@@ -702,13 +710,14 @@
 
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 mb-1">Warna Badge</label>
-                                <select name="badge_color" x-model="editForm.badge_color" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white">
-                                    <option value="blue">Biru (RPL)</option>
-                                    <option value="amber">Amber/Kuning (TOI)</option>
-                                    <option value="purple">Ungu (TP)</option>
-                                    <option value="emerald">Hijau Emerald (KA)</option>
-                                    <option value="orange">Oranye (TPL)</option>
-                                </select>
+                                <div class="flex items-center gap-2 flex-wrap mt-1">
+                                    @foreach(['blue'=>['bg-blue-500','Biru'],'emerald'=>['bg-emerald-500','Hijau'],'purple'=>['bg-purple-500','Ungu'],'amber'=>['bg-amber-500','Kuning'],'orange'=>['bg-orange-500','Oranye'],'rose'=>['bg-rose-500','Merah'],'indigo'=>['bg-indigo-500','Indigo'],'cyan'=>['bg-cyan-500','Cyan']] as $val=>$meta)
+                                    <label class="cursor-pointer" title="{{ $meta[1] }}">
+                                        <input type="radio" name="badge_color" value="{{ $val }}" x-model="editForm.badge_color" class="sr-only peer">
+                                        <span class="block w-7 h-7 rounded-full {{ $meta[0] }} ring-2 ring-transparent ring-offset-2 peer-checked:ring-slate-900 transition-all"></span>
+                                    </label>
+                                    @endforeach
+                                </div>
                             </div>
 
                             <div class="md:col-span-2">

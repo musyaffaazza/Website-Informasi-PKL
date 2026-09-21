@@ -122,13 +122,13 @@ class RombelController extends Controller
             'wali_kelas_guru_id' => 'nullable|exists:guru,id',
             'jumlah_siswa' => 'required|integer|min:1|max:50',
             'siswa_terdata' => 'nullable|integer|min:0|max:50',
-            'status_pkl' => 'required|string|max:50',
             'tahun_ajaran' => 'required|string|max:15',
             'semester' => 'required|string|max:30',
             'status' => 'required|in:aktif,nonaktif',
         ]);
 
         $validated['nama_kode'] = $validated['nama_rombel'];
+        $validated['status_pkl'] = 'Siap Terjun PKL';
         if (empty($validated['siswa_terdata'])) {
             $validated['siswa_terdata'] = $validated['jumlah_siswa'];
         }
@@ -152,13 +152,13 @@ class RombelController extends Controller
             'wali_kelas_guru_id' => 'nullable|exists:guru,id',
             'jumlah_siswa' => 'required|integer|min:1|max:50',
             'siswa_terdata' => 'nullable|integer|min:0|max:50',
-            'status_pkl' => 'required|string|max:50',
             'tahun_ajaran' => 'required|string|max:15',
             'semester' => 'required|string|max:30',
             'status' => 'required|in:aktif,nonaktif',
         ]);
 
         $validated['nama_kode'] = $validated['nama_rombel'];
+        $validated['status_pkl'] = 'Siap Terjun PKL';
         if (empty($validated['siswa_terdata'])) {
             $validated['siswa_terdata'] = $validated['jumlah_siswa'];
         }

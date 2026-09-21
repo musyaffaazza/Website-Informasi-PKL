@@ -116,7 +116,6 @@ class SiswaController extends Controller
             'nama' => 'required|string|max:100',
             'rombel_id' => 'required|exists:rombel,id',
             'jurusan_id' => 'nullable|exists:jurusan,id',
-            'kampus' => 'required|string|max:50',
             'jenis_kelamin' => 'required|in:L,P',
             'kota' => 'nullable|string|max:100',
             'no_hp' => 'nullable|string|max:25',
@@ -125,8 +124,8 @@ class SiswaController extends Controller
             'status_pkl' => 'required|string|max:50',
         ]);
 
-        $rombel = Rombel::find($validated['rombel_id']);
-        $jurusanId = $validated['jurusan_id'] ?: ($rombel ? $rombel->jurusan_id : 1);
+        $rombel = Rombel::findOrFail($validated['rombel_id']);
+        $jurusanId = $rombel->jurusan_id;
 
         $username = 'siswa_' . $validated['nis'];
         $email = $validated['email'] ?: (strtolower(str_replace(' ', '.', $validated['nama'])) . '@smkn1gunungputri.sch.id');
@@ -146,7 +145,6 @@ class SiswaController extends Controller
             'nama' => $validated['nama'],
             'rombel_id' => $validated['rombel_id'],
             'jurusan_id' => $jurusanId,
-            'kampus' => $validated['kampus'],
             'jenis_kelamin' => $validated['jenis_kelamin'],
             'kota' => $validated['kota'] ?: 'Bogor',
             'no_hp' => $validated['no_hp'] ?: null,
@@ -169,7 +167,6 @@ class SiswaController extends Controller
             'nama' => 'required|string|max:100',
             'rombel_id' => 'required|exists:rombel,id',
             'jurusan_id' => 'nullable|exists:jurusan,id',
-            'kampus' => 'required|string|max:50',
             'jenis_kelamin' => 'required|in:L,P',
             'kota' => 'nullable|string|max:100',
             'no_hp' => 'nullable|string|max:25',
@@ -178,8 +175,8 @@ class SiswaController extends Controller
             'status_pkl' => 'required|string|max:50',
         ]);
 
-        $rombel = Rombel::find($validated['rombel_id']);
-        $jurusanId = $validated['jurusan_id'] ?: ($rombel ? $rombel->jurusan_id : $siswa->jurusan_id);
+        $rombel = Rombel::findOrFail($validated['rombel_id']);
+        $jurusanId = $rombel->jurusan_id;
 
         $siswa->update([
             'nis' => $validated['nis'],
@@ -187,7 +184,6 @@ class SiswaController extends Controller
             'nama' => $validated['nama'],
             'rombel_id' => $validated['rombel_id'],
             'jurusan_id' => $jurusanId,
-            'kampus' => $validated['kampus'],
             'jenis_kelamin' => $validated['jenis_kelamin'],
             'kota' => $validated['kota'] ?: $siswa->kota,
             'no_hp' => $validated['no_hp'] ?: $siswa->no_hp,

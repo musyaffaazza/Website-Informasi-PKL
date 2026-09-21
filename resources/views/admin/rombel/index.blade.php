@@ -95,12 +95,13 @@
 
     <!-- Filter & Action Controls Bar -->
     <div class="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-2xs">
-        <form action="{{ route('admin.rombel.index') }}" method="GET" id="filterForm" class="flex flex-col xl:flex-row xl:items-center justify-between gap-4">
+        <div class="flex flex-col 2xl:flex-row 2xl:items-center justify-between gap-4">
+        <form action="{{ route('admin.rombel.index') }}" method="GET" id="filterForm" class="flex-1 min-w-0">
             
             <!-- Left Filters: Search + Tingkat + Jurusan -->
             <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 flex-1">
                 <!-- Search Input -->
-                <div class="relative min-w-[260px] sm:w-80">
+                <div class="relative w-full sm:min-w-[260px] sm:w-80">
                     <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
@@ -114,7 +115,7 @@
                 </div>
 
                 <!-- Tingkat Dropdown -->
-                <div class="relative min-w-[170px]">
+                <div class="relative w-full sm:min-w-[170px] sm:flex-1">
                     <select name="tingkat" 
                             onchange="document.getElementById('filterForm').submit()"
                             class="w-full px-3.5 py-2.5 bg-slate-50/80 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition appearance-none cursor-pointer">
@@ -128,7 +129,7 @@
                 </div>
 
                 <!-- Program Keahlian / Jurusan Dropdown -->
-                <div class="relative min-w-[220px]">
+                <div class="relative w-full sm:min-w-[220px] sm:flex-1">
                     <select name="jurusan_id" 
                             onchange="document.getElementById('filterForm').submit()"
                             class="w-full px-3.5 py-2.5 bg-slate-50/80 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition appearance-none cursor-pointer">
@@ -147,44 +148,45 @@
                 </div>
 
                 @if(request('search') || request('tingkat') != 'XII' || (request('jurusan_id') && request('jurusan_id') != 'all'))
-                    <a href="{{ route('admin.rombel.index') }}" class="text-xs text-rose-600 hover:text-rose-700 font-semibold px-2 py-2">
+                    <a href="{{ route('admin.rombel.index') }}" class="text-xs text-rose-600 hover:text-rose-700 font-semibold px-2 py-2 shrink-0">
                         Reset
                     </a>
                 @endif
             </div>
-
-            <!-- Right Action Buttons -->
-            <div class="flex flex-wrap items-center gap-2.5 shrink-0">
-                <!-- Tambah Rombel Button -->
-                <button type="button" 
-                        @click="openCreateModal()"
-                        class="flex items-center gap-2 px-4 py-2.5 bg-[#0f2942] hover:bg-[#1a385c] text-white rounded-xl text-xs font-bold shadow-xs transition active:scale-98">
-                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
-                    </svg>
-                    <span>+ Tambah Rombel</span>
-                </button>
-
-                <!-- Sinkronisasi Dapodik Button -->
-                <button type="button" 
-                        @click="syncDapodik()"
-                        class="flex items-center gap-2 px-4 py-2.5 bg-[#059669] hover:bg-[#047857] text-white rounded-xl text-xs font-bold shadow-xs transition active:scale-98">
-                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-                    </svg>
-                    <span>Sinkronisasi Dapodik</span>
-                </button>
-
-                <!-- Ekspor Excel Button -->
-                <a href="{{ route('admin.rombel.export', request()->query()) }}" 
-                   class="flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-xl text-xs font-semibold shadow-2xs transition active:scale-98">
-                    <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                    </svg>
-                    <span>Ekspor Excel</span>
-                </a>
-            </div>
         </form>
+
+        <!-- Right Action Buttons -->
+        <div class="flex flex-wrap items-center gap-2.5 shrink-0 justify-start sm:justify-end">
+            <!-- Tambah Rombel Button -->
+            <button type="button" 
+                    @click="openCreateModal()"
+                    class="flex items-center gap-2 px-4 py-2.5 bg-[#0f2942] hover:bg-[#1a385c] text-white rounded-xl text-xs font-bold shadow-xs transition active:scale-98 shrink-0">
+                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
+                </svg>
+                <span>Tambah Rombel</span>
+            </button>
+
+            <!-- Sinkronisasi Dapodik Button -->
+            <button type="button" 
+                    @click="syncDapodik()"
+                    class="flex items-center gap-2 px-4 py-2.5 bg-[#059669] hover:bg-[#047857] text-white rounded-xl text-xs font-bold shadow-xs transition active:scale-98 shrink-0">
+                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                </svg>
+                <span>Sinkronisasi Dapodik</span>
+            </button>
+
+            <!-- Ekspor Excel Button -->
+            <a href="{{ route('admin.rombel.export', request()->query()) }}" 
+               class="flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-xl text-xs font-semibold shadow-2xs transition active:scale-98 shrink-0">
+                <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+                <span>Ekspor Excel</span>
+            </a>
+        </div>
+        </div>
     </div>
 
     <!-- Main Table Card -->
@@ -524,15 +526,6 @@
                                        value="36" 
                                        min="0" max="50"
                                        class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
-                            </div>
-
-                            <div>
-                                <label class="block text-xs font-bold text-slate-700 mb-1">Status PKL <span class="text-rose-500">*</span></label>
-                                <select name="status_pkl" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
-                                    <option value="Siap Terjun PKL">Siap Terjun PKL</option>
-                                    <option value="Sedang PKL">Sedang PKL</option>
-                                    <option value="Selesai PKL">Selesai PKL</option>
-                                </select>
                             </div>
 
                             <div>

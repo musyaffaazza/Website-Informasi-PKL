@@ -72,7 +72,7 @@
                     <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
                     </svg>
-                    <span>+ Tambah Siswa</span>
+                    <span>Tambah Siswa</span>
                 </button>
             </div>
         </div>
@@ -179,7 +179,7 @@
             <!-- Left Filters -->
             <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 flex-1 flex-wrap">
                 <!-- Search Input -->
-                <div class="relative min-w-[240px] sm:w-72">
+                <div class="relative w-full sm:min-w-[240px] sm:w-72">
                     <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
@@ -193,7 +193,7 @@
                 </div>
 
                 <!-- Dropdown 1: Semua Tingkat/Kelas -->
-                <div class="relative min-w-[160px]">
+                <div class="relative w-full sm:min-w-[160px] sm:flex-1">
                     <select name="tingkat" 
                             onchange="document.getElementById('filterForm').submit()"
                             class="w-full px-3.5 py-2.5 bg-slate-50/80 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition appearance-none cursor-pointer">
@@ -210,7 +210,7 @@
                 </div>
 
                 <!-- Dropdown 2: Semua Jurusan -->
-                <div class="relative min-w-[150px]">
+                <div class="relative w-full sm:min-w-[150px] sm:flex-1">
                     <select name="jurusan_id" 
                             onchange="document.getElementById('filterForm').submit()"
                             class="w-full px-3.5 py-2.5 bg-slate-50/80 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition appearance-none cursor-pointer">
@@ -229,7 +229,7 @@
                 </div>
 
                 <!-- Dropdown 3: Semua Status Akun -->
-                <div class="relative min-w-[140px]">
+                <div class="relative w-full sm:min-w-[140px] sm:flex-1">
                     <select name="status_akun" 
                             onchange="document.getElementById('filterForm').submit()"
                             class="w-full px-3.5 py-2.5 bg-slate-50/80 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition appearance-none cursor-pointer">
@@ -246,7 +246,7 @@
                 </div>
 
                 <!-- Dropdown 4: Semua Status PKL -->
-                <div class="relative min-w-[145px]">
+                <div class="relative w-full sm:min-w-[145px] sm:flex-1">
                     <select name="status_pkl" 
                             onchange="document.getElementById('filterForm').submit()"
                             class="w-full px-3.5 py-2.5 bg-slate-50/80 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition appearance-none cursor-pointer">
@@ -639,14 +639,6 @@
                             </div>
 
                             <div>
-                                <label class="block text-xs font-bold text-slate-700 mb-1">Kampus</label>
-                                <select name="kampus" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
-                                    <option value="Kampus Pusat">Kampus Pusat</option>
-                                    <option value="Kampus 2">Kampus 2</option>
-                                </select>
-                            </div>
-
-                            <div>
                                 <label class="block text-xs font-bold text-slate-700 mb-1">Nomor Handphone / WhatsApp</label>
                                 <input type="text" name="no_hp" placeholder="+62 812-xxxx-xxxx" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
                             </div>
@@ -759,14 +751,6 @@
                                     @foreach($rombels as $r)
                                         <option value="{{ $r->id }}">{{ $r->nama_rombel }} ({{ $r->tingkat }})</option>
                                     @endforeach
-                                </select>
-                            </div>
-
-                            <div>
-                                <label class="block text-xs font-bold text-slate-700 mb-1">Kampus</label>
-                                <select name="kampus" x-model="editData.kampus" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
-                                    <option value="Kampus Pusat">Kampus Pusat</option>
-                                    <option value="Kampus 2">Kampus 2</option>
                                 </select>
                             </div>
 

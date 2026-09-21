@@ -24,14 +24,26 @@
             color: #0f172a;
         }
         [x-cloak] { display: none !important; }
+        html { background-color: #f8fafc; }
+        body { overflow-x: hidden; }
+        @media (min-width: 1024px) {
+            .admin-main { margin-left: 16rem; }
+        }
+        .admin-main main > div { max-width: 1600px; margin-inline: auto; }
+        .admin-main main table th { white-space: nowrap; }
+        .admin-main main table td { vertical-align: middle; }
+        .admin-main main .shadow-2xs { box-shadow: 0 1px 2px rgba(15, 41, 66, .04), 0 8px 24px rgba(15, 41, 66, .03); }
+        @media (max-width: 1023px) {
+            .admin-main { margin-left: 0; }
+        }
     </style>
 </head>
-<body class="bg-[#f8fafc] text-slate-900 antialiased min-h-screen flex" x-data="{ sidebarOpen: false }">
+<body class="bg-[#f8fafc] text-slate-900 antialiased min-h-screen" x-data="{ sidebarOpen: false }">
 
     <!-- Sidebar -->
-    <aside class="w-64 bg-white border-r border-slate-200 shrink-0 flex flex-col justify-between min-h-screen fixed lg:static z-30 transition-transform duration-200"
-           :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'">
-        <div>
+    <aside class="fixed inset-y-0 left-0 z-30 flex w-64 flex-col bg-white border-r border-slate-200 transition-transform duration-200 lg:translate-x-0"
+           :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'">
+        <div class="min-h-0 flex-1 overflow-y-auto">
             <!-- School Brand Header -->
             <div class="p-5 flex items-center gap-3 border-b border-slate-100">
                 <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 bg-white border border-slate-200 shadow-xs">
@@ -149,12 +161,12 @@
     </aside>
 
     <!-- Main Container -->
-    <div class="flex-1 flex flex-col min-w-0">
+    <div class="admin-main min-h-screen flex flex-col min-w-0 transition-all duration-200">
         <!-- Top Navbar -->
-        <header class="h-16 bg-white border-b border-slate-200 px-6 flex items-center justify-between sticky top-0 z-20">
+        <header class="h-16 min-w-0 bg-white border-b border-slate-200 px-4 sm:px-6 flex items-center justify-between sticky top-0 z-20 shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
             <!-- Mobile Toggle + Global Search -->
-            <div class="flex items-center gap-4 flex-1">
-                <button @click="sidebarOpen = !sidebarOpen" class="lg:hidden p-2 rounded-lg text-slate-500 hover:bg-slate-100">
+            <div class="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
+                <button @click="sidebarOpen = !sidebarOpen" class="lg:hidden p-2 rounded-lg text-slate-500 hover:bg-slate-100 shrink-0">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
                     </svg>
@@ -175,7 +187,7 @@
                         $searchAction = route('admin.rombel.index');
                     }
                 @endphp
-                <form action="{{ $searchAction }}" method="GET" class="relative w-full max-w-md">
+                <form action="{{ $searchAction }}" method="GET" class="relative w-full max-w-md min-w-0">
                     @if(request('tingkat') && request()->routeIs('admin.rombel.*'))
                         <input type="hidden" name="tingkat" value="{{ request('tingkat') }}">
                     @endif
@@ -196,9 +208,9 @@
             </div>
 
             <!-- Right Actions -->
-            <div class="flex items-center gap-4">
+            <div class="flex items-center gap-3 sm:gap-4 shrink-0">
                 <!-- Tarik Data Rombel Dapodik Button -->
-                <form action="{{ route('admin.rombel.syncDapodik') }}" method="POST" class="inline">
+                <form action="{{ route('admin.rombel.syncDapodik') }}" method="POST" class="hidden xl:inline">
                     @csrf
                     <button type="submit" 
                             class="flex items-center gap-2 px-3.5 py-2 bg-[#f0f9ff] hover:bg-[#e0f2fe] text-[#0284c7] border border-sky-200/80 rounded-xl text-xs font-semibold shadow-2xs transition active:scale-98">
@@ -209,11 +221,11 @@
                     </button>
                 </form>
 
-                <div class="h-6 w-px bg-slate-200"></div>
+                <div class="hidden xl:block h-6 w-px bg-slate-200"></div>
 
                 <!-- User Profile Info -->
-                <div class="flex items-center gap-3">
-                    <div class="w-9 h-9 rounded-full bg-slate-100 text-slate-700 border border-slate-200 font-bold text-xs flex items-center justify-center shadow-xs">
+                <div class="flex items-center gap-2.5 sm:gap-3">
+                    <div class="w-9 h-9 rounded-full bg-slate-100 text-slate-700 border border-slate-200 font-bold text-xs flex items-center justify-center shadow-xs shrink-0">
                         ES
                     </div>
                     <div class="hidden sm:block text-left">

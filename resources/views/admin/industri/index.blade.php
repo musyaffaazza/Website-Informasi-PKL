@@ -50,7 +50,7 @@
                     <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
                     </svg>
-                    <span>+ Tambah Mitra Industri</span>
+                    <span>Tambah Mitra Industri</span>
                 </button>
             </div>
         </div>
@@ -188,7 +188,7 @@
             <!-- Left Filters -->
             <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 flex-1 flex-wrap">
                 <!-- Search Input -->
-                <div class="relative min-w-[260px] sm:w-80">
+                <div class="relative w-full sm:min-w-[260px] sm:w-80">
                     <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
@@ -202,7 +202,7 @@
                 </div>
 
                 <!-- Jurusan Filter -->
-                <div class="min-w-[170px]">
+                <div class="w-full sm:min-w-[170px] sm:flex-1">
                     <select name="jurusan_id" 
                             onchange="this.form.submit()"
                             class="w-full bg-white border border-slate-200 text-slate-700 text-xs rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition font-medium">
@@ -216,7 +216,7 @@
                 </div>
 
                 <!-- Wilayah Filter -->
-                <div class="min-w-[140px]">
+                <div class="w-full sm:min-w-[140px] sm:flex-1">
                     <select name="wilayah" 
                             onchange="this.form.submit()"
                             class="w-full bg-white border border-slate-200 text-slate-700 text-xs rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition font-medium">
@@ -230,7 +230,7 @@
                 </div>
 
                 <!-- Sort Filter -->
-                <div class="min-w-[150px]">
+                <div class="w-full sm:min-w-[150px] sm:flex-1">
                     <select name="sort" 
                             onchange="this.form.submit()"
                             class="w-full bg-white border border-slate-200 text-slate-700 text-xs rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition font-medium">
@@ -516,7 +516,7 @@
                     Reset Filter
                 </a>
                 <button type="button" @click="openCreateModal()" class="px-4 py-2 bg-[#0f2942] hover:bg-[#1a385c] text-white text-xs font-bold rounded-xl shadow-xs transition">
-                    + Tambah Mitra Baru
+                    Tambah Mitra Baru
                 </button>
             </div>
         </div>

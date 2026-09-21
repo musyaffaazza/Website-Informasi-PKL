@@ -25,7 +25,7 @@
             </div>
 
             <!-- Top Right Action Button -->
-            <div class="flex items-center gap-2.5 shrink-0">
+            <div class="flex flex-wrap items-center gap-2.5 shrink-0">
                 <a href="{{ route('admin.mapping-pembimbing.export', request()->query()) }}" 
                    class="flex items-center gap-2 px-3.5 py-2.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-xl text-xs font-semibold shadow-2xs transition active:scale-98">
                     <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -40,7 +40,7 @@
                     <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
                     </svg>
-                    <span>+ Tambah Mapping</span>
+                    <span>Tambah Mapping</span>
                 </button>
             </div>
         </div>
@@ -177,7 +177,7 @@
             </div>
 
             <!-- Filter Buttons Row -->
-            <div class="mt-3.5 pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
+            <div class="mt-3.5 pt-3 border-t border-slate-100 flex flex-wrap items-center justify-end gap-2">
                 <a href="{{ route('admin.mapping-pembimbing.index') }}" 
                    class="px-4 py-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 text-xs font-semibold rounded-xl transition shadow-2xs">
                     Reset
@@ -210,7 +210,7 @@
 
         <!-- Responsive Table -->
         <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs">
+            <table class="min-w-[1050px] w-full text-left text-xs">
                 <thead class="bg-slate-50/70 border-b border-slate-200 text-slate-400 font-bold uppercase text-[10px] tracking-wider">
                     <tr>
                         <th class="py-3.5 px-4 text-slate-400 w-12">NO</th>
@@ -426,7 +426,7 @@
                 <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
                 </svg>
-                <span>+ Tambah Mapping</span>
+                <span>Tambah Mapping</span>
             </button>
         </div>
     </div>
