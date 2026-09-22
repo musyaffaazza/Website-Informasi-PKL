@@ -204,23 +204,16 @@
         @foreach($jurusans as $jurusan)
         @php
             $kode = strtoupper($jurusan->kode);
-            $badgeBg = match($kode) {
-                'RPL' => 'bg-[#2563eb]',
-                'TOI' => 'bg-[#d97706]',
-                'TP'  => 'bg-[#4f46e5]',
-                'KA'  => 'bg-[#059669]',
-                'TPL' => 'bg-[#ea580c]',
-                default => 'bg-[#0f2942]'
+            $badgeBg = match($jurusan->badge_color) {
+                'green' => 'bg-emerald-500',
+                'red' => 'bg-red-500',
+                'gray' => 'bg-slate-500',
+                'blue' => 'bg-blue-500',
+                'white' => 'bg-white border border-slate-300',
+                default => 'bg-blue-500'
             };
 
-            $barColor = match($kode) {
-                'RPL' => 'bg-[#2563eb]',
-                'TOI' => 'bg-[#d97706]',
-                'TP'  => 'bg-[#4f46e5]',
-                'KA'  => 'bg-[#059669]',
-                'TPL' => 'bg-[#ea580c]',
-                default => 'bg-blue-600'
-            };
+            $barColor = $badgeBg;
 
             $totalRombel = $jurusan->rombels->count();
             $kapasitasSiswa = match($kode) {
@@ -257,7 +250,7 @@
                 <!-- Card Header -->
                 <div class="flex items-start justify-between gap-3 mb-4">
                     <div class="flex items-start gap-3">
-                        <div class="w-11 h-11 rounded-xl {{ $badgeBg }} text-white font-black text-sm tracking-wider flex items-center justify-center shrink-0 shadow-2xs">
+                        <div class="w-11 h-11 rounded-xl {{ $badgeBg }} {{ $jurusan->badge_color === 'white' ? 'text-slate-900' : 'text-white' }} font-black text-sm tracking-wider flex items-center justify-center shrink-0 shadow-2xs">
                             {{ $jurusan->kode }}
                         </div>
 
@@ -472,13 +465,15 @@
                                 <input type="number" name="kuota_terisi" value="0" min="0" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
                             </div>
 
-                            <div>
-                                <label class="block text-xs font-bold text-slate-700 mb-1">Warna Badge</label>
-                                <div class="flex items-center gap-2 flex-wrap mt-1">
-                                    @foreach(['blue'=>['bg-blue-500','Biru'],'emerald'=>['bg-emerald-500','Hijau'],'purple'=>['bg-purple-500','Ungu'],'amber'=>['bg-amber-500','Kuning'],'orange'=>['bg-orange-500','Oranye'],'rose'=>['bg-rose-500','Merah'],'indigo'=>['bg-indigo-500','Indigo'],'cyan'=>['bg-cyan-500','Cyan']] as $val=>$meta)
+                            <div class="md:col-span-2">
+                                <label class="block text-xs font-bold text-slate-700 mb-2">Warna Badge</label>
+                                <div class="grid grid-cols-5 gap-2">
+                                    @foreach(['green'=>['bg-emerald-500','Hijau'],'red'=>['bg-red-500','Merah'],'gray'=>['bg-slate-500','Abu-abu'],'blue'=>['bg-blue-500','Biru'],'white'=>['bg-white border border-slate-300','Putih']] as $val=>$meta)
                                     <label class="cursor-pointer" title="{{ $meta[1] }}">
                                         <input type="radio" name="badge_color" value="{{ $val }}" class="sr-only peer" {{ $val === 'blue' ? 'checked' : '' }}>
-                                        <span class="block w-7 h-7 rounded-full {{ $meta[0] }} ring-2 ring-transparent ring-offset-2 peer-checked:ring-slate-900 transition-all"></span>
+                                        <span class="flex h-10 w-full items-center justify-center rounded-xl border border-slate-200 bg-white transition-all peer-checked:border-slate-900 peer-checked:ring-2 peer-checked:ring-slate-900/15">
+                                            <span class="h-5 w-5 rounded-full {{ $meta[0] }} shadow-sm"></span>
+                                        </span>
                                     </label>
                                     @endforeach
                                 </div>
@@ -708,13 +703,15 @@
                                 </select>
                             </div>
 
-                            <div>
-                                <label class="block text-xs font-bold text-slate-700 mb-1">Warna Badge</label>
-                                <div class="flex items-center gap-2 flex-wrap mt-1">
-                                    @foreach(['blue'=>['bg-blue-500','Biru'],'emerald'=>['bg-emerald-500','Hijau'],'purple'=>['bg-purple-500','Ungu'],'amber'=>['bg-amber-500','Kuning'],'orange'=>['bg-orange-500','Oranye'],'rose'=>['bg-rose-500','Merah'],'indigo'=>['bg-indigo-500','Indigo'],'cyan'=>['bg-cyan-500','Cyan']] as $val=>$meta)
+                            <div class="md:col-span-2">
+                                <label class="block text-xs font-bold text-slate-700 mb-2">Warna Badge</label>
+                                <div class="grid grid-cols-5 gap-2">
+                                    @foreach(['green'=>['bg-emerald-500','Hijau'],'red'=>['bg-red-500','Merah'],'gray'=>['bg-slate-500','Abu-abu'],'blue'=>['bg-blue-500','Biru'],'white'=>['bg-white border border-slate-300','Putih']] as $val=>$meta)
                                     <label class="cursor-pointer" title="{{ $meta[1] }}">
                                         <input type="radio" name="badge_color" value="{{ $val }}" x-model="editForm.badge_color" class="sr-only peer">
-                                        <span class="block w-7 h-7 rounded-full {{ $meta[0] }} ring-2 ring-transparent ring-offset-2 peer-checked:ring-slate-900 transition-all"></span>
+                                        <span class="flex h-10 w-full items-center justify-center rounded-xl border border-slate-200 bg-white transition-all peer-checked:border-slate-900 peer-checked:ring-2 peer-checked:ring-slate-900/15">
+                                            <span class="h-5 w-5 rounded-full {{ $meta[0] }} shadow-sm"></span>
+                                        </span>
                                     </label>
                                     @endforeach
                                 </div>

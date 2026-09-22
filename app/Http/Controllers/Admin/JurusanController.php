@@ -99,7 +99,7 @@ class JurusanController extends Controller
             'kaprog_guru_id' => 'nullable|exists:guru,id',
             'kuota_industri' => 'required|integer|min:0',
             'kuota_terisi' => 'nullable|integer|min:0',
-            'badge_color' => 'nullable|string',
+            'badge_color' => 'nullable|in:green,red,gray,blue,white',
             'mitra_utama' => 'nullable|string',
             'capaian_kurikulum' => 'nullable|string',
             'status' => 'required|in:aktif,nonaktif',
@@ -121,7 +121,7 @@ class JurusanController extends Controller
         }
 
         if (empty($validated['badge_color'])) {
-            $colors = ['blue', 'amber', 'purple', 'emerald', 'orange'];
+            $colors = ['green', 'red', 'gray', 'blue', 'white'];
             $validated['badge_color'] = $colors[rand(0, count($colors) - 1)];
         }
 
@@ -143,7 +143,7 @@ class JurusanController extends Controller
             'kaprog_guru_id' => 'nullable|exists:guru,id',
             'kuota_industri' => 'required|integer|min:0',
             'kuota_terisi' => 'required|integer|min:0',
-            'badge_color' => 'nullable|string',
+            'badge_color' => 'nullable|in:green,red,gray,blue,white',
             'mitra_utama' => 'nullable|string',
             'capaian_kurikulum' => 'nullable|string',
             'status' => 'required|in:aktif,nonaktif',
