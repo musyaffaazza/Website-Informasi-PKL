@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'SIPRAK SMKN 1 GUNUNGPUTRI')</title>
+    <link rel="icon" type="image/jpeg" href="{{ asset('image/logo_skiell.jpeg') }}">
 
     <!-- Google Fonts: Plus Jakarta Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -46,16 +47,8 @@
         <div class="min-h-0 flex-1 overflow-y-auto">
             <!-- School Brand Header -->
             <div class="p-5 flex items-center gap-3 border-b border-slate-100">
-                <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 bg-white border border-slate-200 shadow-xs">
-                    <!-- School Emblem / Logo -->
-                    <svg class="w-7 h-7" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="24" cy="24" r="22" fill="#0284c7" />
-                        <circle cx="24" cy="24" r="18" fill="#facc15" />
-                        <path d="M24 10L14 16V26C14 32.5 18.2 38.5 24 40C29.8 38.5 34 32.5 34 26V16L24 10Z" fill="#0369a1" />
-                        <path d="M24 15L18 19V25C18 29.5 20.6 33.6 24 35C27.4 33.6 30 29.5 30 25V19L24 15Z" fill="#ffffff" />
-                        <circle cx="24" cy="24" r="3.5" fill="#e11d48" />
-                        <path d="M20 30H28V32H20V30Z" fill="#0284c7" />
-                    </svg>
+                <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 bg-white border border-slate-200 shadow-xs overflow-hidden">
+                    <img src="{{ asset('image/logo_skiell.jpeg') }}" alt="Logo SIPRAK" class="w-full h-full object-cover">
                 </div>
                 <div>
                     <div class="font-extrabold text-[15px] tracking-wide text-[#0f2942] leading-tight">SIPRAK</div>
