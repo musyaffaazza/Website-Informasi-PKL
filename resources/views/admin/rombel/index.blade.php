@@ -31,8 +31,8 @@
         </div>
     </div>
 
-    <!-- 4 KPI Stat Cards -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <!-- 3 KPI Stat Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <!-- Card 1: Total Rombel Aktif -->
         <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-2xs flex items-center justify-between">
             <div>
@@ -47,26 +47,12 @@
             </div>
         </div>
 
-        <!-- Card 2: Rombel Siap PKL -->
-        <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-2xs flex items-center justify-between">
-            <div>
-                <div class="text-xs font-medium text-slate-500">Rombel Siap PKL</div>
-                <div class="text-2xl font-black text-emerald-600 mt-1 leading-tight">{{ $rombelSiapPkl }} Rombel</div>
-                <div class="text-[11px] font-medium text-slate-400 mt-1">Tingkat XII</div>
-            </div>
-            <div class="w-11 h-11 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 border border-emerald-100/80">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                </svg>
-            </div>
-        </div>
-
-        <!-- Card 3: Siswa Terdaftar -->
+        <!-- Card 2: Siswa Terdaftar -->
         <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-2xs flex items-center justify-between">
             <div>
                 <div class="text-xs font-medium text-slate-500">Siswa Terdaftar</div>
                 <div class="text-2xl font-black text-slate-900 mt-1 leading-tight">{{ number_format($totalSiswaTerdaftar, 0, ',', '.') }} Siswa</div>
-                <div class="text-[11px] font-medium text-slate-400 mt-1">Rata-rata 35–36 siswa/rombel</div>
+                <div class="text-[11px] font-medium text-slate-400 mt-1">Total siswa di rombel aktif</div>
             </div>
             <div class="w-11 h-11 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0 border border-indigo-100/80">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -75,7 +61,7 @@
             </div>
         </div>
 
-        <!-- Card 4: Wali Kelas Terpetakan -->
+        <!-- Card 3: Wali Kelas Terpetakan -->
         <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-2xs flex items-center justify-between">
             <div>
                 <div class="text-xs font-medium text-slate-500">Wali Kelas Terpetakan</div>
@@ -206,7 +192,6 @@
                         <th class="py-3.5 px-4">TINGKAT &amp; JURUSAN</th>
                         <th class="py-3.5 px-4">WALI KELAS</th>
                         <th class="py-3.5 px-4">JUMLAH SISWA</th>
-                        <th class="py-3.5 px-4">STATUS PKL</th>
                         <th class="py-3.5 pr-6 pl-4 text-right">AKSI</th>
                     </tr>
                 </thead>
@@ -260,36 +245,11 @@
                             <!-- Jumlah Siswa -->
                             <td class="py-4 px-4">
                                 <div class="font-bold text-slate-900 text-xs">
-                                    {{ $r->jumlah_siswa }} Siswa
+                                    {{ $r->siswas_count }} Siswa
                                 </div>
                                 <div class="text-[10px] text-emerald-600 font-semibold mt-0.5">
-                                    {{ $r->siswa_terdata ?: $r->jumlah_siswa }} Terdata
+                                    {{ $r->siswas_count }} Terdata
                                 </div>
-                            </td>
-
-                            <!-- Status PKL -->
-                            <td class="py-4 px-4">
-                                @if(str_contains(strtolower($r->status_pkl), 'siap'))
-                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-[#ecfdf5] text-[#059669] border border-emerald-200/80">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                                        <span>{{ $r->status_pkl }}</span>
-                                    </span>
-                                @elseif(str_contains(strtolower($r->status_pkl), 'sedang'))
-                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-200/80">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
-                                        <span>{{ $r->status_pkl }}</span>
-                                    </span>
-                                @elseif(str_contains(strtolower($r->status_pkl), 'persiapan'))
-                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-amber-50 text-amber-700 border border-amber-200/80">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-                                        <span>{{ $r->status_pkl }}</span>
-                                    </span>
-                                @else
-                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-slate-100 text-slate-600 border border-slate-200/80">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
-                                        <span>{{ $r->status_pkl }}</span>
-                                    </span>
-                                @endif
                             </td>
 
                             <!-- Aksi (Eye, Pencil, Trash) -->
@@ -330,7 +290,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="8" class="py-12 text-center text-slate-400">
+                            <td colspan="7" class="py-12 text-center text-slate-400">
                                 <div class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-3 text-slate-400">
                                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -675,15 +635,6 @@
                             </div>
 
                             <div>
-                                <label class="block text-xs font-bold text-slate-700 mb-1">Status PKL <span class="text-rose-500">*</span></label>
-                                <select name="status_pkl" x-model="editData.status_pkl" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
-                                    <option value="Siap Terjun PKL">Siap Terjun PKL</option>
-                                    <option value="Sedang PKL">Sedang PKL</option>
-                                    <option value="Selesai PKL">Selesai PKL</option>
-                                </select>
-                            </div>
-
-                            <div>
                                 <label class="block text-xs font-bold text-slate-700 mb-1">Status Aktif Rombel <span class="text-rose-500">*</span></label>
                                 <select name="status" x-model="editData.status" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
                                     <option value="aktif">Aktif</option>
@@ -733,7 +684,7 @@
         <div class="fixed inset-0 bg-slate-900/60 transition-opacity" @click="isDetailModalOpen = false"></div>
 
         <div class="flex min-h-screen items-center justify-center p-4 text-center sm:p-6">
-            <div class="relative z-10 w-full max-w-xl transform overflow-hidden rounded-3xl bg-white text-left shadow-2xl transition-all border border-slate-100">
+            <div class="relative z-10 w-full max-w-4xl transform overflow-hidden rounded-3xl bg-white text-left shadow-2xl transition-all border border-slate-100">
                 <div class="p-6 bg-slate-50/70 border-b border-slate-100 flex items-center justify-between">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center font-bold">
@@ -768,15 +719,8 @@
                             <span class="font-bold text-slate-800" x-text="detailData.ruang || '-'"></span>
                         </div>
                         <div>
-                            <span class="text-slate-400 block text-[11px]">Status PKL</span>
-                            <span class="inline-flex items-center gap-1 font-bold text-emerald-600">
-                                <span>•</span>
-                                <span x-text="detailData.status_pkl"></span>
-                            </span>
-                        </div>
-                        <div>
                             <span class="text-slate-400 block text-[11px]">Jumlah Siswa</span>
-                            <span class="font-bold text-slate-800"><span x-text="detailData.jumlah_siswa"></span> Siswa (<span x-text="detailData.siswa_terdata"></span> Terdata)</span>
+                            <span class="font-bold text-slate-800"><span x-text="detailData.siswas_count || 0"></span> Siswa (<span x-text="detailData.siswas_count || 0"></span> Terdata)</span>
                         </div>
                         <div>
                             <span class="text-slate-400 block text-[11px]">Tahun Ajaran</span>
@@ -792,6 +736,43 @@
                             <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">WALI KELAS RESMI</div>
                             <div class="font-bold text-slate-900 text-sm truncate" x-text="detailWaliNama || 'Belum Ditentukan'"></div>
                             <div class="text-xs text-slate-500 font-mono" x-text="'NIP: ' + (detailWaliNip || '-')"></div>
+                        </div>
+                    </div>
+
+                    <div class="rounded-2xl border border-slate-200 overflow-hidden">
+                        <div class="flex items-center justify-between gap-3 px-4 py-3 bg-slate-50/70 border-b border-slate-200">
+                            <div>
+                                <h4 class="text-sm font-extrabold text-slate-900">Daftar Siswa</h4>
+                                <p class="text-[11px] text-slate-400 mt-0.5">Siswa yang sudah terdaftar pada rombel ini</p>
+                            </div>
+                            <span class="inline-flex items-center justify-center min-w-7 h-7 px-2 rounded-lg bg-[#0f2942] text-white text-xs font-bold" x-text="(detailData.siswas || []).length"></span>
+                        </div>
+                        <div class="max-h-64 overflow-y-auto">
+                            <table class="w-full text-left text-xs">
+                                <thead class="sticky top-0 bg-white border-b border-slate-100 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                                    <tr>
+                                        <th class="px-4 py-2.5">Nama Siswa</th>
+                                        <th class="px-4 py-2.5">NIS / NISN</th>
+                                        <th class="px-4 py-2.5">L/P</th>
+                                        <th class="px-4 py-2.5 text-right">Status Akun</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100">
+                                    <template x-for="siswa in (detailData.siswas || [])" :key="siswa.id">
+                                        <tr class="hover:bg-slate-50/70">
+                                            <td class="px-4 py-3 font-semibold text-slate-800" x-text="siswa.nama"></td>
+                                            <td class="px-4 py-3 text-slate-500 font-mono text-[11px]" x-text="siswa.nis + (siswa.nisn ? ' / ' + siswa.nisn : '')"></td>
+                                            <td class="px-4 py-3 text-slate-600" x-text="siswa.jenis_kelamin || '-'"></td>
+                                            <td class="px-4 py-3 text-right">
+                                                <span class="inline-flex px-2 py-1 rounded-md text-[10px] font-bold capitalize" :class="siswa.status_akun === 'aktif' ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-600'" x-text="(siswa.status_akun || 'belum aktivasi').replace('_', ' ')"></span>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                    <tr x-show="!(detailData.siswas || []).length">
+                                        <td colspan="4" class="px-4 py-8 text-center text-slate-400">Belum ada siswa terdaftar pada rombel ini.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>

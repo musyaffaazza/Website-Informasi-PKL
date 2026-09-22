@@ -15,7 +15,9 @@ class RombelController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Rombel::with(['jurusan', 'waliKelas']);
+        $query = Rombel::with(['jurusan', 'waliKelas', 'siswas' => function ($q) {
+            $q->orderBy('nama')->select('id', 'rombel_id', 'nis', 'nisn', 'nama', 'jenis_kelamin', 'status_akun');
+        }]);
 
         // Search Filter
         if ($search = $request->input('search')) {
@@ -48,13 +50,6 @@ class RombelController extends Controller
             $query->where('jurusan_id', $selectedJurusan);
         }
 
-        // Status PKL Filter (optional)
-        if ($statusPkl = $request->input('status_pkl')) {
-            if ($statusPkl !== 'all') {
-                $query->where('status_pkl', $statusPkl);
-            }
-        }
-
         // Status Rombel Filter (default aktif)
         if ($status = $request->input('status')) {
             if ($status !== 'all') {
@@ -68,15 +63,15 @@ class RombelController extends Controller
             $perPage = 10;
         }
 
-        $rombels = (clone $query)->where('tingkat', 'XII')->orderBy('id')->paginate($perPage)->withQueryString();
+        $rombels = (clone $query)
+            ->where('tingkat', 'XII')
+            ->withCount('siswas')
+            ->orderBy('id')
+            ->paginate($perPage)
+            ->withQueryString();
 
         // Summary KPI Stats (always calculated across the whole school)
         $totalRombelAktif = Rombel::where('status', 'aktif')->where('tingkat', 'XII')->count();
-
-        $rombelSiapPkl = Rombel::where('status', 'aktif')
-            ->where('tingkat', 'XII')
-            ->where('status_pkl', 'like', '%Siap Terjun PKL%')
-            ->count();
 
         $totalSiswaTerdaftar = Siswa::whereHas('rombel', function ($q) {
             $q->where('tingkat', 'XII');
@@ -92,19 +87,15 @@ class RombelController extends Controller
         $jurusans = Jurusan::where('status', 'aktif')->orderBy('nama')->get();
         $gurus = Guru::where('status_akun', 'aktif')->orderBy('nama')->get();
         $tingkatList = ['XII'];
-        $statusPklList = ['Siap Terjun PKL', 'Sedang PKL', 'Selesai PKL'];
-
         return view('admin.rombel.index', compact(
             'rombels',
             'totalRombelAktif',
-            'rombelSiapPkl',
             'totalSiswaTerdaftar',
             'totalWaliKelas',
             'persentaseWali',
             'jurusans',
             'gurus',
             'tingkatList',
-            'statusPklList',
             'selectedTingkat',
             'selectedJurusan',
             'perPage'
@@ -128,7 +119,6 @@ class RombelController extends Controller
         ]);
 
         $validated['nama_kode'] = $validated['nama_rombel'];
-        $validated['status_pkl'] = 'Siap Terjun PKL';
         if (empty($validated['siswa_terdata'])) {
             $validated['siswa_terdata'] = $validated['jumlah_siswa'];
         }
@@ -158,7 +148,6 @@ class RombelController extends Controller
         ]);
 
         $validated['nama_kode'] = $validated['nama_rombel'];
-        $validated['status_pkl'] = 'Siap Terjun PKL';
         if (empty($validated['siswa_terdata'])) {
             $validated['siswa_terdata'] = $validated['jumlah_siswa'];
         }
