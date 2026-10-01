@@ -163,7 +163,7 @@
         </a>
 
         <a href="{{ route('admin.industri.index', array_merge(request()->except('page'), ['tab' => 'penuh'])) }}"
-           class="flex items-center gap-2 px-4 py-2.5 text-xs font-bold border-b-2 transition whitespace-nowrap {{ $tab === 'penuh' ? 'border-[#d97706] text-[#d97706]' : 'border-transparent text-slate-500 hover:text-slate-800 hover:border-slate-300' }}">
+        class="flex items-center gap-2 px-4 py-2.5 text-xs font-bold border-b-2 transition whitespace-nowrap {{ $tab === 'penuh' ? 'border-[#d97706] text-[#d97706]' : 'border-transparent text-slate-500 hover:text-slate-800 hover:border-slate-300' }}">
             <span>Kuota Penuh</span>
             <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold {{ $tab === 'penuh' ? 'bg-[#d97706] text-white' : 'bg-amber-50 text-amber-700 border border-amber-200' }}">
                 {{ $countPenuh }}
@@ -171,7 +171,7 @@
         </a>
 
         <a href="{{ route('admin.industri.index', array_merge(request()->except('page'), ['tab' => 'perlu_evaluasi'])) }}"
-           class="flex items-center gap-2 px-4 py-2.5 text-xs font-bold border-b-2 transition whitespace-nowrap {{ $tab === 'perlu_evaluasi' ? 'border-[#e11d48] text-[#e11d48]' : 'border-transparent text-slate-500 hover:text-slate-800 hover:border-slate-300' }}">
+        class="flex items-center gap-2 px-4 py-2.5 text-xs font-bold border-b-2 transition whitespace-nowrap {{ $tab === 'perlu_evaluasi' ? 'border-[#e11d48] text-[#e11d48]' : 'border-transparent text-slate-500 hover:text-slate-800 hover:border-slate-300' }}">
             <span>Perlu Evaluasi</span>
             <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold {{ $tab === 'perlu_evaluasi' ? 'bg-[#e11d48] text-white' : 'bg-rose-50 text-rose-700 border border-rose-200' }}">
                 {{ $countEvaluasi }}
@@ -195,10 +195,10 @@
                         </svg>
                     </div>
                     <input type="text" 
-                           name="search" 
-                           value="{{ request('search') }}"
-                           placeholder="Cari nama PT, bidang usaha, PIC, atau alamat..." 
-                           class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition">
+                        name="search" 
+                        value="{{ request('search') }}"
+                        placeholder="Cari nama PT, bidang usaha, PIC, atau alamat..." 
+                        class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition">
                 </div>
 
                 <!-- Jurusan Filter -->
