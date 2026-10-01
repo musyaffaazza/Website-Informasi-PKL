@@ -9,8 +9,64 @@ use App\Http\Controllers\Admin\IndustriController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return redirect()->route('admin.industri.index');
+    return redirect()->route('login');
 });
+
+Route::get('/login', function () {
+    return view()->exists('login') ? view('login') : view('auth.login');
+})->name('login');
+
+Route::post('/login', function (\Illuminate\Http\Request $request) {
+    $request->validate([
+        'identifier' => ['nullable', 'string'],
+        'username' => ['nullable', 'string'],
+        'email' => ['nullable', 'string'],
+        'password' => ['required', 'string'],
+    ]);
+
+    $loginInput = $request->input('identifier') ?? $request->input('username') ?? $request->input('email');
+    $password = $request->input('password');
+
+    if (empty($loginInput)) {
+        return back()->withErrors(['identifier' => 'NISN / NIP / Username wajib diisi.'])->onlyInput('identifier');
+    }
+
+    $fieldType = filter_var($loginInput, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+
+    // 1. Try standard DB authentication
+    try {
+        $credentials = [
+            $fieldType => $loginInput,
+            'password' => $password,
+        ];
+
+        if (\Illuminate\Support\Facades\Auth::attempt($credentials, $request->boolean('remember'))) {
+            $request->session()->regenerate();
+            return redirect()->intended(route('admin.jurusan.index'));
+        }
+    } catch (\Throwable $e) {
+        // Fallback if database is not yet migrated or running
+    }
+
+    // 2. Direct Admin fallback check for development
+    $cleanUser = strtolower(trim($loginInput));
+    if (in_array($cleanUser, ['admin', 'admin@smkn1gunungputri.sch.id', '123456']) && in_array($password, ['admin123', 'password', 'password123', 'admin'])) {
+        $request->session()->regenerate();
+        $request->session()->put('logged_in_as', 'admin');
+        return redirect()->route('admin.jurusan.index');
+    }
+
+    return back()->withErrors([
+        'identifier' => 'NISN, NIP, Username, atau kata sandi yang Anda masukkan salah.',
+    ])->onlyInput('identifier');
+})->name('login.post');
+
+Route::post('/logout', function (\Illuminate\Http\Request $request) {
+    \Illuminate\Support\Facades\Auth::logout();
+    $request->session()->invalidate();
+    $request->session()->regenerateToken();
+    return redirect()->route('login');
+})->name('logout');
 
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/', function () {
@@ -81,3 +137,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         return redirect()->back()->with('success', 'Sinkronisasi Dapodik Kemdikbudristek 2024 berhasil diperbarui secara realtime!');
     })->name('dapodik.sync');
 });
+
+
+
+

@@ -22,3 +22,9 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+.composer-cache/
+.composer-home/
+/database/*.sqlite
+/database/*.sqlite-journal
+sistem_pkl
+fix-laravel-permissions.bat

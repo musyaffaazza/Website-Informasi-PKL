@@ -13,7 +13,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
     <!-- Tailwind & Vite Assets -->
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @else
+        <script src="https://cdn.tailwindcss.com"></script>
+    @endif
 
     <!-- Alpine.js -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
@@ -48,7 +52,7 @@
             <!-- School Brand Header -->
             <div class="p-5 flex items-center gap-3 border-b border-slate-100">
                 <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 bg-white border border-slate-200 shadow-xs overflow-hidden">
-                    <img src="{{ asset('image/logo_skiell.jpeg') }}" alt="Logo SIPRAK" class="w-full h-full object-cover">
+                    <img src="{{ asset('image/logo_skiell.jpeg') }}" alt="Logo SIPRAK" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='{{ asset('images/logo.png') }}';">
                 </div>
                 <div>
                     <div class="font-extrabold text-[15px] tracking-wide text-[#0f2942] leading-tight">SIPRAK</div>
@@ -280,3 +284,7 @@
     @stack('scripts')
 </body>
 </html>
+
+
+
+

@@ -38,4 +38,9 @@ class User extends Authenticatable
     {
         return $this->password_hash;
     }
+
+    public function getRememberTokenName()
+    {
+        return '';
+    }
 }
