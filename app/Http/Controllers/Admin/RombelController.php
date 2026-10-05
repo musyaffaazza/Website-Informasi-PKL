@@ -7,6 +7,7 @@ use App\Models\Guru;
 use App\Models\Jurusan;
 use App\Models\Rombel;
 use App\Models\Siswa;
+use App\Models\LogAktivitas;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -74,7 +75,7 @@ class RombelController extends Controller
         $totalRombelAktif = Rombel::where('status', 'aktif')->where('tingkat', 'XII')->count();
 
         $totalSiswaTerdaftar = Siswa::whereHas('rombel', function ($q) {
-            $q->where('tingkat', 'XII');
+            $q->where('tingkat', 'XII')->where('status', 'aktif');
         })->count();
 
         $totalWaliKelas = Rombel::where('status', 'aktif')
@@ -124,6 +125,7 @@ class RombelController extends Controller
         }
 
         $rombel = Rombel::create($validated);
+        LogAktivitas::catat('Tambah Data', 'Master Rombel', 'Menambahkan rombel baru ' . ($rombel->nama_rombel ?: $rombel->kode_rombel));
 
         return redirect()->route('admin.rombel.index')
             ->with('success', "Rombel {$rombel->nama_rombel} ({$rombel->kode_rombel}) berhasil ditambahkan!");
@@ -153,6 +155,7 @@ class RombelController extends Controller
         }
 
         $rombel->update($validated);
+        LogAktivitas::catat('Edit Data', 'Master Rombel', 'Memperbarui data rombel ' . ($rombel->nama_rombel ?: $rombel->kode_rombel));
 
         return redirect()->route('admin.rombel.index')
             ->with('success', "Data Rombel {$rombel->nama_rombel} berhasil diperbarui!");
@@ -163,20 +166,17 @@ class RombelController extends Controller
         $rombel = Rombel::findOrFail($id);
         $namaRombel = $rombel->nama_rombel ?: $rombel->nama_kode;
 
-        DB::transaction(function () use ($rombel) {
+        DB::transaction(function () use ($rombel, $namaRombel) {
             // Unlink or clean up related siswas if any
             Siswa::where('rombel_id', $rombel->id)->update(['rombel_id' => null]);
             $rombel->delete();
+            LogAktivitas::catat('Hapus Data', 'Master Rombel', 'Menghapus rombel ' . $namaRombel);
         });
 
         return redirect()->route('admin.rombel.index')
             ->with('success', "Rombel {$namaRombel} berhasil dihapus dari sistem.");
     }
 
-    public function syncDapodik(Request $request)
-    {
-        return redirect()->back()->with('success', 'Sinkronisasi Dapodik Rombongan Belajar SMKN 1 Gunungputri berhasil diperbarui secara realtime!');
-    }
 
     public function export(Request $request): StreamedResponse
     {

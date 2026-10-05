@@ -98,101 +98,101 @@
     </div>
 
     <!-- Filters Bar -->
-    <div class="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-2xs">
-        <form action="{{ route('admin.mapping-pembimbing.index') }}" method="GET" id="filterForm">
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5 items-end">
-                
-                <!-- Filter 1: Cari Siswa / NIS -->
-                <div>
-                    <label class="block text-[11px] font-semibold text-slate-600 mb-1.5">Cari Siswa / NIS</label>
-                    <div class="relative">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                            </svg>
+    <div class="bg-white rounded-2xl border border-slate-200/80 p-4 sm:p-5 shadow-2xs">
+        <form action="{{ route('admin.mapping-pembimbing.index') }}" method="GET" id="filterForm" class="space-y-3">
+            <div class="relative w-full">
+                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                </div>
+                <input type="text"
+                       name="search"
+                       value="{{ request('search') }}"
+                       placeholder="Cari nama siswa atau NIS..."
+                       class="w-full h-10.5 pl-10 pr-4 bg-slate-50/80 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition">
+            </div>
+
+            <div class="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-3">
+                <div class="flex flex-wrap items-center gap-2.5">
+                    <div class="relative min-w-[150px] flex-1 sm:flex-none sm:w-44">
+                        <select name="jurusan_id"
+                                class="w-full h-10.5 pl-3.5 pr-8 bg-slate-50/80 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition appearance-none cursor-pointer">
+                            <option value="all">Semua Jurusan</option>
+                            @foreach($jurusans as $j)
+                                <option value="{{ $j->id }}" {{ request('jurusan_id') == $j->id ? 'selected' : '' }}>
+                                    {{ $j->kode }} ({{ Str::limit($j->nama, 18) }})
+                                </option>
+                            @endforeach
+                        </select>
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-400">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
                         </div>
-                        <input type="text" 
-                               name="search" 
-                               value="{{ request('search') }}"
-                               placeholder="Ketik nama siswa atau NIS..." 
-                               class="w-full pl-9 pr-3 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition">
                     </div>
-                </div>
 
-                <!-- Filter 2: Jurusan -->
-                <div>
-                    <label class="block text-[11px] font-semibold text-slate-600 mb-1.5">Jurusan</label>
-                    <select name="jurusan_id" 
-                            class="w-full bg-white border border-slate-200 text-slate-700 text-xs rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition font-medium">
-                        <option value="all">Semua Jurusan</option>
-                        @foreach($jurusans as $j)
-                            <option value="{{ $j->id }}" {{ request('jurusan_id') == $j->id ? 'selected' : '' }}>
-                                {{ $j->kode }} ({{ Str::limit($j->nama, 18) }})
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
+                    <div class="relative min-w-[150px] flex-1 sm:flex-none sm:w-48">
+                        <select name="rombel_id"
+                                class="w-full h-10.5 pl-3.5 pr-8 bg-slate-50/80 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition appearance-none cursor-pointer">
+                            <option value="all">Semua Rombel</option>
+                            @foreach($rombels as $r)
+                                <option value="{{ $r->id }}" {{ request('rombel_id') == $r->id ? 'selected' : '' }}>
+                                    {{ $r->nama_rombel ?: $r->nama_kode }}
+                                </option>
+                            @endforeach
+                        </select>
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-400">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                        </div>
+                    </div>
 
-                <!-- Filter 3: Rombel -->
-                <div>
-                    <label class="block text-[11px] font-semibold text-slate-600 mb-1.5">Rombel</label>
-                    <select name="rombel_id" 
-                            class="w-full bg-white border border-slate-200 text-slate-700 text-xs rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition font-medium">
-                        <option value="all">Semua Rombel</option>
-                        @foreach($rombels as $r)
-                            <option value="{{ $r->id }}" {{ request('rombel_id') == $r->id ? 'selected' : '' }}>
-                                {{ $r->nama_rombel ?: $r->nama_kode }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
+                    <div class="relative min-w-[170px] flex-1 sm:flex-none sm:w-56">
+                        <select name="guru_id"
+                                class="w-full h-10.5 pl-3.5 pr-8 bg-slate-50/80 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition appearance-none cursor-pointer">
+                            <option value="all">Semua Pembimbing</option>
+                            @foreach($gurus as $g)
+                                <option value="{{ $g->id }}" {{ request('guru_id') == $g->id ? 'selected' : '' }}>
+                                    {{ $g->nama }}
+                                </option>
+                            @endforeach
+                        </select>
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-400">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                        </div>
+                    </div>
 
-                <!-- Filter 4: Guru Pembimbing -->
-                <div>
-                    <label class="block text-[11px] font-semibold text-slate-600 mb-1.5">Guru Pembimbing</label>
-                    <select name="guru_id" 
-                            class="w-full bg-white border border-slate-200 text-slate-700 text-xs rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition font-medium">
-                        <option value="all">Semua Pembimbing</option>
-                        @foreach($gurus as $g)
-                            <option value="{{ $g->id }}" {{ request('guru_id') == $g->id ? 'selected' : '' }}>
-                                {{ $g->nama }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-
-                <!-- Filter 5: Status Mapping & Action Buttons -->
-                <div>
-                    <label class="block text-[11px] font-semibold text-slate-600 mb-1.5">Status Mapping</label>
-                    <div class="flex items-center gap-2">
-                        <select name="status_mapping" 
-                                class="flex-1 bg-white border border-slate-200 text-slate-700 text-xs rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition font-medium">
+                    <div class="relative min-w-[160px] flex-1 sm:flex-none sm:w-48">
+                        <select name="status_mapping"
+                                class="w-full h-10.5 pl-3.5 pr-8 bg-slate-50/80 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition appearance-none cursor-pointer">
                             <option value="all" {{ request('status_mapping') == 'all' ? 'selected' : '' }}>Semua Status</option>
                             <option value="sudah" {{ request('status_mapping') == 'sudah' ? 'selected' : '' }}>Sudah Dipetakan</option>
                             <option value="belum" {{ request('status_mapping') == 'belum' ? 'selected' : '' }}>Belum Dipetakan</option>
                         </select>
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-400">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                        </div>
                     </div>
+
+                    <a href="{{ route('admin.mapping-pembimbing.index') }}"
+                       title="Reset Filter"
+                       class="h-10.5 w-10.5 shrink-0 rounded-xl border border-slate-200 text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition flex items-center justify-center">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011 1h16a1 1 0 011 1v2.586a1 1 0 00-.293.707l-6.414 6.414a2 2 0 00-.293.707V17l-4 4v-6.586a2 2 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                        </svg>
+                    </a>
                 </div>
 
-            </div>
-
-            <!-- Filter Buttons Row -->
-            <div class="mt-3.5 pt-3 border-t border-slate-100 flex flex-wrap items-center justify-end gap-2">
-                <a href="{{ route('admin.mapping-pembimbing.index') }}" 
-                   class="px-4 py-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 text-xs font-semibold rounded-xl transition shadow-2xs">
-                    Reset
-                </a>
-                <button type="submit" 
-                        class="flex items-center gap-1.5 px-4 py-2 bg-[#0f2942] hover:bg-[#1a385c] text-white text-xs font-bold rounded-xl shadow-xs transition active:scale-98">
-                    <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-                    </svg>
-                    <span>Terapkan Filter</span>
-                </button>
+                <div class="flex items-center gap-2 self-start xl:self-auto shrink-0">
+                    <button type="submit"
+                            class="flex items-center gap-1.5 h-10.5 px-4 bg-[#0f2942] hover:bg-[#1a385c] text-white text-xs font-bold rounded-xl shadow-xs transition active:scale-98">
+                        <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 0114 0z" />
+                        </svg>
+                        <span>Cari</span>
+                    </button>
+                </div>
             </div>
         </form>
     </div>
-
     <!-- Table Section -->
     <div class="bg-white rounded-2xl border border-slate-200/80 shadow-2xs overflow-hidden">
         <!-- Table Header Bar -->

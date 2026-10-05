@@ -14,38 +14,14 @@
             <span class="text-slate-600">Data Tenaga Pendidik (TA {{ $tahunAjaranAktif }})</span>
         </div>
 
-        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-                <div class="flex flex-wrap items-center gap-3">
-                    <h1 class="text-2xl font-extrabold text-[#0f2942] tracking-tight">
-                        Master Data Guru &amp; Role
-                    </h1>
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold tracking-wide bg-sky-50 text-sky-700 border border-sky-200 shadow-2xs">
-                        <svg class="w-3.5 h-3.5 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        DAPODIK TERVERIFIKASI
-                    </span>
-                </div>
-            </div>
-
-            <!-- Top Right Sync Card & Button -->
-            <div class="flex items-center gap-3 shrink-0">
-                <div class="text-right hidden sm:block">
-                    <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">SINKRONISASI DAPODIK</div>
-                    <div class="text-xs font-bold text-slate-900">Hari ini, 08:45 WIB</div>
-                </div>
-
-                <form action="{{ route('admin.guru.syncDapodik') }}" method="POST" class="inline">
-                    @csrf
-                    <button type="submit" 
-                            class="flex items-center gap-2 px-3.5 py-2 bg-white hover:bg-slate-50 text-[#0284c7] border border-slate-200 rounded-xl text-xs font-semibold shadow-2xs transition active:scale-98">
-                        <svg class="w-3.5 h-3.5 text-[#0284c7]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-                        </svg>
-                        <span>Tarik Data GTK Dapodik</span>
-                    </button>
-                </form>
+                <h1 class="text-2xl font-extrabold text-[#0f2942] tracking-tight">
+                    Master Data Guru &amp; Role
+                </h1>
+                <p class="text-xs text-slate-500 mt-1 max-w-3xl leading-relaxed">
+                    Kelola data tenaga pendidik, wali kelas, guru pembimbing PKL, dan ketua program keahlian.
+                </p>
             </div>
         </div>
     </div>
@@ -87,7 +63,7 @@
                 </div>
             </div>
             <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px]">
-                <span class="text-slate-400">Supervisi 108 Siswa On-Site</span>
+                <span class="text-slate-400">Supervisi {{ $totalSiswaBimbingan }} Siswa Bimbingan</span>
                 <span class="inline-flex items-center gap-1 font-bold text-sky-600 bg-sky-50 px-2 py-0.5 rounded-full">
                     <span>•</span> Aktif Mendampingi
                 </span>
@@ -110,7 +86,7 @@
             <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px]">
                 <span class="text-slate-400">Verifikator Tahap 1</span>
                 <span class="inline-flex items-center gap-1 font-bold text-[#0f2942] bg-slate-100 px-2 py-0.5 rounded-full">
-                    <span>•</span> 6 Jurusan
+                    <span>•</span> {{ $totalJurusan }} Jurusan
                 </span>
             </div>
         </div>
@@ -131,7 +107,7 @@
             <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px]">
                 <span class="text-slate-400">Otorisator Berkas Tahap 2</span>
                 <span class="inline-flex items-center gap-1 font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
-                    <span>•</span> Lengkap
+                    <span>•</span> {{ $kaprogCount }} / {{ $totalJurusan }} Terisi
                 </span>
             </div>
         </div>
@@ -227,15 +203,6 @@
 
                 <!-- Right Actions: Impor, Ekspor, Tambah -->
                 <div class="flex flex-wrap items-center gap-2.5 shrink-0">
-                    <!-- Impor Data GTK -->
-                    <button type="button" 
-                            @click="openImportModal()"
-                            class="h-10.5 flex items-center gap-2 px-4 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-xl text-xs font-semibold shadow-2xs transition active:scale-98">
-                        <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                        </svg>
-                        <span>Impor Data GTK</span>
-                    </button>
 
                     <!-- Ekspor XLS -->
                     <a href="{{ route('admin.guru.export', request()->query()) }}" 
@@ -984,51 +951,6 @@
         </div>
     </div>
 
-    <!-- ==================== MODAL IMPOR DATA GTK ==================== -->
-    <div x-show="isImportModalOpen" 
-         x-cloak
-         class="fixed inset-0 z-50 overflow-y-auto"
-         aria-labelledby="modal-title" role="dialog" aria-modal="true">
-        <!-- Backdrop -->
-        <div class="fixed inset-0 bg-slate-900/60 transition-opacity" @click="isImportModalOpen = false"></div>
-
-        <div class="flex min-h-screen items-center justify-center p-4 text-center sm:p-6">
-            <div class="relative z-10 w-full max-w-md transform overflow-hidden rounded-3xl bg-white text-left shadow-2xl transition-all border border-slate-100">
-                <form action="{{ route('admin.guru.syncDapodik') }}" method="POST">
-                    @csrf
-                    <div class="p-6 bg-slate-50/70 border-b border-slate-100 flex items-center justify-between">
-                        <h3 class="text-base font-extrabold text-slate-900">Impor Data GTK / Sinkronisasi Dapodik</h3>
-                        <button type="button" @click="isImportModalOpen = false" class="text-slate-400 hover:text-slate-600">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
-                    </div>
-
-                    <div class="p-6 space-y-4 text-center">
-                        <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                            </svg>
-                        </div>
-                        <p class="text-xs text-slate-600">
-                            Tarik data resmi Pendidik dan Tenaga Kependidikan (GTK) langsung dari server Dapodikdasmen Kemdikbudristek RI untuk Tahun Ajaran {{ $tahunAjaranAktif }}.
-                        </p>
-                    </div>
-
-                    <div class="p-6 bg-slate-50/70 border-t border-slate-100 flex items-center justify-center gap-3">
-                        <button type="button" @click="isImportModalOpen = false" class="px-4 py-2 bg-white border border-slate-200 rounded-xl text-xs font-semibold text-slate-700">
-                            Batal
-                        </button>
-                        <button type="submit" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-xs transition">
-                            Tarik Data Sekarang
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
     <!-- ==================== MODAL KONFIRMASI HAPUS ==================== -->
     <div x-show="isDeleteModalOpen" 
          x-cloak
@@ -1082,7 +1004,6 @@
             isEditModalOpen: false,
             isManageRoleModalOpen: false,
             isBulkRoleModalOpen: false,
-            isImportModalOpen: false,
             isDeleteModalOpen: false,
 
             editData: {},
@@ -1158,9 +1079,6 @@
                 this.isBulkRoleModalOpen = true;
             },
 
-            openImportModal() {
-                this.isImportModalOpen = true;
-            },
 
             confirmDelete(id, name) {
                 this.deleteId = id;

@@ -87,7 +87,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::post('/rombel', [RombelController::class, 'store'])->name('rombel.store');
     Route::put('/rombel/{id}', [RombelController::class, 'update'])->name('rombel.update');
     Route::delete('/rombel/{id}', [RombelController::class, 'destroy'])->name('rombel.destroy');
-    Route::post('/rombel/sync-dapodik', [RombelController::class, 'syncDapodik'])->name('rombel.syncDapodik');
     Route::get('/rombel-export', [RombelController::class, 'export'])->name('rombel.export');
 
     // Guru & Role Routes
@@ -99,7 +98,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::post('/guru/{id}/send-email', [GuruController::class, 'sendEmail'])->name('guru.sendEmail');
     Route::post('/guru/bulk-role', [GuruController::class, 'bulkRole'])->name('guru.bulkRole');
     Route::post('/guru/bulk-invite', [GuruController::class, 'bulkInvite'])->name('guru.bulkInvite');
-    Route::post('/guru/sync-dapodik', [GuruController::class, 'syncDapodik'])->name('guru.syncDapodik');
     Route::get('/guru-export', [GuruController::class, 'export'])->name('guru.export');
 
     // Siswa Routes
@@ -110,7 +108,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::post('/siswa/bulk-activate', [SiswaController::class, 'bulkActivate'])->name('siswa.bulkActivate');
     Route::post('/siswa/bulk-rombel', [SiswaController::class, 'bulkRombel'])->name('siswa.bulkRombel');
     Route::post('/siswa/invite-pending', [SiswaController::class, 'invitePending'])->name('siswa.invitePending');
-    Route::post('/siswa/sync-dapodik', [SiswaController::class, 'syncDapodik'])->name('siswa.syncDapodik');
     Route::get('/siswa-export', [SiswaController::class, 'export'])->name('siswa.export');
 
     // Industri Routes
@@ -132,10 +129,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
     // Log Aktivitas Routes
     Route::get('/log-aktivitas', [LogAktivitasController::class, 'index'])->name('log-aktivitas.index');
     Route::get('/log-aktivitas-export', [LogAktivitasController::class, 'export'])->name('log-aktivitas.export');
-    // Global Dapodik Sync Route
-    Route::post('/dapodik/sync', function () {
-        return redirect()->back()->with('success', 'Sinkronisasi Dapodik Kemdikbudristek 2024 berhasil diperbarui secara realtime!');
-    })->name('dapodik.sync');
 });
 
 

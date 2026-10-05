@@ -10,6 +10,7 @@ use App\Models\Guru;
 use App\Models\Jurusan;
 use App\Models\Rombel;
 use App\Models\Industri;
+use App\Models\LogAktivitas;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -80,7 +81,9 @@ class MappingPembimbingController extends Controller
         // 3 Summary Stats Cards
         $totalSiswaPkl = PengajuanPkl::where('status', 'disetujui')->count();
 
-        $sudahMemilikiPembimbing = PembimbingPenugasan::count();
+        $sudahMemilikiPembimbing = PembimbingPenugasan::whereHas('pengajuan', function ($q) {
+            $q->where('status', 'disetujui');
+        })->count();
 
         $belumMemilikiPembimbing = max(0, $totalSiswaPkl - $sudahMemilikiPembimbing);
         $persenTerpetakan = $totalSiswaPkl > 0 ? round(($sudahMemilikiPembimbing / $totalSiswaPkl) * 100, 1) : 0;
@@ -128,9 +131,15 @@ class MappingPembimbingController extends Controller
         $pengajuan = PengajuanPkl::where('siswa_id', $siswa->id)->first();
         if (!$pengajuan) {
             $defaultIndustri = Industri::first();
+            if (!$defaultIndustri) {
+                return redirect()->back()->withErrors([
+                    'siswa_id' => 'Tambahkan minimal satu mitra industri sebelum membuat penempatan PKL.',
+                ]);
+            }
+
             $pengajuan = PengajuanPkl::create([
                 'siswa_id' => $siswa->id,
-                'industri_id' => $defaultIndustri ? $defaultIndustri->id : 1,
+                'industri_id' => $defaultIndustri->id,
                 'tanggal_mulai' => $validated['tanggal_mulai'],
                 'tanggal_selesai' => date('Y-m-d', strtotime('+3 months', strtotime($validated['tanggal_mulai']))),
                 'status' => 'disetujui',
@@ -152,6 +161,8 @@ class MappingPembimbingController extends Controller
         $guru = Guru::find($validated['pembimbing_guru_id']);
         $guruNama = $guru ? $guru->nama : 'Guru';
 
+        LogAktivitas::catat('Tambah Data', 'Mapping Pembimbing', 'Menugaskan guru pembimbing ' . $guruNama . ' untuk siswa ' . $siswa->nama);
+
         return redirect()->route('admin.mapping-pembimbing.index')
             ->with('success', "Guru pembimbing {$guruNama} berhasil ditugaskan untuk siswa {$siswa->nama}!");
     }
@@ -167,6 +178,8 @@ class MappingPembimbingController extends Controller
 
         $penugasan->update($validated);
 
+        LogAktivitas::catat('Edit Data', 'Mapping Pembimbing', 'Memperbarui penugasan guru pembimbing untuk siswa ' . ($penugasan->siswa?->nama ?? 'Siswa'));
+
         return redirect()->route('admin.mapping-pembimbing.index')
             ->with('success', "Data penugasan pembimbing berhasil diperbarui!");
     }
@@ -177,6 +190,8 @@ class MappingPembimbingController extends Controller
         $siswaNama = $penugasan->siswa ? $penugasan->siswa->nama : 'Siswa';
 
         $penugasan->delete();
+
+        LogAktivitas::catat('Hapus Data', 'Mapping Pembimbing', 'Menghapus penugasan pembimbing untuk ' . $siswaNama);
 
         return redirect()->route('admin.mapping-pembimbing.index')
             ->with('success', "Penugasan pembimbing untuk {$siswaNama} berhasil dihapus (status kembali Belum Dipetakan).");

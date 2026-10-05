@@ -50,6 +50,11 @@ class Industri extends Model
         return $this->belongsTo(Guru::class, 'pembimbing_guru_id');
     }
 
+    public function pengajuanPkl()
+    {
+        return $this->hasMany(PengajuanPkl::class, 'industri_id');
+    }
+
     public function getInitialsAttribute()
     {
         $cleanName = preg_replace('/^(PT|CV|UD|PD|Koperasi|Yayasan)\.?\s+/i', '', $this->nama);

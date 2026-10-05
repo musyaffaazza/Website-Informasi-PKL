@@ -13,7 +13,6 @@ class Jurusan extends Model
         'nama',
         'singkatan',
         'bidang',
-        'akreditasi',
         'kaprog_guru_id',
         'kuota_industri',
         'kuota_terisi',

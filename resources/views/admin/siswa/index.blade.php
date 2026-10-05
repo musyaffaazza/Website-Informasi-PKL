@@ -20,12 +20,6 @@
                     <h1 class="text-2xl font-extrabold text-[#0f2942] tracking-tight">
                         Master Data Siswa
                     </h1>
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold tracking-wide bg-sky-50 text-sky-700 border border-sky-200 shadow-2xs">
-                        <svg class="w-3.5 h-3.5 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        DAPODIK TERVERIFIKASI
-                    </span>
                 </div>
                 <p class="text-xs text-slate-500 mt-1 max-w-3xl leading-relaxed">
                     Kelola data induk siswa tingkat akhir SMK Negeri 1 Gunungputri untuk persiapan dan penempatan PKL.
@@ -34,27 +28,7 @@
 
             <!-- Top Right Action Buttons -->
             <div class="flex flex-wrap items-center gap-2.5 shrink-0">
-                <!-- Tarik Data Dapodik -->
-                <form action="{{ route('admin.siswa.syncDapodik') }}" method="POST" class="inline">
-                    @csrf
-                    <button type="submit" 
-                            class="flex items-center gap-2 px-3.5 py-2.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-xl text-xs font-semibold shadow-2xs transition active:scale-98">
-                        <svg class="w-3.5 h-3.5 text-[#0284c7]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-                        </svg>
-                        <span>Tarik Data Dapodik</span>
-                    </button>
-                </form>
 
-                <!-- Impor Excel -->
-                <button type="button" 
-                        @click="isImportModalOpen = true"
-                        class="flex items-center gap-2 px-3.5 py-2.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-xl text-xs font-semibold shadow-2xs transition active:scale-98">
-                    <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                    </svg>
-                    <span>Impor Excel</span>
-                </button>
 
                 <!-- Ekspor CSV/Excel -->
                 <a href="{{ route('admin.siswa.export', request()->query()) }}" 
@@ -172,109 +146,138 @@
         </div>
     </div>
 
-    <!-- Filter & Toolbar -->
-    <div class="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-2xs">
-        <form action="{{ route('admin.siswa.index') }}" method="GET" id="filterForm" class="flex flex-col xl:flex-row xl:items-center justify-between gap-3">
-            
-            <!-- Left Filters -->
-            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 flex-1 flex-wrap">
-                <!-- Search Input -->
-                <div class="relative w-full sm:min-w-[240px] sm:w-72">
-                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                        </svg>
-                    </div>
-                    <input type="text" 
-                           name="search" 
-                           value="{{ request('search') }}"
-                           placeholder="Cari nama siswa, NISN, atau email..." 
-                           class="w-full pl-10 pr-4 py-2.5 bg-slate-50/80 border border-slate-200 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition">
-                </div>
+    <!-- Filter & Search Toolbar -->
+    @php
+        $hasActiveFilter = request()->filled('search') 
+            || (request('tingkat', 'all') !== 'all' && request('tingkat') !== null) 
+            || (request('jurusan_id', 'all') !== 'all' && request('jurusan_id') !== null) 
+            || (request('status_akun', 'all') !== 'all' && request('status_akun') !== null) 
+            || (request('status_pkl', 'all') !== 'all' && request('status_pkl') !== null);
+    @endphp
 
-                <!-- Dropdown 1: Semua Tingkat/Kelas -->
-                <div class="relative w-full sm:min-w-[160px] sm:flex-1">
-                    <select name="tingkat" 
-                            onchange="document.getElementById('filterForm').submit()"
-                            class="w-full px-3.5 py-2.5 bg-slate-50/80 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition appearance-none cursor-pointer">
-                        <option value="XII" {{ request('tingkat', 'XII') == 'XII' ? 'selected' : '' }}>Semua Kelas (Tingkat XII)</option>
-                        @foreach($rombels as $r)
-                            <option value="{{ $r->id }}" {{ request('tingkat') == $r->id ? 'selected' : '' }}>{{ $r->nama_rombel }}</option>
-                        @endforeach
-                    </select>
-                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-400">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                        </svg>
-                    </div>
-                </div>
-
-                <!-- Dropdown 2: Semua Jurusan -->
-                <div class="relative w-full sm:min-w-[150px] sm:flex-1">
-                    <select name="jurusan_id" 
-                            onchange="document.getElementById('filterForm').submit()"
-                            class="w-full px-3.5 py-2.5 bg-slate-50/80 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition appearance-none cursor-pointer">
-                        <option value="all" {{ request('jurusan_id', 'all') == 'all' ? 'selected' : '' }}>Semua Jurusan</option>
-                        @foreach($jurusans as $j)
-                            <option value="{{ $j->id }}" {{ request('jurusan_id') == $j->id ? 'selected' : '' }}>
-                                {{ $j->singkatan ?: $j->kode }}
-                            </option>
-                        @endforeach
-                    </select>
-                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-400">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                        </svg>
-                    </div>
-                </div>
-
-                <!-- Dropdown 3: Semua Status Akun -->
-                <div class="relative w-full sm:min-w-[140px] sm:flex-1">
-                    <select name="status_akun" 
-                            onchange="document.getElementById('filterForm').submit()"
-                            class="w-full px-3.5 py-2.5 bg-slate-50/80 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition appearance-none cursor-pointer">
-                        <option value="all" {{ request('status_akun', 'all') == 'all' ? 'selected' : '' }}>Semua Status Akun</option>
-                        <option value="aktif" {{ request('status_akun') == 'aktif' ? 'selected' : '' }}>Aktif</option>
-                        <option value="belum_aktivasi" {{ request('status_akun') == 'belum_aktivasi' ? 'selected' : '' }}>Belum Aktivasi</option>
-                        <option value="ditangguhkan" {{ request('status_akun') == 'ditangguhkan' ? 'selected' : '' }}>Ditangguhkan</option>
-                    </select>
-                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-400">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                        </svg>
-                    </div>
-                </div>
-
-                <!-- Dropdown 4: Semua Status PKL -->
-                <div class="relative w-full sm:min-w-[145px] sm:flex-1">
-                    <select name="status_pkl" 
-                            onchange="document.getElementById('filterForm').submit()"
-                            class="w-full px-3.5 py-2.5 bg-slate-50/80 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition appearance-none cursor-pointer">
-                        <option value="all" {{ request('status_pkl', 'all') == 'all' ? 'selected' : '' }}>Semua Status PKL</option>
-                        <option value="Sudah Ditempatkan" {{ request('status_pkl') == 'Sudah Ditempatkan' ? 'selected' : '' }}>Sudah Ditempatkan</option>
-                        <option value="Siap Terjun" {{ request('status_pkl') == 'Siap Terjun' ? 'selected' : '' }}>Siap Terjun</option>
-                        <option value="Belum Terpetakan" {{ request('status_pkl') == 'Belum Terpetakan' ? 'selected' : '' }}>Belum Terpetakan</option>
-                        <option value="Sedang PKL" {{ request('status_pkl') == 'Sedang PKL' ? 'selected' : '' }}>Sedang PKL</option>
-                    </select>
-                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-400">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                        </svg>
-                    </div>
-                </div>
-
-                <!-- Reset Button -->
-                <a href="{{ route('admin.siswa.index') }}" 
-                   title="Reset Filter"
-                   class="p-2.5 rounded-xl border border-slate-200 text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition flex items-center justify-center">
+    <div class="bg-white rounded-2xl border border-slate-200/80 p-4 sm:p-5 shadow-2xs space-y-3.5">
+        <form action="{{ route('admin.siswa.index') }}" method="GET" id="filterForm" class="space-y-3.5">
+            <!-- Row 1: Search Bar -->
+            <div class="relative w-full">
+                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 111-14 0 7 7 0 0114 0z"/>
                     </svg>
-                </a>
+                </div>
+                <input type="text"
+                       name="search"
+                       value="{{ request('search') }}"
+                       placeholder="Cari nama siswa, NIS, NISN, atau email..."
+                       class="w-full h-11 pl-10 pr-24 sm:pr-28 bg-slate-50/80 hover:bg-slate-50 focus:bg-white border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition shadow-2xs">
+                
+                @if(request('search'))
+                    <a href="{{ route('admin.siswa.index', request()->except(['search', 'page'])) }}" 
+                       class="absolute inset-y-0 right-20 sm:right-22 pr-2 flex items-center text-slate-400 hover:text-slate-600 transition"
+                       title="Hapus pencarian">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </a>
+                @endif
+
+                <button type="submit" 
+                        class="absolute inset-y-1.5 right-1.5 px-3.5 bg-[#0f2942] hover:bg-[#1a385c] text-white rounded-lg text-xs font-semibold flex items-center gap-1 transition shadow-xs cursor-pointer">
+                    <span>Cari</span>
+                </button>
+            </div>
+
+            <!-- Row 2: Filter Controls Grid & Status Info -->
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 pt-1 border-t border-slate-100/80">
+                <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-2.5 flex-1">
+                    <!-- Filter Tingkat / Rombel -->
+                    <div class="relative">
+                        <select name="tingkat"
+                                onchange="document.getElementById('filterForm').submit()"
+                                class="w-full h-10 pl-3.5 pr-8 {{ request('tingkat', 'all') !== 'all' && request('tingkat') !== null ? 'bg-sky-50/90 border-sky-300 text-sky-900 font-bold' : 'bg-slate-50/80 border-slate-200 text-slate-700 font-semibold' }} border rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition appearance-none cursor-pointer">
+                            <option value="all" {{ request('tingkat', 'all') == 'all' ? 'selected' : '' }}>Semua Tingkat / Rombel</option>
+                            <option value="XII" {{ request('tingkat') == 'XII' ? 'selected' : '' }}>Tingkat XII (PKL)</option>
+                            @foreach($rombels as $r)
+                                <option value="{{ $r->id }}" {{ request('tingkat') == $r->id ? 'selected' : '' }}>{{ $r->nama_rombel }}</option>
+                            @endforeach
+                        </select>
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-400">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                        </div>
+                    </div>
+
+                    <!-- Filter Jurusan -->
+                    <div class="relative">
+                        <select name="jurusan_id"
+                                onchange="document.getElementById('filterForm').submit()"
+                                class="w-full h-10 pl-3.5 pr-8 {{ request('jurusan_id', 'all') !== 'all' && request('jurusan_id') !== null ? 'bg-sky-50/90 border-sky-300 text-sky-900 font-bold' : 'bg-slate-50/80 border-slate-200 text-slate-700 font-semibold' }} border rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition appearance-none cursor-pointer">
+                            <option value="all" {{ request('jurusan_id', 'all') == 'all' ? 'selected' : '' }}>Semua Jurusan</option>
+                            @foreach($jurusans as $j)
+                                <option value="{{ $j->id }}" {{ request('jurusan_id') == $j->id ? 'selected' : '' }}>
+                                   {{ $j->singkatan ?: $j->kode }} - {{ Str::limit($j->nama, 20) }}
+                                </option>
+                            @endforeach
+                        </select>
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-400">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                        </div>
+                    </div>
+
+                    <!-- Filter Status Akun -->
+                    <div class="relative">
+                        <select name="status_akun"
+                                onchange="document.getElementById('filterForm').submit()"
+                                class="w-full h-10 pl-3.5 pr-8 {{ request('status_akun', 'all') !== 'all' && request('status_akun') !== null ? 'bg-sky-50/90 border-sky-300 text-sky-900 font-bold' : 'bg-slate-50/80 border-slate-200 text-slate-700 font-semibold' }} border rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition appearance-none cursor-pointer">
+                            <option value="all" {{ request('status_akun', 'all') == 'all' ? 'selected' : '' }}>Semua Akun</option>
+                            <option value="aktif" {{ request('status_akun') == 'aktif' ? 'selected' : '' }}>Akun Aktif</option>
+                            <option value="belum_aktivasi" {{ request('status_akun') == 'belum_aktivasi' ? 'selected' : '' }}>Belum Aktivasi</option>
+                            <option value="ditangguhkan" {{ request('status_akun') == 'ditangguhkan' ? 'selected' : '' }}>Ditangguhkan</option>
+                        </select>
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-400">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                        </div>
+                    </div>
+
+                    <!-- Filter Status PKL -->
+                    <div class="relative">
+                        <select name="status_pkl"
+                                onchange="document.getElementById('filterForm').submit()"
+                                class="w-full h-10 pl-3.5 pr-8 {{ request('status_pkl', 'all') !== 'all' && request('status_pkl') !== null ? 'bg-sky-50/90 border-sky-300 text-sky-900 font-bold' : 'bg-slate-50/80 border-slate-200 text-slate-700 font-semibold' }} border rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition appearance-none cursor-pointer">
+                            <option value="all" {{ request('status_pkl', 'all') == 'all' ? 'selected' : '' }}>Semua Status PKL</option>
+                            <option value="Sudah Ditempatkan" {{ request('status_pkl') == 'Sudah Ditempatkan' ? 'selected' : '' }}>Sudah Ditempatkan</option>
+                            <option value="Siap Terjun" {{ request('status_pkl') == 'Siap Terjun' ? 'selected' : '' }}>Siap Terjun</option>
+                            <option value="Belum Terpetakan" {{ request('status_pkl') == 'Belum Terpetakan' ? 'selected' : '' }}>Belum Terpetakan</option>
+                            <option value="Sedang PKL" {{ request('status_pkl') == 'Sedang PKL' ? 'selected' : '' }}>Sedang PKL</option>
+                        </select>
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-400">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reset Filter & Counter Badge -->
+                <div class="flex items-center justify-between sm:justify-end gap-2.5 shrink-0">
+                    @if($hasActiveFilter)
+                        <a href="{{ route('admin.siswa.index') }}"
+                           class="h-10 px-3.5 flex items-center gap-1.5 rounded-xl border border-rose-200 bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-semibold transition active:scale-98">
+                            <svg class="w-3.5 h-3.5 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                            </svg>
+                            <span>Reset Filter</span>
+                        </a>
+                    @else
+                        <span class="text-[11px] font-medium text-slate-400 hidden xl:inline-block">
+                            Filter otomatis diterapkan
+                        </span>
+                    @endif
+
+                    <div class="flex items-center gap-1.5 px-3 py-2 bg-slate-50 border border-slate-200/80 rounded-xl text-xs font-semibold text-slate-600">
+                        <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                        <span>{{ number_format($siswas->total(), 0, ',', '.') }} Siswa</span>
+                    </div>
+                </div>
             </div>
         </form>
     </div>
-
     <!-- Collective Action Bar (Selected Items) -->
     <div x-show="selectedIds.length > 0" 
          x-transition:enter="transition ease-out duration-200"
@@ -930,51 +933,6 @@
         </div>
     </div>
 
-    <!-- ==================== MODAL IMPOR EXCEL ==================== -->
-    <div x-show="isImportModalOpen" 
-         x-cloak
-         class="fixed inset-0 z-50 overflow-y-auto"
-         aria-labelledby="modal-title" role="dialog" aria-modal="true">
-        <!-- Backdrop -->
-        <div class="fixed inset-0 bg-slate-900/60 transition-opacity" @click="isImportModalOpen = false"></div>
-
-        <div class="flex min-h-screen items-center justify-center p-4 text-center sm:p-6">
-            <div class="relative z-10 w-full max-w-md transform overflow-hidden rounded-3xl bg-white text-left shadow-2xl transition-all border border-slate-100">
-                <form action="{{ route('admin.siswa.syncDapodik') }}" method="POST">
-                    @csrf
-                    <div class="p-6 bg-slate-50/70 border-b border-slate-100 flex items-center justify-between">
-                        <h3 class="text-base font-extrabold text-slate-900">Impor Data Siswa / Sinkronisasi Dapodik</h3>
-                        <button type="button" @click="isImportModalOpen = false" class="text-slate-400 hover:text-slate-600">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
-                    </div>
-
-                    <div class="p-6 space-y-4 text-center">
-                        <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                            </svg>
-                        </div>
-                        <p class="text-xs text-slate-600">
-                            Sinkronisasi dan tarik data resmi peserta didik langsung dari server Dapodikdasmen Kemendikbudristek RI untuk Tahun Ajaran {{ $tahunAjaranAktif }}.
-                        </p>
-                    </div>
-
-                    <div class="p-6 bg-slate-50/70 border-t border-slate-100 flex items-center justify-center gap-3">
-                        <button type="button" @click="isImportModalOpen = false" class="px-4 py-2 bg-white border border-slate-200 rounded-xl text-xs font-semibold text-slate-700">
-                            Batal
-                        </button>
-                        <button type="submit" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-xs transition">
-                            Tarik Data Sekarang
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
     <!-- ==================== MODAL KONFIRMASI HAPUS ==================== -->
     <div x-show="isDeleteModalOpen" 
          x-cloak
@@ -1027,7 +985,6 @@
             isEditModalOpen: false,
             isDetailModalOpen: false,
             isBulkRombelModalOpen: false,
-            isImportModalOpen: false,
             isDeleteModalOpen: false,
 
             editData: {},

@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Industri;
+use App\Models\PengajuanPkl;
 use App\Models\Jurusan;
 use App\Models\Guru;
+use App\Models\LogAktivitas;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -14,33 +16,25 @@ class IndustriController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Industri::with(['jurusans', 'pembimbingGuru']);
+        $query = $this->withRealtimeKuota(
+            Industri::with(['jurusans', 'pembimbingGuru'])
+        );
 
-        // Search Filter (nama, PIC, kota/wilayah, bidang usaha)
         if ($search = $request->input('search')) {
             $query->where(function ($q) use ($search) {
-                $q->where('nama', 'like', "%{$search}%")
-                  ->orWhere('kontak_nama', 'like', "%{$search}%")
-                  ->orWhere('alamat', 'like', "%{$search}%")
-                  ->orWhere('wilayah', 'like', "%{$search}%")
-                  ->orWhere('bidang_usaha', 'like', "%{$search}%")
-                  ->orWhere('pembimbing_nama', 'like', "%{$search}%")
-                  ->orWhere('no_mou', 'like', "%{$search}%");
+                $q->where('industri.nama', 'like', "%{$search}%")
+                    ->orWhere('industri.kontak_nama', 'like', "%{$search}%")
+                    ->orWhere('industri.alamat', 'like', "%{$search}%")
+                    ->orWhere('industri.wilayah', 'like', "%{$search}%")
+                    ->orWhere('industri.bidang_usaha', 'like', "%{$search}%")
+                    ->orWhere('industri.pembimbing_nama', 'like', "%{$search}%")
+                    ->orWhere('industri.no_mou', 'like', "%{$search}%");
             });
         }
 
-        // Tab Filter (Semua, Aktif Tersedia, Kuota Penuh, Perlu Evaluasi)
         $tab = $request->input('tab', 'all');
-        if ($tab === 'aktif') {
-            $query->where('kuota_terisi', '<', DB::raw('kuota'))
-                  ->where('status_kemitraan', '!=', 'perlu_evaluasi');
-        } elseif ($tab === 'penuh') {
-            $query->where('kuota_terisi', '>=', DB::raw('kuota'));
-        } elseif ($tab === 'perlu_evaluasi') {
-            $query->where('status_kemitraan', 'perlu_evaluasi');
-        }
+        $this->applyQuotaTabFilter($query, $tab);
 
-        // Jurusan / Bidang Kejuruan Filter
         if ($jurusanId = $request->input('jurusan_id')) {
             if ($jurusanId !== 'all') {
                 $query->whereHas('jurusans', function ($q) use ($jurusanId) {
@@ -49,56 +43,65 @@ class IndustriController extends Controller
             }
         }
 
-        // Wilayah Filter
         if ($wilayah = $request->input('wilayah')) {
             if ($wilayah !== 'all') {
-                $query->where('wilayah', 'like', "%{$wilayah}%");
+                $query->where('industri.wilayah', 'like', "%{$wilayah}%");
             }
         }
 
-        // Sort Filter
         $sort = $request->input('sort', 'nama_asc');
         if ($sort === 'nama_desc') {
-            $query->orderBy('nama', 'desc');
+            $query->orderBy('industri.nama', 'desc');
         } elseif ($sort === 'kuota_desc') {
-            $query->orderBy('kuota', 'desc');
+            $query->orderBy('industri.kuota', 'desc');
         } elseif ($sort === 'kuota_tersedia') {
-            $query->orderByRaw('(kuota - kuota_terisi) DESC');
+            $query->orderByRaw('(industri.kuota - COALESCE(penempatan_pkl.total, 0)) DESC');
         } else {
-            // default nama_asc
-            $query->orderBy('id', 'asc');
+            $query->orderBy('industri.nama', 'asc');
         }
 
-        // View Mode: 'grid' (default as screenshot) or 'table'
         $viewMode = $request->input('view_mode', 'grid');
-
-        // Pagination: default 8 items per page as shown in screenshot (Menampilkan 8 dari 48)
         $perPage = (int) $request->input('per_page', 8);
+        if (!in_array($perPage, [8, 10, 25, 50, 100])) {
+            $perPage = 8;
+        }
+
         $industris = $query->paginate($perPage)->withQueryString();
+        $industris->getCollection()->transform(function (Industri $industri) {
+            $industri->setAttribute('kuota_terisi', (int) $industri->kuota_terisi_aktual);
 
-        // 4 KPI Summary Stats (Always whole school)
+            return $industri;
+        });
+
         $totalMitra = Industri::count();
-
         $totalKuota = Industri::sum('kuota');
-
-        $totalTerisi = Industri::sum('kuota_terisi');
+        $totalTerisi = PengajuanPkl::where('status', 'disetujui')
+            ->whereNotNull('industri_id')
+            ->count();
         $persenKapasitas = $totalKuota > 0 ? round(($totalTerisi / $totalKuota) * 100) : 0;
 
-        $mitraPenuh = Industri::where('kuota_terisi', '>=', DB::raw('kuota'))->count();
+        $quotaMetricsQuery = $this->withRealtimeKuota(Industri::query());
+        $mitraPenuh = (clone $quotaMetricsQuery)
+            ->whereRaw('COALESCE(penempatan_pkl.total, 0) >= industri.kuota')
+            ->count('industri.id');
+        $countAktif = (clone $quotaMetricsQuery)
+            ->whereRaw('COALESCE(penempatan_pkl.total, 0) < industri.kuota')
+            ->where('industri.status_kemitraan', '!=', 'perlu_evaluasi')
+            ->count('industri.id');
 
         $kemitraanBaru = Industri::where('status_kemitraan', 'baru')->count();
-
-        // Filter Counts for Tabs
         $countSemua = $totalMitra;
-        $countAktif = Industri::where('kuota_terisi', '<', DB::raw('kuota'))
-            ->where('status_kemitraan', '!=', 'perlu_evaluasi')->count();
         $countPenuh = $mitraPenuh;
         $countEvaluasi = Industri::where('status_kemitraan', 'perlu_evaluasi')->count();
 
-        // Master Data options for filters and modal forms
         $jurusans = Jurusan::where('status', 'aktif')->orderBy('nama')->get();
         $gurus = Guru::where('status_akun', 'aktif')->orderBy('nama')->get();
-        $wilayahList = ['Bogor', 'Jakarta', 'Bekasi', 'Depok', 'Karawang'];
+        $wilayahList = Industri::whereNotNull('wilayah')
+            ->where('wilayah', '!=', '')
+            ->select('wilayah')
+            ->distinct()
+            ->orderBy('wilayah')
+            ->pluck('wilayah');
 
         return view('admin.industri.index', compact(
             'industris',
@@ -120,7 +123,6 @@ class IndustriController extends Controller
             'perPage'
         ));
     }
-
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -135,16 +137,10 @@ class IndustriController extends Controller
             'kontak_no_hp' => 'required|string|max:25',
             'kontak_email' => 'required|email|max:100',
             'kuota' => 'required|integer|min:1|max:50',
-            'kuota_terisi' => 'nullable|integer|min:0|max:50',
             'pembimbing_nama' => 'nullable|string|max:150',
-            'status_kemitraan' => 'required|in:aktif,penuh,baru,perlu_evaluasi',
+            'status_kemitraan' => 'required|in:aktif,baru,perlu_evaluasi',
             'jurusan_ids' => 'nullable|array',
         ]);
-
-        $validated['kuota_terisi'] = $validated['kuota_terisi'] ?: 0;
-        if ($validated['kuota_terisi'] >= $validated['kuota']) {
-            $validated['status_kemitraan'] = 'penuh';
-        }
 
         $industri = Industri::create($validated);
 
@@ -152,10 +148,11 @@ class IndustriController extends Controller
             $industri->jurusans()->sync($validated['jurusan_ids']);
         }
 
+        LogAktivitas::catat('Tambah Data', 'Master Industri', 'Menambahkan mitra industri baru ' . $industri->nama);
+
         return redirect()->route('admin.industri.index')
             ->with('success', "Mitra Industri {$industri->nama} berhasil ditambahkan!");
     }
-
     public function update(Request $request, $id)
     {
         $industri = Industri::findOrFail($id);
@@ -172,16 +169,10 @@ class IndustriController extends Controller
             'kontak_no_hp' => 'required|string|max:25',
             'kontak_email' => 'required|email|max:100',
             'kuota' => 'required|integer|min:1|max:50',
-            'kuota_terisi' => 'nullable|integer|min:0|max:50',
             'pembimbing_nama' => 'nullable|string|max:150',
-            'status_kemitraan' => 'required|in:aktif,penuh,baru,perlu_evaluasi',
+            'status_kemitraan' => 'required|in:aktif,baru,perlu_evaluasi',
             'jurusan_ids' => 'nullable|array',
         ]);
-
-        $validated['kuota_terisi'] = isset($validated['kuota_terisi']) ? $validated['kuota_terisi'] : $industri->kuota_terisi;
-        if ($validated['kuota_terisi'] >= $validated['kuota']) {
-            $validated['status_kemitraan'] = 'penuh';
-        }
 
         $industri->update($validated);
 
@@ -189,40 +180,50 @@ class IndustriController extends Controller
             $industri->jurusans()->sync($validated['jurusan_ids']);
         }
 
+        LogAktivitas::catat('Edit Data', 'Master Industri', 'Memperbarui data mitra industri ' . $industri->nama);
+
         return redirect()->route('admin.industri.index')
             ->with('success', "Data Kemitraan {$industri->nama} berhasil diperbarui!");
     }
-
     public function updateKuota(Request $request, $id)
     {
         $industri = Industri::findOrFail($id);
-
         $validated = $request->validate([
             'kuota' => 'required|integer|min:1|max:100',
-            'kuota_terisi' => 'required|integer|min:0|max:100',
         ]);
 
-        if ($validated['kuota_terisi'] >= $validated['kuota']) {
-            $industri->status_kemitraan = 'penuh';
-        } else {
-            $industri->status_kemitraan = 'aktif';
+        $terisiAktual = $industri->pengajuanPkl()
+            ->where('status', 'disetujui')
+            ->count();
+
+        if ($validated['kuota'] < $terisiAktual) {
+            return redirect()->back()->withErrors([
+                'kuota' => "Kuota tidak boleh lebih kecil dari {$terisiAktual} siswa yang sudah disetujui penempatannya.",
+            ]);
         }
 
-        $industri->kuota = $validated['kuota'];
-        $industri->kuota_terisi = $validated['kuota_terisi'];
-        $industri->save();
+        $industri->update(['kuota' => $validated['kuota']]);
 
-        return redirect()->back()->with('success', "Kapasitas kuota {$industri->nama} berhasil disesuaikan ({$industri->kuota_terisi}/{$industri->kuota} siswa).");
+        LogAktivitas::catat(
+            'Edit Data',
+            'Master Industri',
+            'Memperbarui daya tampung industri ' . $industri->nama . " ({$terisiAktual}/{$industri->kuota} siswa terisi aktual)"
+        );
+
+        return redirect()->back()->with(
+            'success',
+            "Daya tampung {$industri->nama} berhasil diperbarui. Jumlah terisi dihitung otomatis dari penempatan PKL yang disetujui ({$terisiAktual} siswa)."
+        );
     }
-
     public function destroy($id)
     {
         $industri = Industri::findOrFail($id);
         $nama = $industri->nama;
 
-        DB::transaction(function () use ($industri) {
+        DB::transaction(function () use ($industri, $nama) {
             $industri->jurusans()->detach();
             $industri->delete();
+            LogAktivitas::catat('Hapus Data', 'Master Industri', 'Menghapus mitra industri ' . $nama);
         });
 
         return redirect()->route('admin.industri.index')
@@ -231,27 +232,22 @@ class IndustriController extends Controller
 
     public function export(Request $request): StreamedResponse
     {
-        $query = Industri::with(['jurusans']);
+        $query = $this->withRealtimeKuota(Industri::with(['jurusans']));
 
         if ($search = $request->input('search')) {
             $query->where(function ($q) use ($search) {
-                $q->where('nama', 'like', "%{$search}%")
-                  ->orWhere('kontak_nama', 'like', "%{$search}%")
-                  ->orWhere('bidang_usaha', 'like', "%{$search}%");
+                $q->where('industri.nama', 'like', "%{$search}%")
+                    ->orWhere('industri.kontak_nama', 'like', "%{$search}%")
+                    ->orWhere('industri.bidang_usaha', 'like', "%{$search}%");
             });
         }
 
-        if ($tab = $request->input('tab')) {
-            if ($tab === 'aktif') {
-                $query->where('kuota_terisi', '<', DB::raw('kuota'));
-            } elseif ($tab === 'penuh') {
-                $query->where('kuota_terisi', '>=', DB::raw('kuota'));
-            } elseif ($tab === 'perlu_evaluasi') {
-                $query->where('status_kemitraan', 'perlu_evaluasi');
-            }
-        }
+        $this->applyQuotaTabFilter($query, $request->input('tab', 'all'));
 
-        $industris = $query->orderBy('nama', 'asc')->get();
+        $industris = $query->orderBy('industri.nama', 'asc')->get();
+        $industris->each(function (Industri $industri) {
+            $industri->setAttribute('kuota_terisi', (int) $industri->kuota_terisi_aktual);
+        });
 
         $headers = [
             'Content-Type' => 'text/csv',
@@ -274,35 +270,64 @@ class IndustriController extends Controller
                 'Email PIC',
                 'Pembimbing Sekolah',
                 'Kuota Total',
-                'Kuota Terisi',
+                'Kuota Terisi Aktual',
                 'Sisa Kursi',
                 'Status Kemitraan',
             ]);
 
-            $no = 1;
-            foreach ($industris as $ind) {
-                $sisa = max(0, $ind->kuota - $ind->kuota_terisi);
+            foreach ($industris as $index => $industri) {
+                $terisiAktual = (int) $industri->kuota_terisi;
+                $sisa = max(0, $industri->kuota - $terisiAktual);
+
                 fputcsv($handle, [
-                    $no++,
-                    $ind->nama,
-                    $ind->bidang_usaha ?: '-',
-                    $ind->no_mou ?: '-',
-                    $ind->mou_berlaku_sampai ? $ind->mou_berlaku_sampai->format('d/m/Y') : '-',
-                    $ind->alamat ?: '-',
-                    $ind->wilayah ?: 'Bogor',
-                    $ind->kontak_nama ?: '-',
-                    $ind->kontak_jabatan ?: '-',
-                    $ind->kontak_no_hp ?: '-',
-                    $ind->kontak_email ?: '-',
-                    $ind->pembimbing_nama ?: '-',
-                    $ind->kuota,
-                    $ind->kuota_terisi,
+                    $index + 1,
+                    $industri->nama,
+                    $industri->bidang_usaha ?: '-',
+                    $industri->no_mou ?: '-',
+                    $industri->mou_berlaku_sampai ? $industri->mou_berlaku_sampai->format('d/m/Y') : '-',
+                    $industri->alamat ?: '-',
+                    $industri->wilayah ?: 'Bogor',
+                    $industri->kontak_nama ?: '-',
+                    $industri->kontak_jabatan ?: '-',
+                    $industri->kontak_no_hp ?: '-',
+                    $industri->kontak_email ?: '-',
+                    $industri->pembimbing_nama ?: '-',
+                    $industri->kuota,
+                    $terisiAktual,
                     $sisa,
-                    strtoupper($ind->status_kemitraan),
+                    strtoupper($industri->status_kemitraan),
                 ]);
             }
 
             fclose($handle);
         }, 200, $headers);
+    }
+
+    private function withRealtimeKuota($query)
+    {
+        $penempatanDisetujui = PengajuanPkl::query()
+            ->select('industri_id', DB::raw('COUNT(*) as total'))
+            ->where('status', 'disetujui')
+            ->whereNotNull('industri_id')
+            ->groupBy('industri_id');
+
+        return $query
+            ->leftJoinSub($penempatanDisetujui, 'penempatan_pkl', function ($join) {
+                $join->on('penempatan_pkl.industri_id', '=', 'industri.id');
+            })
+            ->select('industri.*')
+            ->selectRaw('COALESCE(penempatan_pkl.total, 0) as kuota_terisi_aktual');
+    }
+
+    private function applyQuotaTabFilter($query, string $tab): void
+    {
+        if ($tab === 'aktif') {
+            $query->whereRaw('COALESCE(penempatan_pkl.total, 0) < industri.kuota')
+                ->where('industri.status_kemitraan', '!=', 'perlu_evaluasi');
+        } elseif ($tab === 'penuh') {
+            $query->whereRaw('COALESCE(penempatan_pkl.total, 0) >= industri.kuota');
+        } elseif ($tab === 'perlu_evaluasi') {
+            $query->where('industri.status_kemitraan', 'perlu_evaluasi');
+        }
     }
 }

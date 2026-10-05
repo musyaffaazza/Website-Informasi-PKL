@@ -15,9 +15,6 @@ class DatabaseSeeder extends Seeder
             GuruSeeder::class,
             RombelSeeder::class,
             SiswaSeeder::class,
-            IndustriSeeder::class,
-            PengajuanPklSeeder::class,
-            PembimbingPenugasanSeeder::class,
         ]);
 
         if (!DB::table('users')->where('username', 'admin')->exists()) {

@@ -32,10 +32,20 @@ class LogAktivitas extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
-    public static function catat(string $aksi, ?string $modul = null, ?string $deskripsi = null, int $userId = 1): void
+    public static function catat(string $aksi, ?string $modul = null, ?string $deskripsi = null, ?int $userId = null): void
     {
+        $actorId = $userId ?? auth()->id();
+
+        if (!$actorId || !User::whereKey($actorId)->exists()) {
+            $actorId = User::query()->orderBy('id')->value('id');
+        }
+
+        if (!$actorId) {
+            return;
+        }
+
         static::create([
-            'user_id'    => $userId,
+            'user_id'    => $actorId,
             'aksi'       => $aksi,
             'modul'      => $modul,
             'deskripsi'  => $deskripsi,

@@ -130,11 +130,11 @@
                                 </svg>
                             </div>
                             <input class="block w-full pl-11 pr-11 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 border-0 rounded-xl focus:ring-1 focus:ring-brand-700 bg-transparent"
-                                   id="password"
-                                   name="password"
-                                   placeholder="••••••••••••"
-                                   required
-                                   type="password">
+                                id="password"
+                                name="password"
+                                placeholder="••••••••••••"
+                                required
+                                type="password">
                             <button aria-label="Tampilkan atau sembunyikan kata sandi"
                                     class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 focus:outline-none"
                                     id="togglePassword"

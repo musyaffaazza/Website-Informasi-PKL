@@ -28,7 +28,7 @@
                     </span>
                 </div>
                 <p class="text-xs text-slate-500 mt-1 max-w-3xl leading-relaxed">
-                    Direktori kemitraan vokasi resmi SMK Negeri 1 Gunungputri dengan Dunia Usaha &amp; Dunia Industri (DU/DI), kuota penempatan PKL, monitoring MoU, dan pembimbing lapangan.
+                    Direktori kemitraan vokasi resmi SMK Negeri 1 Gunungputri dengan Dunia Usaha &amp; Dunia Industri (DU/DI), kapasitas penempatan PKL, monitoring MoU, dan pembimbing lapangan. Keterisian kuota diperbarui otomatis dari penempatan siswa yang disetujui.
                 </p>
             </div>
 
@@ -180,105 +180,112 @@
     </div>
 
     <!-- Filters & Action Bar -->
-    <div class="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-2xs">
-        <form action="{{ route('admin.industri.index') }}" method="GET" id="filterForm" class="flex flex-col xl:flex-row xl:items-center justify-between gap-4">
+    <div class="bg-white rounded-2xl border border-slate-200/80 p-4 sm:p-5 shadow-2xs">
+        <form action="{{ route('admin.industri.index') }}" method="GET" id="filterForm" class="space-y-3">
             <input type="hidden" name="tab" value="{{ $tab }}">
             <input type="hidden" name="view_mode" :value="viewMode">
 
-            <!-- Left Filters -->
-            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 flex-1 flex-wrap">
-                <!-- Search Input -->
-                <div class="relative w-full sm:min-w-[260px] sm:w-80">
-                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                        </svg>
-                    </div>
-                    <input type="text" 
-                        name="search" 
-                        value="{{ request('search') }}"
-                        placeholder="Cari nama PT, bidang usaha, PIC, atau alamat..." 
-                        class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition">
-                </div>
-
-                <!-- Jurusan Filter -->
-                <div class="w-full sm:min-w-[170px] sm:flex-1">
-                    <select name="jurusan_id" 
-                            onchange="this.form.submit()"
-                            class="w-full bg-white border border-slate-200 text-slate-700 text-xs rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition font-medium">
-                        <option value="all">Semua Konsentrasi</option>
-                        @foreach($jurusans as $j)
-                            <option value="{{ $j->id }}" {{ request('jurusan_id') == $j->id ? 'selected' : '' }}>
-                                {{ $j->kode }} - {{ Str::limit($j->nama, 24) }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-
-                <!-- Wilayah Filter -->
-                <div class="w-full sm:min-w-[140px] sm:flex-1">
-                    <select name="wilayah" 
-                            onchange="this.form.submit()"
-                            class="w-full bg-white border border-slate-200 text-slate-700 text-xs rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition font-medium">
-                        <option value="all">Semua Wilayah</option>
-                        @foreach($wilayahList as $w)
-                            <option value="{{ $w }}" {{ request('wilayah') == $w ? 'selected' : '' }}>
-                                Wilayah {{ $w }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-
-                <!-- Sort Filter -->
-                <div class="w-full sm:min-w-[150px] sm:flex-1">
-                    <select name="sort" 
-                            onchange="this.form.submit()"
-                            class="w-full bg-white border border-slate-200 text-slate-700 text-xs rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition font-medium">
-                        <option value="nama_asc" {{ request('sort') == 'nama_asc' ? 'selected' : '' }}>Nama Mitra (A - Z)</option>
-                        <option value="nama_desc" {{ request('sort') == 'nama_desc' ? 'selected' : '' }}>Nama Mitra (Z - A)</option>
-                        <option value="kuota_desc" {{ request('sort') == 'kuota_desc' ? 'selected' : '' }}>Kuota Terbanyak</option>
-                        <option value="kuota_tersedia" {{ request('sort') == 'kuota_tersedia' ? 'selected' : '' }}>Sisa Kursi Terbanyak</option>
-                    </select>
-                </div>
-
-                <!-- Reset Button -->
-                @if(request()->hasAny(['search', 'jurusan_id', 'wilayah', 'sort']) && (request('search') || request('jurusan_id') !== 'all' || request('wilayah') !== 'all' || request('sort') !== 'nama_asc'))
-                <a href="{{ route('admin.industri.index', ['tab' => $tab]) }}" 
-                   class="flex items-center gap-1.5 px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-xs font-semibold transition">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            <div class="relative w-full">
+                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                     </svg>
-                    <span>Reset</span>
-                </a>
-                @endif
+                </div>
+                <input type="text"
+                       name="search"
+                       value="{{ request('search') }}"
+                       placeholder="Cari nama industri, bidang usaha, PIC, atau alamat..."
+                       class="w-full h-10.5 pl-10 pr-4 bg-slate-50/80 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition">
             </div>
 
-            <!-- Right Controls: View Switcher (Grid / Table) -->
-            <div class="flex items-center gap-2 self-end xl:self-auto shrink-0">
-                <div class="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200">
-                    <button type="button" 
-                            @click="setViewMode('grid')"
-                            :class="viewMode === 'grid' ? 'bg-white text-[#0f2942] shadow-xs' : 'text-slate-400 hover:text-slate-700'"
-                            class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition">
+            <div class="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-3">
+                <div class="flex flex-wrap items-center gap-2.5">
+                    <div class="relative min-w-[170px] flex-1 sm:flex-none sm:w-52">
+                        <select name="jurusan_id"
+                                onchange="this.form.submit()"
+                                class="w-full h-10.5 pl-3.5 pr-8 bg-slate-50/80 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition appearance-none cursor-pointer">
+                            <option value="all">Semua Konsentrasi</option>
+                            @foreach($jurusans as $j)
+                                <option value="{{ $j->id }}" {{ request('jurusan_id') == $j->id ? 'selected' : '' }}>
+                                    {{ $j->kode }} - {{ Str::limit($j->nama, 24) }}
+                                </option>
+                            @endforeach
+                        </select>
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-400">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div class="relative min-w-[140px] flex-1 sm:flex-none sm:w-44">
+                        <select name="wilayah"
+                                onchange="this.form.submit()"
+                                class="w-full h-10.5 pl-3.5 pr-8 bg-slate-50/80 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition appearance-none cursor-pointer">
+                            <option value="all">Semua Wilayah</option>
+                            @foreach($wilayahList as $w)
+                                <option value="{{ $w }}" {{ request('wilayah') == $w ? 'selected' : '' }}>
+                                    Wilayah {{ $w }}
+                                </option>
+                            @endforeach
+                        </select>
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-400">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div class="relative min-w-[150px] flex-1 sm:flex-none sm:w-48">
+                        <select name="sort"
+                                onchange="this.form.submit()"
+                                class="w-full h-10.5 pl-3.5 pr-8 bg-slate-50/80 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition appearance-none cursor-pointer">
+                            <option value="nama_asc" {{ request('sort') == 'nama_asc' ? 'selected' : '' }}>Nama Mitra (A - Z)</option>
+                            <option value="nama_desc" {{ request('sort') == 'nama_desc' ? 'selected' : '' }}>Nama Mitra (Z - A)</option>
+                            <option value="kuota_desc" {{ request('sort') == 'kuota_desc' ? 'selected' : '' }}>Kuota Terbanyak</option>
+                            <option value="kuota_tersedia" {{ request('sort') == 'kuota_tersedia' ? 'selected' : '' }}>Sisa Kursi Terbanyak</option>
+                        </select>
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-400">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </div>
+                    </div>
+
+                    <a href="{{ route('admin.industri.index', ['tab' => $tab]) }}"
+                       title="Reset Filter"
+                       class="h-10.5 w-10.5 shrink-0 rounded-xl border border-slate-200 text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition flex items-center justify-center">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011 1h16a1 1 0 011 1v2.586a1 1 0 00-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
                         </svg>
-                        <span>Grid</span>
-                    </button>
-                    <button type="button" 
-                            @click="setViewMode('table')"
-                            :class="viewMode === 'table' ? 'bg-white text-[#0f2942] shadow-xs' : 'text-slate-400 hover:text-slate-700'"
-                            class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
-                        </svg>
-                        <span>Tabel</span>
-                    </button>
+                    </a>
+                </div>
+
+                <div class="flex items-center gap-2 self-start xl:self-auto shrink-0">
+                    <div class="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200">
+                        <button type="button"
+                                @click="setViewMode('grid')"
+                                :class="viewMode === 'grid' ? 'bg-white text-[#0f2942] shadow-xs' : 'text-slate-400 hover:text-slate-700'"
+                                class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                            </svg>
+                            <span>Grid</span>
+                        </button>
+                        <button type="button"
+                                @click="setViewMode('table')"
+                                :class="viewMode === 'table' ? 'bg-white text-[#0f2942] shadow-xs' : 'text-slate-400 hover:text-slate-700'"
+                                class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                            </svg>
+                            <span>Tabel</span>
+                        </button>
+                    </div>
                 </div>
             </div>
         </form>
     </div>
-
     <!-- ==================== MAIN CONTENT: GRID OR TABLE ==================== -->
 
     <!-- VIEW 1: GRID CARDS (Default) -->
@@ -289,7 +296,7 @@
             $persenInd = $ind->kuota > 0 ? min(100, round(($ind->kuota_terisi / $ind->kuota) * 100)) : 0;
             
             // Status Tag Info
-            $isPenuh = $ind->kuota_terisi >= $ind->kuota || $ind->status_kemitraan === 'penuh';
+            $isPenuh = $ind->kuota_terisi >= $ind->kuota;
             $isEvaluasi = $ind->status_kemitraan === 'perlu_evaluasi';
             $isBaru = $ind->status_kemitraan === 'baru';
             
@@ -544,7 +551,7 @@
                     @php
                         $sisaKuota = max(0, $ind->kuota - $ind->kuota_terisi);
                         $persenInd = $ind->kuota > 0 ? min(100, round(($ind->kuota_terisi / $ind->kuota) * 100)) : 0;
-                        $isPenuh = $ind->kuota_terisi >= $ind->kuota || $ind->status_kemitraan === 'penuh';
+                        $isPenuh = $ind->kuota_terisi >= $ind->kuota;
                         $isEvaluasi = $ind->status_kemitraan === 'perlu_evaluasi';
                         $isBaru = $ind->status_kemitraan === 'baru';
                         
@@ -781,12 +788,9 @@
                                 <input type="number" name="kuota" required value="6" min="1" max="50" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
                             </div>
 
-                            <!-- Kuota Terisi -->
-                            <div>
-                                <label class="block text-xs font-bold text-slate-700 mb-1">Kuota Terisi Saat Ini</label>
-                                <input type="number" name="kuota_terisi" value="0" min="0" max="50" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
+                            <div class="sm:col-span-2 p-3 bg-blue-50 border border-blue-100 rounded-xl text-[11px] text-blue-700">
+                                Jumlah siswa terisi dihitung otomatis dari penempatan PKL yang sudah disetujui.
                             </div>
-
                             <!-- Pembimbing Sekolah -->
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 mb-1">Pembimbing Sekolah</label>
@@ -798,7 +802,6 @@
                                 <label class="block text-xs font-bold text-slate-700 mb-1">Status Kemitraan *</label>
                                 <select name="status_kemitraan" required class="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white">
                                     <option value="aktif" selected>Aktif Tersedia</option>
-                                    <option value="penuh">Kuota Penuh</option>
                                     <option value="baru">Kemitraan Baru</option>
                                     <option value="perlu_evaluasi">Perlu Evaluasi</option>
                                 </select>
@@ -1065,12 +1068,9 @@
                                 <input type="number" name="kuota" x-model="editForm.kuota" required min="1" max="50" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
                             </div>
 
-                            <!-- Kuota Terisi -->
-                            <div>
-                                <label class="block text-xs font-bold text-slate-700 mb-1">Kuota Terisi Saat Ini</label>
-                                <input type="number" name="kuota_terisi" x-model="editForm.kuota_terisi" min="0" max="50" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
+                            <div class="sm:col-span-2 p-3 bg-blue-50 border border-blue-100 rounded-xl text-[11px] text-blue-700">
+                                Jumlah siswa terisi tidak diubah manual. Sistem menghitungnya otomatis dari penempatan PKL yang sudah disetujui.
                             </div>
-
                             <!-- Pembimbing Sekolah -->
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 mb-1">Pembimbing Sekolah</label>
@@ -1082,7 +1082,6 @@
                                 <label class="block text-xs font-bold text-slate-700 mb-1">Status Kemitraan *</label>
                                 <select name="status_kemitraan" x-model="editForm.status_kemitraan" required class="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white">
                                     <option value="aktif">Aktif Tersedia</option>
-                                    <option value="penuh">Kuota Penuh</option>
                                     <option value="baru">Kemitraan Baru</option>
                                     <option value="perlu_evaluasi">Perlu Evaluasi</option>
                                 </select>
@@ -1143,20 +1142,16 @@
                                        class="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
                             </div>
 
-                            <div>
-                                <label class="block text-xs font-bold text-slate-700 mb-1">Jumlah Kuota Terisi Saat Ini *</label>
-                                <input type="number" 
-                                       name="kuota_terisi" 
-                                       x-model="kuotaForm.kuota_terisi"
-                                       required 
-                                       min="0" 
-                                       max="100" 
-                                       class="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
+                            <div class="p-3 bg-blue-50 border border-blue-100 rounded-xl text-xs space-y-1">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-blue-700 font-medium">Siswa Terplotting Aktual:</span>
+                                    <span class="font-bold text-blue-800" x-text="(activeKuotaIndustri?.kuota_terisi || 0) + ' Siswa'"></span>
+                                </div>
+                                <p class="text-[11px] text-blue-600">Dihitung otomatis dari pengajuan PKL berstatus disetujui.</p>
                             </div>
-
                             <div class="p-3 bg-slate-50 border border-slate-100 rounded-xl text-xs flex items-center justify-between">
                                 <span class="text-slate-500 font-medium">Sisa Kursi Tersedia:</span>
-                                <span class="font-bold text-emerald-600" x-text="Math.max(0, (kuotaForm.kuota || 0) - (kuotaForm.kuota_terisi || 0)) + ' Siswa'"></span>
+                                <span class="font-bold text-emerald-600" x-text="Math.max(0, (kuotaForm.kuota || 0) - (activeKuotaIndustri?.kuota_terisi || 0)) + ' Siswa'"></span>
                             </div>
                         </div>
                     </div>
@@ -1192,7 +1187,6 @@ function industriApp() {
 
         kuotaForm: {
             kuota: 0,
-            kuota_terisi: 0,
         },
 
         editForm: {
@@ -1208,7 +1202,6 @@ function industriApp() {
             kontak_no_hp: '',
             kontak_email: '',
             kuota: 6,
-            kuota_terisi: 0,
             pembimbing_nama: '',
             status_kemitraan: 'aktif',
             jurusan_ids: [],
@@ -1252,9 +1245,8 @@ function industriApp() {
                 kontak_no_hp: industri.kontak_no_hp || '',
                 kontak_email: industri.kontak_email || '',
                 kuota: industri.kuota || 6,
-                kuota_terisi: industri.kuota_terisi || 0,
                 pembimbing_nama: industri.pembimbing_nama || '',
-                status_kemitraan: industri.status_kemitraan || 'aktif',
+                status_kemitraan: industri.status_kemitraan === 'penuh' ? 'aktif' : (industri.status_kemitraan || 'aktif'),
                 jurusan_ids: jIds,
             };
             this.editModalOpen = true;
@@ -1273,7 +1265,6 @@ function industriApp() {
             this.activeKuotaIndustri = industri;
             this.kuotaForm = {
                 kuota: industri.kuota || 0,
-                kuota_terisi: industri.kuota_terisi || 0,
             };
             this.kuotaModalOpen = true;
         }

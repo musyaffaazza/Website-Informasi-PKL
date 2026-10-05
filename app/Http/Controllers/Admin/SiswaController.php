@@ -7,6 +7,7 @@ use App\Models\Siswa;
 use App\Models\Rombel;
 use App\Models\Jurusan;
 use App\Models\User;
+use App\Models\LogAktivitas;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -39,13 +40,13 @@ class SiswaController extends Controller
             });
         }
 
-        // Tingkat / Kelas Filter (default 'XII' to match 432 students shown in screenshot, or 'all' if selected)
-        $selectedTingkat = $request->input('tingkat', 'XII');
-        $query->whereHas('rombel', function ($q) {
-            $q->where('tingkat', 'XII');
-        });
-
-        if ($selectedTingkat !== 'all' && $selectedTingkat !== 'XII' && !empty($selectedTingkat)) {
+        // Tingkat / Kelas Filter
+        $selectedTingkat = $request->input('tingkat', 'all');
+        if ($selectedTingkat === 'XII') {
+            $query->whereHas('rombel', function ($q) {
+                $q->where('tingkat', 'XII');
+            });
+        } elseif ($selectedTingkat !== 'all' && !empty($selectedTingkat)) {
             $query->where('rombel_id', $selectedTingkat);
         }
 
@@ -153,6 +154,8 @@ class SiswaController extends Controller
             'status_pkl' => $validated['status_pkl'],
         ]);
 
+        LogAktivitas::catat('Tambah Data', 'Master Siswa', 'Menambahkan data siswa baru ' . $siswa->nama . ' (NIS: ' . $siswa->nis . ')');
+
         return redirect()->route('admin.siswa.index')
             ->with('success', "Data Siswa {$siswa->nama} (NIS: {$siswa->nis}) berhasil ditambahkan!");
     }
@@ -192,6 +195,8 @@ class SiswaController extends Controller
             'status_pkl' => $validated['status_pkl'],
         ]);
 
+        LogAktivitas::catat('Edit Data', 'Master Siswa', 'Memperbarui data siswa ' . $siswa->nama . ' (NIS: ' . $siswa->nis . ')');
+
         return redirect()->route('admin.siswa.index')
             ->with('success', "Data Siswa {$siswa->nama} berhasil diperbarui!");
     }
@@ -201,12 +206,13 @@ class SiswaController extends Controller
         $siswa = Siswa::findOrFail($id);
         $nama = $siswa->nama;
 
-        DB::transaction(function () use ($siswa) {
+        DB::transaction(function () use ($siswa, $nama) {
             $userId = $siswa->user_id;
             $siswa->delete();
             if ($userId) {
                 DB::table('users')->where('id', $userId)->delete();
             }
+            LogAktivitas::catat('Hapus Data', 'Master Siswa', 'Menghapus data siswa ' . $nama);
         });
 
         return redirect()->route('admin.siswa.index')
@@ -218,6 +224,7 @@ class SiswaController extends Controller
         $ids = $request->input('siswa_ids', []);
         if (!empty($ids)) {
             Siswa::whereIn('id', $ids)->update(['status_akun' => 'aktif']);
+            LogAktivitas::catat('Otorisasi', 'Master Siswa', 'Mengaktifkan akun massal untuk ' . count($ids) . ' siswa');
             return redirect()->back()->with('success', "Akses akun berhasil diaktifkan dan dikirim ulang untuk " . count($ids) . " siswa terpilih!");
         }
         return redirect()->back()->with('info', "Pilih minimal 1 siswa terlebih dahulu.");
@@ -235,6 +242,7 @@ class SiswaController extends Controller
                     'rombel_id' => $rombel->id,
                     'jurusan_id' => $rombel->jurusan_id
                 ]);
+                LogAktivitas::catat('Edit Data', 'Master Siswa', 'Memindahkan ' . count($ids) . ' siswa ke rombel ' . $rombel->nama_rombel);
                 return redirect()->back()->with('success', "Rombongan belajar berhasil disetel ke {$rombel->nama_rombel} untuk " . count($ids) . " siswa!");
             }
         }
@@ -245,13 +253,10 @@ class SiswaController extends Controller
     {
         $count = Siswa::whereIn('status_akun', ['belum_aktivasi', 'ditangguhkan'])->count();
         Siswa::whereIn('status_akun', ['belum_aktivasi', 'ditangguhkan'])->update(['status_akun' => 'aktif']);
+        LogAktivitas::catat('Otorisasi', 'Master Siswa', 'Mengirimkan undangan dan mengaktifkan ' . $count . ' akun siswa');
         return redirect()->back()->with('success', "Undangan aktivasi akun berhasil dikirimkan secara serentak ke {$count} siswa belum aktif!");
     }
 
-    public function syncDapodik()
-    {
-        return redirect()->back()->with('success', 'Tarik Data Siswa Dapodikdasmen Kemendikbudristek berhasil diperbarui secara realtime!');
-    }
 
     public function export(Request $request): StreamedResponse
     {

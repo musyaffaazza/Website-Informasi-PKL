@@ -1,6 +1,7 @@
 @extends('layouts.admin')
 
 @section('title', 'SIPRAK SMKN 1 GUNUNGPUTRI - Master Data Jurusan')
+@section('header_search_placeholder', 'Cari kode, nama jurusan, Kaprog, atau bidang...')
 
 @section('content')
 <div x-data="jurusanApp()" class="space-y-6">
@@ -45,7 +46,7 @@
                 <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                 </svg>
-                <span>Ekspor Akreditasi</span>
+                <span>Ekspor Jurusan</span>
             </a>
 
             <button type="button" 
@@ -153,80 +154,139 @@
     </div>
 
     <!-- Search & Filter Bar -->
-    <div class="bg-white rounded-2xl border border-slate-200/80 p-3 shadow-2xs flex flex-wrap items-center justify-between gap-4">
-        <div class="relative flex-1 w-full sm:min-w-[280px]">
+    <form action="{{ route('admin.jurusan.index') }}" method="GET" id="jurusanFilterForm" class="bg-white rounded-2xl border border-slate-200/80 p-4 sm:p-5 shadow-2xs space-y-3">
+        <div class="relative w-full">
             <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
             </div>
-            <input type="text" 
+            <input type="text"
+                   name="search"
+                   value="{{ request('search') }}"
                    x-model="searchQuery"
-                   placeholder="Cari jurusan, nama Kaprog, atau keahlian..." 
-                   class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition">
+                   placeholder="Cari kode, nama jurusan, Kaprog, atau bidang keahlian..."
+                   class="w-full h-10.5 pl-10 pr-4 bg-slate-50/80 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition">
         </div>
 
-        <div class="flex flex-wrap items-center gap-3">
-            <div class="flex items-center gap-2">
-                <span class="text-xs text-slate-500 font-semibold">Bidang:</span>
-                <select x-model="selectedBidang" 
-                        class="bg-white border border-slate-200 text-slate-700 text-xs rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition font-medium">
-                    <option value="all">Semua Bidang Keahlian</option>
-                    @foreach($bidangList as $b)
-                        <option value="{{ $b }}">{{ $b }}</option>
-                    @endforeach
-                </select>
+        <div class="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-3">
+            <div class="flex flex-wrap items-center gap-2.5">
+                <div class="relative min-w-[200px] flex-1 sm:flex-none sm:w-64">
+                    <select name="bidang" x-model="selectedBidang" onchange="document.getElementById('jurusanFilterForm').submit()" class="w-full h-10.5 pl-3.5 pr-8 bg-slate-50/80 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition appearance-none cursor-pointer">
+                        <option value="all">Semua Bidang Keahlian</option>
+                        @foreach($bidangList as $b)
+                            <option value="{{ $b }}" {{ request('bidang') == $b ? 'selected' : '' }}>{{ $b }}</option>
+                        @endforeach
+                    </select>
+                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-400">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                    </div>
+                </div>
+                <a href="{{ route('admin.jurusan.index') }}" title="Reset Filter" class="h-10.5 w-10.5 shrink-0 rounded-xl border border-slate-200 text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition flex items-center justify-center">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011 1h16a1 1 0 011 1v2.586a1 1 0 00-.293.707l-6.414 6.414a2 2 0 00-.293.707V17l-4 4v-6.586a2 2 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                    </svg>
+                </a>
             </div>
-
-            <div class="flex items-center gap-2">
-                <span class="text-xs text-slate-500 font-semibold">Status Akreditasi:</span>
-                <select x-model="selectedAkreditasi" 
-                        class="bg-white border border-slate-200 text-slate-700 text-xs rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition font-medium">
-                    <option value="all">Semua Status (A Unggul)</option>
-                    @foreach($akreditasiList as $a)
-                        <option value="{{ $a }}">{{ $a }}</option>
-                    @endforeach
-                </select>
-            </div>
-
-            <button type="button" 
-                    @click="resetFilters()"
-                    class="flex items-center gap-1.5 px-3.5 py-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 rounded-xl text-xs font-semibold shadow-2xs transition active:scale-98">
-                <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
-                </svg>
-                <span>Reset</span>
-            </button>
         </div>
-    </div>
+    </form>
     <!-- Jurusan Cards Grid (3 Columns) -->
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-        @foreach($jurusans as $jurusan)
+        @forelse($jurusans as $jurusan)
         @php
             $kode = strtoupper($jurusan->kode);
-            $badgeBg = match($jurusan->badge_color) {
-                'green' => 'bg-emerald-500',
-                'red' => 'bg-red-500',
-                'gray' => 'bg-slate-500',
-                'blue' => 'bg-blue-500',
-                'white' => 'bg-white border border-slate-300',
-                default => 'bg-blue-500'
+            $badgeStyles = match($jurusan->badge_color) {
+                'emerald', 'green' => [
+                    'bg' => 'bg-emerald-500',
+                    'bar' => 'bg-emerald-500',
+                    'soft' => 'bg-emerald-50',
+                    'text' => 'text-emerald-700',
+                    'border' => 'border-emerald-200',
+                    'foreground' => 'text-white',
+                ],
+                'purple' => [
+                    'bg' => 'bg-purple-500',
+                    'bar' => 'bg-purple-500',
+                    'soft' => 'bg-purple-50',
+                    'text' => 'text-purple-700',
+                    'border' => 'border-purple-200',
+                    'foreground' => 'text-white',
+                ],
+                'orange' => [
+                    'bg' => 'bg-orange-500',
+                    'bar' => 'bg-orange-500',
+                    'soft' => 'bg-orange-50',
+                    'text' => 'text-orange-700',
+                    'border' => 'border-orange-200',
+                    'foreground' => 'text-white',
+                ],
+                'amber' => [
+                    'bg' => 'bg-amber-500',
+                    'bar' => 'bg-amber-500',
+                    'soft' => 'bg-amber-50',
+                    'text' => 'text-amber-700',
+                    'border' => 'border-amber-200',
+                    'foreground' => 'text-slate-900',
+                ],
+                'red' => [
+                    'bg' => 'bg-red-500',
+                    'bar' => 'bg-red-500',
+                    'soft' => 'bg-red-50',
+                    'text' => 'text-red-700',
+                    'border' => 'border-red-200',
+                    'foreground' => 'text-white',
+                ],
+                'gray' => [
+                    'bg' => 'bg-slate-500',
+                    'bar' => 'bg-slate-500',
+                    'soft' => 'bg-slate-100',
+                    'text' => 'text-slate-700',
+                    'border' => 'border-slate-200',
+                    'foreground' => 'text-white',
+                ],
+                'white' => [
+                    'bg' => 'bg-white border border-slate-300',
+                    'bar' => 'bg-slate-300',
+                    'soft' => 'bg-slate-50',
+                    'text' => 'text-slate-700',
+                    'border' => 'border-slate-200',
+                    'foreground' => 'text-slate-900',
+                ],
+                default => [
+                    'bg' => 'bg-blue-500',
+                    'bar' => 'bg-blue-500',
+                    'soft' => 'bg-blue-50',
+                    'text' => 'text-blue-700',
+                    'border' => 'border-blue-200',
+                    'foreground' => 'text-white',
+                ],
             };
 
-            $barColor = $badgeBg;
+            $legacyBadgeColors = [
+                'blue'    => '#3b82f6',
+                'emerald' => '#10b981',
+                'green'   => '#10b981',
+                'purple'  => '#a855f7',
+                'orange'  => '#f97316',
+                'amber'   => '#f59e0b',
+                'red'     => '#ef4444',
+                'gray'    => '#64748b',
+                'white'   => '#f1f5f9',
+            ];
+            $rawBadgeColor = $jurusan->badge_color ?? 'blue';
+            $badgeHex = preg_match('/^#[0-9a-fA-F]{6}$/', $rawBadgeColor)
+                ? $rawBadgeColor
+                : ($legacyBadgeColors[$rawBadgeColor] ?? '#3b82f6');
+            $isWhiteBadge = in_array(strtolower($rawBadgeColor), ['white', '#ffffff', '#f1f5f9'], true);
+            $badgeAccentHex = $isWhiteBadge ? '#94a3b8' : $badgeHex;
+            $badgeTextColor = $isWhiteBadge ? '#334155' : '#ffffff';
+            $badgeBorderColor = $isWhiteBadge ? '#cbd5e1' : 'transparent';
 
-            $totalRombel = $jurusan->rombels->count();
-            $kapasitasSiswa = match($kode) {
-                'RPL' => 108,
-                'TOI' => 72,
-                'TP'  => 72,
-                'KA'  => 70,
-                'TPL' => 36,
-                default => $totalRombel * 36
-            };
+            $totalRombel = (int) ($jurusan->rombels_xii_aktual ?? $jurusan->rombels->where('tingkat', 'XII')->count());
+            $kapasitasSiswa = (int) ($jurusan->siswa_xii_aktual ?? $jurusan->rombels->where('tingkat', 'XII')->sum(fn($r) => $r->siswas->count()));
 
-            $kuotaTotal = $jurusan->kuota_industri ?: 100;
-            $kuotaTerisi = $jurusan->kuota_terisi ?: 0;
+            $kuotaTotal = $jurusan->kuota_industri_aktual ?? 0;
+            $kuotaTerisi = $jurusan->kuota_terisi_aktual ?? 0;
             $sisaKuota = max(0, $kuotaTotal - $kuotaTerisi);
             $persen = $kuotaTotal > 0 ? min(100, round(($kuotaTerisi / $kuotaTotal) * 100)) : 0;
 
@@ -236,21 +296,18 @@
                 default => 'Terserap Terpenuhi'
             };
 
-            $mitraList = is_array($jurusan->mitra_utama) ? $jurusan->mitra_utama : [];
-            if (empty($mitraList)) {
-                $mitraList = $jurusan->industris->take(3)->pluck('nama')->toArray();
-            }
+            $mitraList = $jurusan->industris->take(3)->pluck('nama')->toArray();
         @endphp
 
         <!-- Single Card -->
-        <div x-show="matchesFilter('{{ addslashes(strtolower($jurusan->nama)) }}', '{{ addslashes(strtolower($jurusan->kode)) }}', '{{ addslashes(strtolower($jurusan->kaprog ? $jurusan->kaprog->nama : '')) }}', '{{ addslashes($jurusan->bidang) }}', '{{ addslashes($jurusan->akreditasi) }}')" 
-             class="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-2xs hover:shadow-md transition duration-200 flex flex-col justify-between">
-            
-            <div>
+        <div class="group overflow-hidden bg-white rounded-3xl border border-slate-200/90 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition duration-200 flex flex-col">
+            <div class="h-1.5" style="background-color:{{ $badgeAccentHex }};"></div>
+
+            <div class="p-5 flex-1">
                 <!-- Card Header -->
                 <div class="flex items-start justify-between gap-3 mb-4">
                     <div class="flex items-start gap-3">
-                        <div class="w-11 h-11 rounded-xl {{ $badgeBg }} {{ $jurusan->badge_color === 'white' ? 'text-slate-900' : 'text-white' }} font-black text-sm tracking-wider flex items-center justify-center shrink-0 shadow-2xs">
+                        <div class="w-12 h-12 rounded-2xl font-black text-sm tracking-wider flex items-center justify-center shrink-0 shadow-sm text-white" style="background-color:{{ $badgeHex }};border:1px solid {{ $badgeBorderColor }};color:{{ $badgeTextColor }};">
                             {{ $jurusan->kode }}
                         </div>
 
@@ -264,10 +321,6 @@
                         </div>
                     </div>
 
-                    <div class="shrink-0 bg-[#e8f8f0] text-[#059669] border border-[#bbf0d8] rounded-xl px-2.5 py-1 text-center font-bold">
-                        <div class="text-xs font-black leading-none">A</div>
-                        <div class="text-[8px] font-extrabold tracking-wider leading-none mt-0.5">UNGGUL</div>
-                    </div>
                 </div>
 
                 <!-- Info Stack with Icons -->
@@ -281,7 +334,7 @@
                             <div class="text-[9px] font-bold text-slate-400 uppercase tracking-wider">
                                 KEPALA PROGRAM (KAPROG)
                             </div>
-                            <div class="text-xs font-bold text-slate-900 mt-0.5">
+                            <div class="text-xs font-bold text-slate-900 mt-0.5 truncate max-w-[28rem]">
                                 {{ $jurusan->kaprog ? $jurusan->kaprog->nama : 'Belum Ditugaskan' }}
                             </div>
                         </div>
@@ -297,11 +350,15 @@
                                 ROMBEL &amp; KAPASITAS
                             </div>
                             <div class="text-xs font-bold text-slate-900 mt-0.5">
-                                {{ $totalRombel }} Rombel ({{ $kapasitasSiswa }} Siswa Tingkat XII)
+                                @if($totalRombel > 0)
+                                    {{ $totalRombel }} Rombel ({{ $kapasitasSiswa }} Siswa Tingkat XII)
+                                @else
+                                    <span class="text-slate-400 font-semibold italic">Belum Ada Rombel (0 Siswa)</span>
+                                @endif
                             </div>
                         </div>
                     </div>
-
+                    
                     <!-- Item 3: Mitra Utama DU/DI -->
                     <div class="flex items-start gap-2.5">
                         <svg class="w-4 h-4 text-slate-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -326,25 +383,25 @@
                     <!-- Item 4: Quota & Progress Bar -->
                     <div class="pt-1">
                         <div class="flex items-center justify-between text-xs mb-1.5">
-                            <span class="text-slate-500 font-medium">Ketersediaan Kuota Industri:</span>
-                            <span class="font-extrabold text-slate-900">{{ $kuotaTerisi }} / {{ $kuotaTotal }} Kursi</span>
+                        <span class="text-slate-500 font-medium">Penempatan DU/DI:</span>
+                            <span class="font-extrabold text-slate-900">{{ $kuotaTerisi }} / {{ $kuotaTotal }} siswa</span>
                         </div>
                         <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
-                            <div class="{{ $barColor }} h-2 rounded-full transition-all duration-500" style="width: {{ $persen }}%;"></div>
+                            <div class="h-2 rounded-full transition-all duration-500" style="width:{{ $persen }}%;background-color:{{ $badgeHex }};"></div>
                         </div>
                         <div class="flex items-center justify-between text-[11px] mt-1.5">
-                            <span class="font-semibold text-emerald-600">{{ $statusSerap }}</span>
-                            <span class="text-slate-400">Sisa: {{ $sisaKuota }} Kursi Magang</span>
+                            <span class="font-semibold text-emerald-600">{{ $kuotaTotal > 0 ? $statusSerap : 'Belum Ada Mitra' }}</span>
+                            <span class="text-slate-400">Sisa: {{ $sisaKuota }} slot</span>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Card Actions -->
-            <div class="pt-4 mt-4 border-t border-slate-100 flex items-center gap-2">
+            <div class="px-5 py-4 border-t border-slate-100 bg-slate-50/70 flex flex-wrap items-center gap-2">
                 <button type="button" 
                         @click="openKurikulumModal({{ json_encode($jurusan) }})"
-                        class="flex-1 py-2 px-2 bg-white hover:bg-slate-50 text-slate-700 text-center text-xs font-semibold border border-slate-200 rounded-xl shadow-2xs transition active:scale-98">
+                        class="flex-1 min-w-[10rem] py-2 px-2 bg-white hover:bg-slate-100 text-slate-700 text-center text-xs font-semibold border border-slate-200 rounded-xl shadow-2xs transition active:scale-98">
                     Kelola Kurikulum PKL
                 </button>
 
@@ -361,7 +418,12 @@
                 </button>
             </div>
         </div>
-        @endforeach
+        @empty
+            <div class="xl:col-span-3 md:col-span-2 bg-white rounded-2xl border border-dashed border-slate-300 p-12 text-center text-slate-400">
+                <div class="font-bold text-slate-700 text-sm">Tidak ada jurusan yang sesuai</div>
+                <div class="text-xs mt-1">Ubah kata kunci atau filter untuk melihat data lainnya.</div>
+            </div>
+        @endforelse
     </div>
 
     <!-- Bottom Information & Pagination Bar -->
@@ -370,19 +432,29 @@
             <svg class="w-4 h-4 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <span>Menampilkan {{ count($jurusans) }} dari {{ $totalPrograms }} konsentrasi keahlian vokasi SMKN 1 Gunungputri</span>
+            <span>Menampilkan {{ $jurusans->firstItem() ?? 0 }} - {{ $jurusans->lastItem() ?? 0 }} dari {{ $jurusans->total() }} konsentrasi keahlian vokasi SMKN 1 Gunungputri</span>
         </div>
 
         <div class="flex items-center gap-2">
-            <button class="px-3.5 py-1.5 bg-white border border-slate-200 text-slate-400 text-xs font-medium rounded-xl hover:bg-slate-50 transition cursor-default">
-                Sebelumnya
-            </button>
-            <span class="w-7 h-7 flex items-center justify-center bg-[#0f2942] text-white text-xs font-bold rounded-lg shadow-xs">
-                1
-            </span>
-            <button class="px-3.5 py-1.5 bg-white border border-slate-200 text-slate-400 text-xs font-medium rounded-xl hover:bg-slate-50 transition cursor-default">
-                Selanjutnya
-            </button>
+            @if ($jurusans->onFirstPage())
+                <span class="px-3.5 py-1.5 rounded-xl text-slate-300 text-xs font-medium cursor-not-allowed">Sebelumnya</span>
+            @else
+                <a href="{{ $jurusans->previousPageUrl() }}" class="px-3.5 py-1.5 rounded-xl text-slate-600 text-xs font-semibold hover:bg-slate-100">Sebelumnya</a>
+            @endif
+
+            @foreach ($jurusans->getUrlRange(1, $jurusans->lastPage()) as $page => $url)
+                @if ($page == $jurusans->currentPage())
+                    <span class="w-7 h-7 flex items-center justify-center bg-[#0f2942] text-white text-xs font-bold rounded-lg shadow-xs">{{ $page }}</span>
+                @else
+                    <a href="{{ $url }}" class="w-7 h-7 flex items-center justify-center text-slate-600 text-xs font-semibold rounded-lg hover:bg-slate-100">{{ $page }}</a>
+                @endif
+            @endforeach
+
+            @if ($jurusans->hasMorePages())
+                <a href="{{ $jurusans->nextPageUrl() }}" class="px-3.5 py-1.5 rounded-xl text-slate-600 text-xs font-semibold hover:bg-slate-100">Selanjutnya</a>
+            @else
+                <span class="px-3.5 py-1.5 rounded-xl text-slate-300 text-xs font-medium cursor-not-allowed">Selanjutnya</span>
+            @endif
         </div>
     </div>
     <!-- ==================== MODALS ==================== -->
@@ -437,15 +509,6 @@
                             </div>
 
                             <div>
-                                <label class="block text-xs font-bold text-slate-700 mb-1">Akreditasi *</label>
-                                <select name="akreditasi" required class="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white">
-                                    <option value="A UNGGUL" selected>A UNGGUL</option>
-                                    <option value="A (Amat Baik)">A (Amat Baik)</option>
-                                    <option value="B (Baik)">B (Baik)</option>
-                                </select>
-                            </div>
-
-                            <div class="md:col-span-2">
                                 <label class="block text-xs font-bold text-slate-700 mb-1">Kepala Program Keahlian (Kaprog)</label>
                                 <select name="kaprog_guru_id" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white">
                                     <option value="">-- Pilih Guru Sebagai Kaprog --</option>
@@ -455,26 +518,27 @@
                                 </select>
                             </div>
 
-                            <div>
-                                <label class="block text-xs font-bold text-slate-700 mb-1">Target Kuota Industri *</label>
-                                <input type="number" name="kuota_industri" required value="100" min="1" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
+                            <div class="md:col-span-2 rounded-xl border border-sky-100 bg-sky-50/70 p-3">
+                                <div class="text-xs font-bold text-sky-800">Kuota DU/DI dihitung otomatis</div>
+                                <p class="mt-1 text-[11px] leading-relaxed text-sky-700">Kapasitas berasal dari total kuota mitra yang ditautkan setelah jurusan dibuat. Jumlah terisi berasal dari pengajuan PKL siswa yang sudah disetujui.</p>
+                                <input type="hidden" name="kuota_industri" value="0">
+                                <input type="hidden" name="kuota_terisi" value="0">
                             </div>
 
-                            <div>
-                                <label class="block text-xs font-bold text-slate-700 mb-1">Kuota Terisi Saat Ini</label>
-                                <input type="number" name="kuota_terisi" value="0" min="0" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
-                            </div>
 
                             <div class="md:col-span-2">
-                                <label class="block text-xs font-bold text-slate-700 mb-2">Warna Badge</label>
-                                <div class="grid grid-cols-5 gap-2">
-                                    @foreach(['green'=>['bg-emerald-500','Hijau'],'red'=>['bg-red-500','Merah'],'gray'=>['bg-slate-500','Abu-abu'],'blue'=>['bg-blue-500','Biru'],'white'=>['bg-white border border-slate-300','Putih']] as $val=>$meta)
-                                    <label class="cursor-pointer" title="{{ $meta[1] }}">
-                                        <input type="radio" name="badge_color" value="{{ $val }}" class="sr-only peer" {{ $val === 'blue' ? 'checked' : '' }}>
-                                        <span class="flex h-10 w-full items-center justify-center rounded-xl border border-slate-200 bg-white transition-all peer-checked:border-slate-900 peer-checked:ring-2 peer-checked:ring-slate-900/15">
-                                            <span class="h-5 w-5 rounded-full {{ $meta[0] }} shadow-sm"></span>
+                                <label class="block text-xs font-bold text-slate-700 mb-3">Warna Badge</label>
+                                <div class="flex flex-wrap gap-3" x-data="{ selected: 'blue' }">
+                                    <input type="hidden" name="badge_color" x-model="selected">
+                                    @foreach(['blue'=>['#3b82f6','#2563eb','Biru'],'emerald'=>['#10b981','#059669','Hijau'],'red'=>['#ef4444','#dc2626','Merah'],'gray'=>['#64748b','#475569','Abu-abu'],'white'=>['#f8fafc','#64748b','Putih']] as $val=>$meta)
+                                    <button type="button" class="flex flex-col items-center gap-1 cursor-pointer" title="Pilih {{ $meta[2] }}" @click="selected = '{{ $val }}'">
+                                        <span class="relative flex items-center justify-center w-9 h-9 rounded-full shadow-sm transition-all duration-150"
+                                              :style="selected === '{{ $val }}' ? 'background-color: {{ $meta[0] }}; border: 2px solid {{ $meta[1] }}; box-shadow: 0 0 0 3px {{ $meta[1] }}; transform: scale(1.1);' : 'background-color: {{ $meta[0] }}; border: 2px solid {{ $meta[1] }};'"
+                                              :class="selected === '{{ $val }}' ? '' : 'hover:scale-105'">
+                                            <svg x-show="selected === '{{ $val }}'" class="w-4 h-4" :class="selected === 'white' ? 'text-slate-700' : 'text-white'" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
                                         </span>
-                                    </label>
+                                        <span class="text-[10px] font-semibold transition-colors" :class="selected === '{{ $val }}' ? 'text-slate-900' : 'text-slate-400'">{{ $meta[2] }}</span>
+                                    </button>
                                     @endforeach
                                 </div>
                             </div>
@@ -535,7 +599,7 @@
                         </div>
                         <div class="flex items-center gap-2">
                             <span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200"
-                                  x-text="activeJurusan?.akreditasi"></span>
+                                  x-text="activeJurusan?.kode"></span>
                             <button type="button" @click="detailModalOpen = false" class="text-slate-400 hover:text-slate-600 text-xl font-bold ml-2">&times;</button>
                         </div>
                     </div>
@@ -555,10 +619,10 @@
                                 KUOTA &amp; KETERSEDIAAN
                             </div>
                             <div class="text-xs font-bold text-slate-900">
-                                <span x-text="activeJurusan?.kuota_terisi || 0"></span> / <span x-text="activeJurusan?.kuota_industri || 0"></span> Kursi Magang
+                                <span x-text="activeJurusan?.kuota_terisi_aktual || 0"></span> / <span x-text="activeJurusan?.kuota_industri_aktual || 0"></span> Siswa Terplotting
                             </div>
                             <div class="text-[11px] text-emerald-600 font-semibold mt-1">
-                                Sisa Kursi Tersedia: <span x-text="Math.max(0, (activeJurusan?.kuota_industri || 0) - (activeJurusan?.kuota_terisi || 0))"></span>
+                                Sisa Slot Tersedia: <span x-text="Math.max(0, (activeJurusan?.kuota_industri_aktual || 0) - (activeJurusan?.kuota_terisi_aktual || 0))"></span>
                             </div>
                             <div class="text-[11px] text-slate-500 mt-0.5">
                                 Status: <span class="capitalize font-bold" :class="activeJurusan?.status === 'aktif' ? 'text-emerald-600' : 'text-rose-600'" x-text="activeJurusan?.status"></span>
@@ -570,7 +634,7 @@
                                 DAFTAR ROMBONGAN BELAJAR (ROMBEL) TINGKAT XII
                             </div>
                             <div class="flex flex-wrap gap-2">
-                                <template x-for="rombel in (activeJurusan?.rombels || [])" :key="rombel.id">
+                                <template x-for="rombel in (activeJurusan?.rombels || []).filter(rombel => rombel.tingkat === 'XII' && (rombel.status || 'aktif') === 'aktif')" :key="rombel.id">
                                     <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 text-slate-800 text-xs font-medium rounded-lg shadow-2xs">
                                         <svg class="w-3.5 h-3.5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
@@ -579,7 +643,7 @@
                                         <span class="text-[10px] text-slate-400" x-text="'(' + rombel.tahun_ajaran + ')'"></span>
                                     </span>
                                 </template>
-                                <span x-show="!activeJurusan?.rombels?.length" class="text-xs text-slate-400 italic">Belum ada rombel terdaftar.</span>
+                                <span x-show="!(activeJurusan?.rombels || []).some(rombel => rombel.tingkat === 'XII' && (rombel.status || 'aktif') === 'aktif')" class="text-xs text-slate-400 italic">Belum ada rombel terdaftar.</span>
                             </div>
                         </div>
 
@@ -667,15 +731,6 @@
                             </div>
 
                             <div>
-                                <label class="block text-xs font-bold text-slate-700 mb-1">Akreditasi *</label>
-                                <select name="akreditasi" x-model="editForm.akreditasi" required class="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white">
-                                    <option value="A UNGGUL">A UNGGUL</option>
-                                    <option value="A (Amat Baik)">A (Amat Baik)</option>
-                                    <option value="B (Baik)">B (Baik)</option>
-                                </select>
-                            </div>
-
-                            <div class="md:col-span-2">
                                 <label class="block text-xs font-bold text-slate-700 mb-1">Kepala Program (Kaprog)</label>
                                 <select name="kaprog_guru_id" x-model="editForm.kaprog_guru_id" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white">
                                     <option value="">-- Tidak Ada Kaprog --</option>
@@ -685,14 +740,11 @@
                                 </select>
                             </div>
 
-                            <div>
-                                <label class="block text-xs font-bold text-slate-700 mb-1">Target Kuota Industri *</label>
-                                <input type="number" name="kuota_industri" x-model="editForm.kuota_industri" required min="1" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
-                            </div>
-
-                            <div>
-                                <label class="block text-xs font-bold text-slate-700 mb-1">Kuota Terisi *</label>
-                                <input type="number" name="kuota_terisi" x-model="editForm.kuota_terisi" required min="0" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
+                            <div class="md:col-span-2 rounded-xl border border-sky-100 bg-sky-50/70 p-3">
+                                <div class="text-xs font-bold text-sky-800">Kuota DU/DI dihitung otomatis</div>
+                                <p class="mt-1 text-[11px] leading-relaxed text-sky-700">Atur mitra melalui tombol <span class="font-semibold">Daftar DU/DI</span>. Kapasitas mengikuti total kuota mitra, sedangkan keterisian mengikuti pengajuan PKL yang disetujui.</p>
+                                <input type="hidden" name="kuota_industri" x-model="editForm.kuota_industri">
+                                <input type="hidden" name="kuota_terisi" x-model="editForm.kuota_terisi">
                             </div>
 
                             <div>
@@ -703,24 +755,24 @@
                                 </select>
                             </div>
 
+
                             <div class="md:col-span-2">
-                                <label class="block text-xs font-bold text-slate-700 mb-2">Warna Badge</label>
-                                <div class="grid grid-cols-5 gap-2">
-                                    @foreach(['green'=>['bg-emerald-500','Hijau'],'red'=>['bg-red-500','Merah'],'gray'=>['bg-slate-500','Abu-abu'],'blue'=>['bg-blue-500','Biru'],'white'=>['bg-white border border-slate-300','Putih']] as $val=>$meta)
-                                    <label class="cursor-pointer" title="{{ $meta[1] }}">
-                                        <input type="radio" name="badge_color" value="{{ $val }}" x-model="editForm.badge_color" class="sr-only peer">
-                                        <span class="flex h-10 w-full items-center justify-center rounded-xl border border-slate-200 bg-white transition-all peer-checked:border-slate-900 peer-checked:ring-2 peer-checked:ring-slate-900/15">
-                                            <span class="h-5 w-5 rounded-full {{ $meta[0] }} shadow-sm"></span>
+                                <label class="block text-xs font-bold text-slate-700 mb-3">Warna Badge</label>
+                                <div class="flex flex-wrap gap-3">
+                                    <input type="hidden" name="badge_color" x-model="editForm.badge_color">
+                                    @foreach(['blue'=>['#3b82f6','#2563eb','Biru'],'emerald'=>['#10b981','#059669','Hijau'],'red'=>['#ef4444','#dc2626','Merah'],'gray'=>['#64748b','#475569','Abu-abu'],'white'=>['#f8fafc','#64748b','Putih']] as $val=>$meta)
+                                    <button type="button" class="flex flex-col items-center gap-1 cursor-pointer" title="Pilih {{ $meta[2] }}" @click="editForm.badge_color = '{{ $val }}'">
+                                        <span class="relative flex items-center justify-center w-9 h-9 rounded-full shadow-sm transition-all duration-150"
+                                              :style="editForm.badge_color === '{{ $val }}' ? 'background-color: {{ $meta[0] }}; border: 2px solid {{ $meta[1] }}; box-shadow: 0 0 0 3px {{ $meta[1] }}; transform: scale(1.1);' : 'background-color: {{ $meta[0] }}; border: 2px solid {{ $meta[1] }};'"
+                                              :class="editForm.badge_color === '{{ $val }}' ? '' : 'hover:scale-105'">
+                                            <svg x-show="editForm.badge_color === '{{ $val }}'" class="w-4 h-4" :class="editForm.badge_color === 'white' ? 'text-slate-700' : 'text-white'" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
                                         </span>
-                                    </label>
+                                        <span class="text-[10px] font-semibold transition-colors" :class="editForm.badge_color === '{{ $val }}' ? 'text-slate-900' : 'text-slate-400'">{{ $meta[2] }}</span>
+                                    </button>
                                     @endforeach
                                 </div>
                             </div>
 
-                            <div class="md:col-span-2">
-                                <label class="block text-xs font-bold text-slate-700 mb-1">Mitra Utama DU/DI (Pisahkan koma)</label>
-                                <input type="text" name="mitra_utama" x-model="editForm.mitra_utama" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
-                            </div>
 
                             <div class="md:col-span-2">
                                 <label class="block text-xs font-bold text-slate-700 mb-1">Capaian Kurikulum PKL</label>
@@ -945,9 +997,9 @@
 <script>
 function jurusanApp() {
     return {
-        searchQuery: '',
-        selectedBidang: 'all',
-        selectedAkreditasi: 'all',
+        searchQuery: @js(request('search', '')),
+        selectedBidang: '{{ request("bidang", "all") }}',
+        
 
         createModalOpen: false,
         detailModalOpen: false,
@@ -968,7 +1020,6 @@ function jurusanApp() {
             nama: '',
             singkatan: '',
             bidang: '',
-            akreditasi: 'A UNGGUL',
             kaprog_guru_id: '',
             kuota_industri: 100,
             kuota_terisi: 0,
@@ -978,29 +1029,7 @@ function jurusanApp() {
             capaian_kurikulum: '',
         },
 
-        resetFilters() {
-            this.searchQuery = '';
-            this.selectedBidang = 'all';
-            this.selectedAkreditasi = 'all';
-        },
-
-        matchesFilter(nama, kode, kaprog, bidang, akreditasi) {
-            if (this.searchQuery.trim() !== '') {
-                const q = this.searchQuery.toLowerCase().trim();
-                const matched = nama.includes(q) || kode.includes(q) || kaprog.includes(q) || bidang.toLowerCase().includes(q);
-                if (!matched) return false;
-            }
-
-            if (this.selectedBidang !== 'all') {
-                if (bidang !== this.selectedBidang) return false;
-            }
-
-            if (this.selectedAkreditasi !== 'all') {
-                if (akreditasi !== this.selectedAkreditasi) return false;
-            }
-
-            return true;
-        },
+        resetFilters() {},
 
         openCreateModal() {
             this.createModalOpen = true;
@@ -1019,12 +1048,16 @@ function jurusanApp() {
                 nama: jurusan.nama,
                 singkatan: jurusan.singkatan || jurusan.kode,
                 bidang: jurusan.bidang || '',
-                akreditasi: jurusan.akreditasi || 'A UNGGUL',
                 kaprog_guru_id: jurusan.kaprog_guru_id || '',
                 kuota_industri: jurusan.kuota_industri || 0,
                 kuota_terisi: jurusan.kuota_terisi || 0,
                 status: jurusan.status || 'aktif',
-                badge_color: jurusan.badge_color || 'blue',
+                badge_color: (function(c) {
+                    const hexToKey = { '#3b82f6': 'blue', '#10b981': 'emerald', '#ef4444': 'red', '#64748b': 'gray', '#ffffff': 'white', '#f1f5f9': 'white' };
+                    const validKeys = ['blue','emerald','red','gray','white'];
+                    if (c && validKeys.includes(c)) return c;
+                    return hexToKey[c] || 'blue';
+                })(jurusan.badge_color),
                 mitra_utama: Array.isArray(jurusan.mitra_utama) ? jurusan.mitra_utama.join(', ') : (jurusan.mitra_utama || ''),
                 capaian_kurikulum: jurusan.capaian_kurikulum || '',
             };

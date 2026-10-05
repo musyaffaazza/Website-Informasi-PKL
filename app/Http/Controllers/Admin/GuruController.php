@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Guru;
 use App\Models\Jurusan;
+use App\Models\PembimbingPenugasan;
+use App\Models\LogAktivitas;
 use App\Models\Rombel;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -93,6 +95,10 @@ class GuruController extends Controller
         }
 
         $jurusans = Jurusan::where('status', 'aktif')->orderBy('nama')->get();
+        $totalJurusan = $jurusans->count();
+        $totalSiswaBimbingan = PembimbingPenugasan::whereHas('pengajuan', function ($q) {
+            $q->where('status', 'disetujui');
+        })->count();
 
         return view('admin.guru.index', compact(
             'gurus',
@@ -101,7 +107,9 @@ class GuruController extends Controller
             'waliKelasCount',
             'kaprogCount',
             'jurusans',
-            'perPage'
+            'perPage',
+            'totalJurusan',
+            'totalSiswaBimbingan'
         ));
     }
 
@@ -155,6 +163,8 @@ class GuruController extends Controller
             'jurusan_id' => $validated['jurusan_id'] ?: null,
         ]);
 
+        LogAktivitas::catat('Tambah Data', 'Master Guru', 'Menambahkan data guru baru ' . $guru->nama . ' (' . $guru->nip . ')');
+
         return redirect()->route('admin.guru.index')
             ->with('success', "Data Guru {$guru->nama} berhasil ditambahkan!");
     }
@@ -198,6 +208,8 @@ class GuruController extends Controller
             'jurusan_id' => $validated['jurusan_id'] ?: null,
         ]);
 
+        LogAktivitas::catat('Edit Data', 'Master Guru', 'Memperbarui data guru ' . $guru->nama . ' (' . $guru->nip . ')');
+
         return redirect()->route('admin.guru.index')
             ->with('success', "Data Guru {$guru->nama} berhasil diperbarui!");
     }
@@ -207,7 +219,7 @@ class GuruController extends Controller
         $guru = Guru::findOrFail($id);
         $nama = $guru->nama;
 
-        DB::transaction(function () use ($guru) {
+        DB::transaction(function () use ($guru, $nama) {
             // Unlink as wali kelas in rombel
             Rombel::where('wali_kelas_guru_id', $guru->id)->update(['wali_kelas_guru_id' => null]);
             // Unlink as kaprog in jurusan
@@ -218,6 +230,7 @@ class GuruController extends Controller
             if ($userId) {
                 DB::table('users')->where('id', $userId)->delete();
             }
+            LogAktivitas::catat('Hapus Data', 'Master Guru', 'Menghapus data guru ' . $nama);
         });
 
         return redirect()->route('admin.guru.index')
@@ -233,6 +246,7 @@ class GuruController extends Controller
         }
         $guru->status_akun = $newStatus;
         $guru->save();
+        LogAktivitas::catat('Ubah Status', 'Master Guru', 'Mengubah status akun guru ' . $guru->nama . ' menjadi ' . ucfirst($newStatus));
 
         if ($request->wantsJson()) {
             return response()->json(['success' => true, 'status_akun' => $guru->status_akun]);
@@ -246,6 +260,7 @@ class GuruController extends Controller
         $guru = Guru::findOrFail($id);
         $guru->status_akun = 'aktif';
         $guru->save();
+        LogAktivitas::catat('Otorisasi', 'Master Guru', 'Mengirimkan email aktivasi dan mengaktifkan akun guru ' . $guru->nama);
 
         return redirect()->back()->with('success', "Email aktivasi akun dan kredensial SIPRAK berhasil dikirimkan ke {$guru->nama} ({$guru->email})!");
     }
@@ -265,6 +280,7 @@ class GuruController extends Controller
                 $g->roles_list = $roles;
                 $g->save();
             }
+            LogAktivitas::catat('Ubah Status', 'Master Guru', 'Memperbarui role massal (' . $newRole . ') untuk ' . count($ids) . ' guru');
             return redirect()->back()->with('success', "Penugasan role '{$newRole}' berhasil diperbarui secara massal untuk " . count($ids) . " guru!");
         }
 
@@ -276,15 +292,12 @@ class GuruController extends Controller
         $ids = $request->input('guru_ids', []);
         if (!empty($ids)) {
             Guru::whereIn('id', $ids)->update(['status_akun' => 'aktif']);
+            LogAktivitas::catat('Otorisasi', 'Master Guru', 'Mengaktifkan akun dan mengirimkan undangan massal ke ' . count($ids) . ' guru');
             return redirect()->back()->with('success', "Akses akun dan email aktivasi berhasil dikirimkan ke " . count($ids) . " guru terpilih!");
         }
         return redirect()->back()->with('info', "Pilih minimal 1 guru untuk mengirimkan akses akun.");
     }
 
-    public function syncDapodik()
-    {
-        return redirect()->back()->with('success', 'Tarik Data GTK Dapodikdasmen Kemendikbudristek berhasil diperbarui secara realtime!');
-    }
 
     public function export(Request $request): StreamedResponse
     {
@@ -352,3 +365,4 @@ class GuruController extends Controller
         }, 200, $headers);
     }
 }
+

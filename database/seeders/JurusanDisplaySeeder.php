@@ -20,7 +20,7 @@ class JurusanDisplaySeeder extends Seeder
                 'nip' => '197805122005011004',
             ],
             [
-                'username' => 'kaprog_toi',
+                'username' => 'kaprog_tei',
                 'nama' => 'Drs. H. Suryana, M.Pd.',
                 'email' => 'suryana@smkn1gunungputri.sch.id',
                 'nip' => '196803201995121001',
@@ -32,7 +32,7 @@ class JurusanDisplaySeeder extends Seeder
                 'nip' => '198207182009021003',
             ],
             [
-                'username' => 'kaprog_ka',
+                'username' => 'kaprog_ki',
                 'nama' => 'Dra. Hj. Nurhayati, M.Pd.',
                 'email' => 'nurhayati@smkn1gunungputri.sch.id',
                 'nip' => '197011051998022001',
@@ -81,34 +81,30 @@ class JurusanDisplaySeeder extends Seeder
             $kaprogIds[$k['username']] = $guruId;
         }
 
-        DB::table('industri_jurusan')->delete();
-
         $definitions = [
             1 => [
                 'kode' => 'RPL',
                 'nama' => 'Rekayasa Perangkat Lunak',
                 'singkatan' => 'RPL',
                 'bidang' => 'Teknologi Informasi',
-                'akreditasi' => 'A UNGGUL',
-                'kaprog_guru_id' => $kaprogIds['kaprog_rpl'],
-                'kuota_industri' => 112,
-                'kuota_terisi' => 108,
+                'kaprog_guru_id' => $kaprogIds['kaprog_rpl'] ?? null,
+                'kuota_industri' => 0,
+                'kuota_terisi' => 0,
                 'badge_color' => 'blue',
-                'mitra_utama' => json_encode(['PT Telkom Akses', 'Tokopedia', 'PT Nusantara Digital']),
+                'mitra_utama' => json_encode([]),
                 'capaian_kurikulum' => 'Pengembangan Perangkat Lunak Berbasis Web, Mobile & Cloud Computing sesuai standar industri 4.0 dan SKKNI.',
                 'status' => 'aktif',
             ],
             3 => [
-                'kode' => 'KA',
-                'nama' => 'Kimia Analisis (4 Tahun)',
-                'singkatan' => 'KA',
+                'kode' => 'KI',
+                'nama' => 'Kimia Industri',
+                'singkatan' => 'KI',
                 'bidang' => 'Teknologi Kimia & Industri',
-                'akreditasi' => 'A UNGGUL',
-                'kaprog_guru_id' => $kaprogIds['kaprog_ka'],
-                'kuota_industri' => 75,
-                'kuota_terisi' => 70,
+                'kaprog_guru_id' => $kaprogIds['kaprog_ki'] ?? null,
+                'kuota_industri' => 0,
+                'kuota_terisi' => 0,
                 'badge_color' => 'emerald',
-                'mitra_utama' => json_encode(['PT Kalbe Farma', 'PT Indofood CBP', 'Sucofindo']),
+                'mitra_utama' => json_encode([]),
                 'capaian_kurikulum' => 'Analisis Kimia Terapan, Kontrol Kualitas Laboratorium (QC/QA), Kromatografi & Spektrofotometri Industri.',
                 'status' => 'aktif',
             ],
@@ -117,12 +113,11 @@ class JurusanDisplaySeeder extends Seeder
                 'nama' => 'Teknik Pemesinan',
                 'singkatan' => 'TP',
                 'bidang' => 'Teknologi & Rekayasa',
-                'akreditasi' => 'A UNGGUL',
-                'kaprog_guru_id' => $kaprogIds['kaprog_tp'],
-                'kuota_industri' => 76,
-                'kuota_terisi' => 72,
-                'badge_color' => 'purple',
-                'mitra_utama' => json_encode(['Astra Group', 'PT United Tractors', 'Komatsu']),
+                'kaprog_guru_id' => $kaprogIds['kaprog_tp'] ?? null,
+                'kuota_industri' => 0,
+                'kuota_terisi' => 0,
+                'badge_color' => 'red',
+                'mitra_utama' => json_encode([]),
                 'capaian_kurikulum' => 'Operasional Mesin Bubut, Frais Konvensional & Mesin CNC (CAM), serta Pembuatan Komponen Presisi Tinggi.',
                 'status' => 'aktif',
             ],
@@ -131,26 +126,24 @@ class JurusanDisplaySeeder extends Seeder
                 'nama' => 'Teknik Pengelasan & Fabrikasi',
                 'singkatan' => 'TPL',
                 'bidang' => 'Teknologi & Rekayasa',
-                'akreditasi' => 'A UNGGUL',
-                'kaprog_guru_id' => $kaprogIds['kaprog_tpl'],
-                'kuota_industri' => 40,
-                'kuota_terisi' => 36,
-                'badge_color' => 'orange',
-                'mitra_utama' => json_encode(['PT PAL Indonesia', 'PT Barata Indonesia']),
+                'kaprog_guru_id' => $kaprogIds['kaprog_tpl'] ?? null,
+                'kuota_industri' => 0,
+                'kuota_terisi' => 0,
+                'badge_color' => 'gray',
+                'mitra_utama' => json_encode([]),
                 'capaian_kurikulum' => 'Teknik Las SMAW, GMAW, GTAW Posisi 1G-6G, Non-Destructive Testing (NDT), dan Fabrikasi Konstruksi Logam.',
                 'status' => 'aktif',
             ],
             6 => [
-                'kode' => 'TOI',
-                'nama' => 'Teknik Otomasi Industri',
-                'singkatan' => 'TOI',
+                'kode' => 'TEI',
+                'nama' => 'Teknik Elektronika Industri',
+                'singkatan' => 'TEI',
                 'bidang' => 'Rekayasa & Manufaktur',
-                'akreditasi' => 'A UNGGUL',
-                'kaprog_guru_id' => $kaprogIds['kaprog_toi'],
-                'kuota_industri' => 80,
-                'kuota_terisi' => 72,
-                'badge_color' => 'amber',
-                'mitra_utama' => json_encode(['PT Astra Honda Motor', 'PT Bukaka Teknik Utama']),
+                'kaprog_guru_id' => $kaprogIds['kaprog_tei'] ?? null,
+                'kuota_industri' => 0,
+                'kuota_terisi' => 0,
+                'badge_color' => 'white',
+                'mitra_utama' => json_encode([]),
                 'capaian_kurikulum' => 'Sistem Kontrol PLC, SCADA, Pneumatik & Hidrolik Otomasi Pabrik, serta Integrasi Robotik Manufaktur.',
                 'status' => 'aktif',
             ],
@@ -168,83 +161,6 @@ class JurusanDisplaySeeder extends Seeder
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]));
-            }
-        }
-
-        // Rombels
-        DB::table('rombel')->delete();
-        $rombels = [
-            ['nama_kode' => 'XII RPL 1', 'jurusan_id' => 1, 'tahun_ajaran' => '2026/2027'],
-            ['nama_kode' => 'XII RPL 2', 'jurusan_id' => 1, 'tahun_ajaran' => '2026/2027'],
-            ['nama_kode' => 'XII RPL 3', 'jurusan_id' => 1, 'tahun_ajaran' => '2026/2027'],
-            ['nama_kode' => 'XII TOI 1', 'jurusan_id' => 6, 'tahun_ajaran' => '2026/2027'],
-            ['nama_kode' => 'XII TOI 2', 'jurusan_id' => 6, 'tahun_ajaran' => '2026/2027'],
-            ['nama_kode' => 'XII TP 1', 'jurusan_id' => 4, 'tahun_ajaran' => '2026/2027'],
-            ['nama_kode' => 'XII TP 2', 'jurusan_id' => 4, 'tahun_ajaran' => '2026/2027'],
-            ['nama_kode' => 'XII KA 1', 'jurusan_id' => 3, 'tahun_ajaran' => '2026/2027'],
-            ['nama_kode' => 'XII KA 2', 'jurusan_id' => 3, 'tahun_ajaran' => '2026/2027'],
-            ['nama_kode' => 'XII TPL 1', 'jurusan_id' => 5, 'tahun_ajaran' => '2026/2027'],
-        ];
-
-        foreach ($rombels as $r) {
-            DB::table('rombel')->insert(array_merge($r, [
-                'wali_kelas_guru_id' => null,
-                'status' => 'aktif',
-            ]));
-        }
-
-        // Industry partners
-        $allIndustri = [
-            'PT Telkom Akses' => ['RPL'],
-            'Tokopedia' => ['RPL'],
-            'PT Nusantara Digital' => ['RPL'],
-            'PT Astra Honda Motor' => ['TOI', 'TP'],
-            'PT Bukaka Teknik Utama' => ['TOI', 'TPL'],
-            'Astra Group' => ['TP', 'TOI'],
-            'PT United Tractors' => ['TP', 'TPL'],
-            'Komatsu' => ['TP'],
-            'PT Kalbe Farma' => ['KA'],
-            'PT Indofood CBP' => ['KA'],
-            'Sucofindo' => ['KA'],
-            'PT PAL Indonesia' => ['TPL'],
-            'PT Barata Indonesia' => ['TPL'],
-        ];
-
-        foreach ($allIndustri as $namaInd => $majorKodes) {
-            $ind = DB::table('industri')->where('nama', $namaInd)->first();
-            if (!$ind) {
-                $indId = DB::table('industri')->insertGetId([
-                    'nama' => $namaInd,
-                    'alamat' => 'Kawasan Industri Mitra SMKN 1 Gunungputri, Bogor / Jabodetabek',
-                    'latitude' => -6.4500000,
-                    'longitude' => 106.9000000,
-                    'radius_meter' => 100,
-                    'kontak_nama' => 'PIC ' . $namaInd,
-                    'kontak_no_hp' => '0811' . rand(1000000, 9999999),
-                    'kontak_email' => strtolower(str_replace(' ', '', $namaInd)) . '@mitra.co.id',
-                    'kuota' => 15,
-                    'status' => 'aktif',
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]);
-            } else {
-                $indId = $ind->id;
-            }
-
-            foreach ($majorKodes as $mk) {
-                $jur = DB::table('jurusan')->where('kode', $mk)->first();
-                if ($jur) {
-                    $link = DB::table('industri_jurusan')
-                        ->where('industri_id', $indId)
-                        ->where('jurusan_id', $jur->id)
-                        ->first();
-                    if (!$link) {
-                        DB::table('industri_jurusan')->insert([
-                            'industri_id' => $indId,
-                            'jurusan_id' => $jur->id,
-                        ]);
-                    }
-                }
             }
         }
 

@@ -8,6 +8,8 @@ use App\Models\Industri;
 use App\Models\Jurusan;
 use App\Models\Rombel;
 use App\Models\Siswa;
+use App\Models\LogAktivitas;
+use App\Models\PengajuanPkl;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -16,7 +18,8 @@ class JurusanController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Jurusan::with(['kaprog', 'rombels', 'industris']);
+        $query = Jurusan::with(['kaprog', 'rombels.siswas', 'siswas.pengajuanPkl', 'industris'])
+            ->withCount(['rombels', 'siswas']);
 
         // Search filter
         if ($search = $request->input('search')) {
@@ -38,39 +41,52 @@ class JurusanController extends Controller
             }
         }
 
-        // Akreditasi filter
-        if ($akreditasi = $request->input('akreditasi')) {
-            if ($akreditasi !== 'all') {
-                $query->where('akreditasi', $akreditasi);
-            }
+
+        $perPage = (int) $request->input('per_page', 6);
+        if (!in_array($perPage, [6, 12, 24, 48])) {
+            $perPage = 6;
         }
 
-        $allJurusans = (clone $query)->orderByRaw("CASE kode 
+        $jurusans = (clone $query)->orderByRaw("CASE kode 
             WHEN 'RPL' THEN 1 
-            WHEN 'TOI' THEN 2 
+            WHEN 'KI' THEN 2 
             WHEN 'TP' THEN 3 
-            WHEN 'KA' THEN 4 
-            WHEN 'TPL' THEN 5 
-            ELSE 6 END, id")->get();
-        $jurusans = $allJurusans;
+            WHEN 'TPL' THEN 4 
+            WHEN 'TEI' THEN 5 
+            ELSE 6 END, id")
+            ->paginate($perPage)
+            ->withQueryString();
 
+        $jurusans->getCollection()->each(function (Jurusan $jurusan) {
+            $rombelsXii = $jurusan->rombels->filter(function (Rombel $rombel) {
+                return $rombel->tingkat === 'XII' && ($rombel->status ?? 'aktif') === 'aktif';
+            });
+
+            $jurusan->setAttribute('rombels_xii_aktual', $rombelsXii->count());
+            $jurusan->setAttribute('siswa_xii_aktual', $rombelsXii->sum(
+                fn (Rombel $rombel) => $rombel->siswas->count()
+            ));
+            $jurusan->setAttribute('kuota_industri_aktual', (int) $jurusan->industris->sum('kuota'));
+            $jurusan->setAttribute('kuota_terisi_aktual', $jurusan->siswas
+                ->filter(fn (Siswa $siswa) => $siswa->pengajuanPkl?->status === 'disetujui')
+                ->count());
+        });
         // KPI stats
         $totalPrograms = Jurusan::where('status', 'aktif')->count();
         $allMajors = Jurusan::where('status', 'aktif')->with('rombels')->get();
 
         $totalSiswaMagang = Siswa::whereHas('rombel', function ($q) {
-            $q->where('tingkat', 'XII');
+            $q->where('tingkat', 'XII')->where('status', 'aktif');
         })->count();
 
         $totalKemitraan = Industri::count();
 
-        $totalKuota = $allMajors->sum('kuota_industri');
-        $totalTerisi = $allMajors->sum('kuota_terisi');
+        $totalKuota = Industri::sum('kuota');
+        $totalTerisi = PengajuanPkl::where('status', 'disetujui')->count();
         $persentaseKeterserapan = $totalKuota > 0 ? round(($totalTerisi / $totalKuota) * 100, 1) : 0;
 
         // Filter options
         $bidangList = Jurusan::whereNotNull('bidang')->select('bidang')->distinct()->pluck('bidang');
-        $akreditasiList = Jurusan::whereNotNull('akreditasi')->select('akreditasi')->distinct()->pluck('akreditasi');
 
         $gurus = Guru::where('status_akun', 'aktif')->orderBy('nama')->get();
         $allIndustris = Industri::orderBy('nama')->get();
@@ -82,9 +98,9 @@ class JurusanController extends Controller
             'totalKemitraan',
             'persentaseKeterserapan',
             'bidangList',
-            'akreditasiList',
             'gurus',
-            'allIndustris'
+            'allIndustris',
+            'perPage'
         ));
     }
 
@@ -95,11 +111,10 @@ class JurusanController extends Controller
             'nama' => 'required|string|max:100',
             'singkatan' => 'nullable|string|max:20',
             'bidang' => 'required|string|max:100',
-            'akreditasi' => 'required|string|max:50',
             'kaprog_guru_id' => 'nullable|exists:guru,id',
-            'kuota_industri' => 'required|integer|min:0',
+            'kuota_industri' => 'nullable|integer|min:0',
             'kuota_terisi' => 'nullable|integer|min:0',
-            'badge_color' => 'nullable|in:green,red,gray,blue,white',
+            'badge_color' => 'nullable|in:blue,emerald,red,gray,white',
             'mitra_utama' => 'nullable|string',
             'capaian_kurikulum' => 'nullable|string',
             'status' => 'required|in:aktif,nonaktif',
@@ -109,23 +124,20 @@ class JurusanController extends Controller
             $validated['singkatan'] = $validated['kode'];
         }
 
-        if (empty($validated['kuota_terisi'])) {
-            $validated['kuota_terisi'] = 0;
-        }
+        $validated['kuota_industri'] = 0;
+        $validated['kuota_terisi'] = 0;
 
-        if (!empty($validated['mitra_utama'])) {
-            $mitraArray = array_values(array_filter(array_map('trim', explode(',', $validated['mitra_utama']))));
-            $validated['mitra_utama'] = $mitraArray;
-        } else {
-            $validated['mitra_utama'] = [];
-        }
+        $validated['mitra_utama'] = [];
 
         if (empty($validated['badge_color'])) {
-            $colors = ['green', 'red', 'gray', 'blue', 'white'];
-            $validated['badge_color'] = $colors[rand(0, count($colors) - 1)];
+            $colors = ['blue', 'emerald', 'red', 'gray', 'white'];
+            $usedColors = Jurusan::whereNotNull('badge_color')->pluck('badge_color')->all();
+            $validated['badge_color'] = collect($colors)->first(
+                fn (string $color) => !in_array($color, $usedColors, true)
+            ) ?? $colors[array_rand($colors)];
         }
-
         $jurusan = Jurusan::create($validated);
+        LogAktivitas::catat('Tambah Data', 'Master Jurusan', 'Menambahkan jurusan baru ' . $jurusan->nama . ' (' . $jurusan->kode . ')');
 
         return redirect()->route('admin.jurusan.index')->with('success', 'Jurusan ' . $jurusan->nama . ' berhasil ditambahkan!');
     }
@@ -139,11 +151,10 @@ class JurusanController extends Controller
             'nama' => 'required|string|max:100',
             'singkatan' => 'nullable|string|max:20',
             'bidang' => 'required|string|max:100',
-            'akreditasi' => 'required|string|max:50',
             'kaprog_guru_id' => 'nullable|exists:guru,id',
-            'kuota_industri' => 'required|integer|min:0',
-            'kuota_terisi' => 'required|integer|min:0',
-            'badge_color' => 'nullable|in:green,red,gray,blue,white',
+            'kuota_industri' => 'nullable|integer|min:0',
+            'kuota_terisi' => 'nullable|integer|min:0',
+            'badge_color' => 'nullable|in:blue,emerald,red,gray,white',
             'mitra_utama' => 'nullable|string',
             'capaian_kurikulum' => 'nullable|string',
             'status' => 'required|in:aktif,nonaktif',
@@ -152,15 +163,13 @@ class JurusanController extends Controller
         if (empty($validated['singkatan'])) {
             $validated['singkatan'] = $validated['kode'];
         }
+        $validated['kuota_industri'] = 0;
+        $validated['kuota_terisi'] = 0;
 
-        if (!empty($validated['mitra_utama'])) {
-            $mitraArray = array_values(array_filter(array_map('trim', explode(',', $validated['mitra_utama']))));
-            $validated['mitra_utama'] = $mitraArray;
-        } else {
-            $validated['mitra_utama'] = [];
-        }
+        $validated['mitra_utama'] = [];
 
         $jurusan->update($validated);
+        LogAktivitas::catat('Edit Data', 'Master Jurusan', 'Memperbarui data jurusan ' . $jurusan->nama . ' (' . $jurusan->kode . ')');
 
         return redirect()->route('admin.jurusan.index')->with('success', 'Data jurusan ' . $jurusan->nama . ' berhasil diperbarui!');
     }
@@ -168,8 +177,9 @@ class JurusanController extends Controller
     public function destroy($id)
     {
         $jurusan = Jurusan::findOrFail($id);
+        $nama = $jurusan->nama . ' (' . $jurusan->kode . ')';
 
-        DB::transaction(function () use ($jurusan) {
+        DB::transaction(function () use ($jurusan, $nama) {
             $jurusan->industris()->detach();
 
             $siswaIds = $jurusan->siswas()->pluck('id');
@@ -190,6 +200,7 @@ class JurusanController extends Controller
 
             $jurusan->rombels()->delete();
             $jurusan->delete();
+            LogAktivitas::catat('Hapus Data', 'Master Jurusan', 'Menghapus data jurusan ' . $nama);
         });
 
         return redirect()->route('admin.jurusan.index')->with('success', "Jurusan {$jurusan->nama} ({$jurusan->kode}) berhasil dihapus.");
@@ -203,6 +214,7 @@ class JurusanController extends Controller
         ]);
 
         $jurusan->update($validated);
+        LogAktivitas::catat('Edit Data', 'Kurikulum PKL', 'Memperbarui capaian kurikulum PKL jurusan ' . $jurusan->nama . ' (' . $jurusan->kode . ')');
 
         return redirect()->route('admin.jurusan.index')->with('success', 'Capaian Kurikulum PKL untuk ' . $jurusan->nama . ' berhasil diperbarui!');
     }
@@ -213,19 +225,18 @@ class JurusanController extends Controller
         $industriIds = $request->input('industri_ids', []);
 
         $jurusan->industris()->sync($industriIds);
+        LogAktivitas::catat('Persetujuan', 'Kemitraan Jurusan', 'Menyinkronkan ' . count($industriIds) . ' mitra industri untuk jurusan ' . $jurusan->nama);
 
         $topNames = Industri::whereIn('id', $industriIds)->take(3)->pluck('nama')->toArray();
-        if (!empty($topNames)) {
-            $jurusan->mitra_utama = $topNames;
-            $jurusan->save();
-        }
+        $jurusan->mitra_utama = $topNames;
+        $jurusan->save();
 
         return redirect()->route('admin.jurusan.index')->with('success', 'Daftar DU/DI mitra ' . $jurusan->nama . ' berhasil disinkronisasi!');
     }
 
     public function export(): StreamedResponse
     {
-        $jurusans = Jurusan::with(['kaprog', 'rombels', 'industris'])->get();
+        $jurusans = Jurusan::with(['kaprog', 'rombels.siswas', 'industris', 'siswas.pengajuanPkl'])->get();
 
         $headers = [
             'Content-Type' => 'text/csv',
@@ -240,9 +251,8 @@ class JurusanController extends Controller
                 'Nama Program Keahlian',
                 'Singkatan',
                 'Bidang Keahlian',
-                'Status Akreditasi',
                 'Kaprog (Kepala Program)',
-                'Jumlah Rombel',
+                'Jumlah Rombel Tingkat XII',
                 'Kuota Kursi Industri',
                 'Kuota Terisi',
                 'Sisa Kuota',
@@ -251,28 +261,34 @@ class JurusanController extends Controller
                 'Status',
             ]);
 
-            foreach ($jurusans as $j) {
-                $kaprogNama = $j->kaprog ? $j->kaprog->nama : '-';
-                $rombelCount = $j->rombels->count();
-                $sisa = max(0, $j->kuota_industri - $j->kuota_terisi);
-                $persen = $j->kuota_industri > 0 ? round(($j->kuota_terisi / $j->kuota_industri) * 100, 1) . '%' : '0%';
-                $mitra = is_array($j->mitra_utama) ? implode('; ', $j->mitra_utama) : '';
+            foreach ($jurusans as $jurusan) {
+                $rombelsXii = $jurusan->rombels->filter(function (Rombel $rombel) {
+                    return $rombel->tingkat === 'XII' && ($rombel->status ?? 'aktif') === 'aktif';
+                });
+                $rombelCount = $rombelsXii->count();
+                $kuotaTotal = (int) $jurusan->industris->sum('kuota');
+                $kuotaTerisi = $jurusan->siswas
+                    ->filter(fn (Siswa $siswa) => $siswa->pengajuanPkl?->status === 'disetujui')
+                    ->count();
+                $sisaKuota = max(0, $kuotaTotal - $kuotaTerisi);
+                $persentase = $kuotaTotal > 0
+                    ? round(($kuotaTerisi / $kuotaTotal) * 100, 1) . '%'
+                    : '0%';
 
                 fputcsv($handle, [
-                    $j->id,
-                    $j->kode,
-                    $j->nama,
-                    $j->singkatan,
-                    $j->bidang,
-                    $j->akreditasi,
-                    $kaprogNama,
+                    $jurusan->id,
+                    $jurusan->kode,
+                    $jurusan->nama,
+                    $jurusan->singkatan,
+                    $jurusan->bidang,
+                    $jurusan->kaprog?->nama ?? '-',
                     $rombelCount,
-                    $j->kuota_industri,
-                    $j->kuota_terisi,
-                    $sisa,
-                    $persen,
-                    $mitra,
-                    $j->status,
+                    $kuotaTotal,
+                    $kuotaTerisi,
+                    $sisaKuota,
+                    $persentase,
+                    $jurusan->industris->pluck('nama')->implode('; '),
+                    $jurusan->status,
                 ]);
             }
 
@@ -280,3 +296,4 @@ class JurusanController extends Controller
         }, 200, $headers);
     }
 }
+

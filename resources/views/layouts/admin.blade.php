@@ -135,26 +135,7 @@
             </div>
         </div>
 
-        <!-- Bottom Sync Widget -->
-        <div class="p-3">
-            <div class="rounded-xl border border-emerald-200/80 bg-[#f0fdf4] p-3.5 shadow-2xs">
-                <div class="flex items-center justify-between mb-1.5">
-                    <span class="text-xs font-bold text-slate-900">Dapodik SIPRAK Sync</span>
-                    <span class="relative flex h-2 w-2">
-                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                        <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                    </span>
-                </div>
-                <div class="text-[11px] font-medium text-emerald-600 mb-1.5 flex items-center gap-1.5">
-                    <span>⇄</span>
-                    <span>Online • Terhubung Realtime</span>
-                </div>
-                <div class="flex items-center justify-between text-[10px] text-slate-400 pt-1 border-t border-emerald-100">
-                    <span>Server Pusdatin: OK</span>
-                    <span class="font-mono">v2024.b</span>
-                </div>
-            </div>
-        </div>
+
     </aside>
 
     <!-- Main Container -->
@@ -182,6 +163,8 @@
                         $searchAction = route('admin.guru.index');
                     } elseif (request()->routeIs('admin.rombel.*')) {
                         $searchAction = route('admin.rombel.index');
+                    } elseif (request()->routeIs('admin.log-aktivitas.*')) {
+                        $searchAction = route('admin.log-aktivitas.index');
                     }
                 @endphp
                 <form action="{{ $searchAction }}" method="GET" class="relative w-full max-w-md min-w-0">
@@ -206,19 +189,7 @@
 
             <!-- Right Actions -->
             <div class="flex items-center gap-3 sm:gap-4 shrink-0">
-                <!-- Tarik Data Rombel Dapodik Button -->
-                <form action="{{ route('admin.rombel.syncDapodik') }}" method="POST" class="hidden xl:inline">
-                    @csrf
-                    <button type="submit" 
-                            class="flex items-center gap-2 px-3.5 py-2 bg-[#f0f9ff] hover:bg-[#e0f2fe] text-[#0284c7] border border-sky-200/80 rounded-xl text-xs font-semibold shadow-2xs transition active:scale-98">
-                        <svg class="w-3.5 h-3.5 text-[#0284c7]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-                        </svg>
-                        <span>Tarik Data Rombel Dapodik</span>
-                    </button>
-                </form>
 
-                <div class="hidden xl:block h-6 w-px bg-slate-200"></div>
 
                 <!-- User Profile Info -->
                 <div class="flex items-center gap-2.5 sm:gap-3">
@@ -227,7 +198,7 @@
                     </div>
                     <div class="hidden sm:block text-left">
                         <div class="text-xs font-bold text-slate-900 leading-tight">Endang Supriyatna, S.AP.</div>
-                        <div class="text-[10px] text-slate-400">Staf Tata Usaha &amp; Admin Dapodik</div>
+                        <div class="text-[10px] text-slate-400">Staf Tata Usaha &amp; Admin Sistem</div>
                     </div>
                 </div>
             </div>
@@ -277,9 +248,9 @@
 
     <!-- Backdrop for mobile sidebar -->
     <div x-show="sidebarOpen" 
-         @click="sidebarOpen = false"
-         x-cloak
-         class="fixed inset-0 bg-slate-900/60 z-20 lg:hidden"></div>
+        @click="sidebarOpen = false"
+        x-cloak
+        class="fixed inset-0 bg-slate-900/60 z-20 lg:hidden"></div>
 
     @stack('scripts')
 </body>

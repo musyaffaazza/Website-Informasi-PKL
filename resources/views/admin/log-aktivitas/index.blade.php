@@ -111,82 +111,61 @@
     </div>
 
     <!-- Filter & Toolbar Bar -->
-    <div class="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-2xs">
-        <form method="GET" action="{{ route('admin.log-aktivitas.index') }}" id="logFilterForm" class="flex flex-col xl:flex-row xl:items-center justify-between gap-3">
-            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 flex-1 flex-wrap">
-                <!-- Search Input -->
-                <div class="relative w-full sm:min-w-[240px] sm:w-72">
-                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+    <div class="bg-white rounded-2xl border border-slate-200/80 p-4 sm:p-5 shadow-2xs">
+        <form method="GET" action="{{ route('admin.log-aktivitas.index') }}" id="logFilterForm" class="space-y-3">
+            <div class="relative w-full">
+                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                </div>
+                <input type="text"
+                       name="search"
+                       value="{{ request('search') }}"
+                       placeholder="Cari nama pengguna, aksi, atau IP address..."
+                       class="w-full h-10.5 pl-10 pr-4 bg-slate-50/80 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition">
+            </div>
+
+            <div class="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-3">
+                <div class="flex flex-wrap items-center gap-2.5">
+                    <div class="flex items-center gap-1.5 bg-slate-50/80 border border-slate-200 rounded-xl px-3 h-10.5">
+                        <input type="date" name="from" value="{{ request('from') }}" onchange="document.getElementById('logFilterForm').submit()" class="bg-transparent text-xs font-semibold text-slate-700 focus:outline-none cursor-pointer">
+                        <span class="text-slate-300 text-xs">—</span>
+                        <input type="date" name="to" value="{{ request('to') }}" onchange="document.getElementById('logFilterForm').submit()" class="bg-transparent text-xs font-semibold text-slate-700 focus:outline-none cursor-pointer">
+                    </div>
+
+                    <div class="relative min-w-[140px] flex-1 sm:flex-none sm:w-44">
+                        <select name="role" onchange="document.getElementById('logFilterForm').submit()" class="w-full h-10.5 pl-3.5 pr-8 bg-slate-50/80 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition appearance-none cursor-pointer">
+                            <option value="all">Semua Role</option>
+                            <option value="guru" @selected(request('role') === 'guru')>Guru</option>
+                            <option value="siswa" @selected(request('role') === 'siswa')>Siswa</option>
+                        </select>
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-400">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                        </div>
+                    </div>
+
+                    <div class="relative min-w-[160px] flex-1 sm:flex-none sm:w-52">
+                        <select name="aksi" onchange="document.getElementById('logFilterForm').submit()" class="w-full h-10.5 pl-3.5 pr-8 bg-slate-50/80 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition appearance-none cursor-pointer">
+                            <option value="all">Semua Kategori Aksi</option>
+                            @foreach($aksiList as $aksi)
+                                <option value="{{ $aksi }}" @selected(request('aksi') === $aksi)>{{ $aksi }}</option>
+                            @endforeach
+                        </select>
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-400">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                        </div>
+                    </div>
+
+                    <a href="{{ route('admin.log-aktivitas.index') }}" title="Reset Filter" class="h-10.5 w-10.5 shrink-0 rounded-xl border border-slate-200 text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition flex items-center justify-center">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011 1h16a1 1 0 011 1v2.586a1 1 0 00-.293.707l-6.414 6.414a2 2 0 00-.293.707V17l-4 4v-6.586a2 2 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
                         </svg>
-                    </div>
-                    <input type="text" 
-                           name="search" 
-                           value="{{ request('search') }}" 
-                           placeholder="Cari nama pengguna, IP address..." 
-                           class="w-full pl-10 pr-4 py-2.5 bg-slate-50/80 border border-slate-200 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition">
-                </div>
-
-                <!-- Date Range Inputs -->
-                <div class="flex items-center gap-1.5 bg-slate-50/80 border border-slate-200 rounded-xl px-3 py-1.5 w-full sm:w-auto">
-                    <input type="date" 
-                           name="from" 
-                           value="{{ request('from') }}" 
-                           onchange="document.getElementById('logFilterForm').submit()"
-                           class="bg-transparent text-xs font-semibold text-slate-700 focus:outline-none cursor-pointer">
-                    <span class="text-slate-300 text-xs">—</span>
-                    <input type="date" 
-                           name="to" 
-                           value="{{ request('to') }}" 
-                           onchange="document.getElementById('logFilterForm').submit()"
-                           class="bg-transparent text-xs font-semibold text-slate-700 focus:outline-none cursor-pointer">
-                </div>
-
-                <!-- Role Filter -->
-                <div class="relative w-full sm:min-w-[140px] sm:flex-1">
-                    <select name="role" 
-                            onchange="document.getElementById('logFilterForm').submit()"
-                            class="w-full px-3.5 py-2.5 bg-slate-50/80 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition appearance-none cursor-pointer">
-                        <option value="all">Semua Role</option>
-                        <option value="guru" @selected(request('role') === 'guru')>Guru</option>
-                        <option value="siswa" @selected(request('role') === 'siswa')>Siswa</option>
-                    </select>
-                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-400">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                        </svg>
-                    </div>
-                </div>
-
-                <!-- Aksi Filter -->
-                <div class="relative w-full sm:min-w-[160px] sm:flex-1">
-                    <select name="aksi" 
-                            onchange="document.getElementById('logFilterForm').submit()"
-                            class="w-full px-3.5 py-2.5 bg-slate-50/80 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition appearance-none cursor-pointer">
-                        <option value="all">Semua Kategori Aksi</option>
-                        @foreach($aksiList as $aksi)
-                            <option value="{{ $aksi }}" @selected(request('aksi') === $aksi)>{{ $aksi }}</option>
-                        @endforeach
-                    </select>
-                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-400">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                        </svg>
-                    </div>
-                </div>
-
-                <!-- Reset Button -->
-                @if(request('search') || (request('role') && request('role') !== 'all') || (request('aksi') && request('aksi') !== 'all') || request('from') || request('to'))
-                    <a href="{{ route('admin.log-aktivitas.index') }}" 
-                       class="text-xs text-rose-600 hover:text-rose-700 font-semibold px-2 py-2">
-                        Reset
                     </a>
-                @endif
+                </div>
             </div>
         </form>
     </div>
-
     <!-- Main Table Card -->
     <div class="bg-white rounded-2xl border border-slate-200/80 shadow-2xs overflow-hidden">
         <div class="overflow-x-auto">

@@ -13,12 +13,6 @@
                 <h1 class="text-2xl font-extrabold text-[#0f2942] tracking-tight">
                     Master Data Rombel
                 </h1>
-                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold tracking-wide bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-2xs">
-                    <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    DAPODIK TERVERIFIKASI
-                </span>
             </div>
             <p class="text-xs text-slate-500 mt-1 max-w-3xl leading-relaxed">
                 Daftar Rombongan Belajar resmi aktif Tahun Ajaran {{ $tahunAjaranAktif }} SMKN 1 Gunungputri untuk pemetaan peserta PKL.
@@ -80,101 +74,83 @@
     </div>
 
     <!-- Filter & Action Controls Bar -->
-    <div class="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-2xs">
-        <div class="flex flex-col 2xl:flex-row 2xl:items-center justify-between gap-4">
-        <form action="{{ route('admin.rombel.index') }}" method="GET" id="filterForm" class="flex-1 min-w-0">
-            
-            <!-- Left Filters: Search + Tingkat + Jurusan -->
-            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 flex-1">
-                <!-- Search Input -->
-                <div class="relative w-full sm:min-w-[260px] sm:w-80">
-                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+    <div class="bg-white rounded-2xl border border-slate-200/80 p-4 sm:p-5 shadow-2xs">
+        <form action="{{ route('admin.rombel.index') }}" method="GET" id="filterForm" class="space-y-3">
+            <div class="relative w-full">
+                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                </div>
+                <input type="text"
+                       name="search"
+                       value="{{ request('search') }}"
+                       placeholder="Cari nama rombel, kode rombel, wali kelas, atau ruang..."
+                       class="w-full h-10.5 pl-10 pr-4 bg-slate-50/80 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition">
+            </div>
+
+            <div class="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-3">
+                <div class="flex flex-wrap items-center gap-2.5">
+                    <div class="relative min-w-[170px] flex-1 sm:flex-none sm:w-48">
+                        <select name="tingkat"
+                                onchange="document.getElementById('filterForm').submit()"
+                                class="w-full h-10.5 pl-3.5 pr-8 bg-slate-50/80 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition appearance-none cursor-pointer">
+                            <option value="XII" selected>Tingkat XII (PKL)</option>
+                        </select>
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-400">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div class="relative min-w-[220px] flex-1 sm:flex-none sm:w-64">
+                        <select name="jurusan_id"
+                                onchange="document.getElementById('filterForm').submit()"
+                                class="w-full h-10.5 pl-3.5 pr-8 bg-slate-50/80 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition appearance-none cursor-pointer">
+                            <option value="all" {{ request('jurusan_id', 'all') == 'all' ? 'selected' : '' }}>Semua Jurusan</option>
+                            @foreach($jurusans as $j)
+                                <option value="{{ $j->id }}" {{ request('jurusan_id') == $j->id ? 'selected' : '' }}>
+                                    {{ $j->singkatan ?: $j->kode }} - {{ $j->nama }}
+                                </option>
+                            @endforeach
+                        </select>
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-400">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </div>
+                    </div>
+
+                    <a href="{{ route('admin.rombel.index') }}"
+                       title="Reset Filter"
+                       class="h-10.5 w-10.5 shrink-0 rounded-xl border border-slate-200 text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition flex items-center justify-center">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011 1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
                         </svg>
-                    </div>
-                    <input type="text" 
-                           name="search" 
-                           value="{{ request('search') }}"
-                           placeholder="Cari nama rombel (misal: XII RPL 1), kode rombel..." 
-                           class="w-full pl-10 pr-4 py-2.5 bg-slate-50/80 border border-slate-200 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition">
-                </div>
-
-                <!-- Tingkat Dropdown -->
-                <div class="relative w-full sm:min-w-[170px] sm:flex-1">
-                    <select name="tingkat" 
-                            onchange="document.getElementById('filterForm').submit()"
-                            class="w-full px-3.5 py-2.5 bg-slate-50/80 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition appearance-none cursor-pointer">
-                        <option value="XII" selected>Tingkat XII (PKL)</option>
-                    </select>
-                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-400">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                        </svg>
-                    </div>
-                </div>
-
-                <!-- Program Keahlian / Jurusan Dropdown -->
-                <div class="relative w-full sm:min-w-[220px] sm:flex-1">
-                    <select name="jurusan_id" 
-                            onchange="document.getElementById('filterForm').submit()"
-                            class="w-full px-3.5 py-2.5 bg-slate-50/80 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition appearance-none cursor-pointer">
-                        <option value="all" {{ request('jurusan_id', 'all') == 'all' ? 'selected' : '' }}>Program Keahlian: Semua Jurusan</option>
-                        @foreach($jurusans as $j)
-                            <option value="{{ $j->id }}" {{ request('jurusan_id') == $j->id ? 'selected' : '' }}>
-                                {{ $j->singkatan ?: $j->kode }} - {{ $j->nama }}
-                            </option>
-                        @endforeach
-                    </select>
-                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-400">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                        </svg>
-                    </div>
-                </div>
-
-                @if(request('search') || request('tingkat') != 'XII' || (request('jurusan_id') && request('jurusan_id') != 'all'))
-                    <a href="{{ route('admin.rombel.index') }}" class="text-xs text-rose-600 hover:text-rose-700 font-semibold px-2 py-2 shrink-0">
-                        Reset
                     </a>
-                @endif
+                </div>
+
+                <div class="flex flex-wrap items-center gap-2.5 self-start xl:self-auto shrink-0">
+                    <a href="{{ route('admin.rombel.export', request()->query()) }}"
+                       class="h-10.5 flex items-center gap-2 px-4 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-xl text-xs font-semibold shadow-2xs transition active:scale-98">
+                        <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                        </svg>
+                        <span>Ekspor Excel</span>
+                    </a>
+                    <button type="button"
+                            @click="openCreateModal()"
+                            class="h-10.5 flex items-center gap-2 px-4.5 bg-[#0f2942] hover:bg-[#1a385c] text-white rounded-xl text-xs font-bold shadow-xs transition active:scale-98">
+                        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
+                        </svg>
+                        <span>Tambah Rombel</span>
+                    </button>
+                </div>
             </div>
         </form>
-
-        <!-- Right Action Buttons -->
-        <div class="flex flex-wrap items-center gap-2.5 shrink-0 justify-start sm:justify-end">
-            <!-- Tambah Rombel Button -->
-            <button type="button" 
-                    @click="openCreateModal()"
-                    class="flex items-center gap-2 px-4 py-2.5 bg-[#0f2942] hover:bg-[#1a385c] text-white rounded-xl text-xs font-bold shadow-xs transition active:scale-98 shrink-0">
-                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
-                </svg>
-                <span>Tambah Rombel</span>
-            </button>
-
-            <!-- Sinkronisasi Dapodik Button -->
-            <button type="button" 
-                    @click="syncDapodik()"
-                    class="flex items-center gap-2 px-4 py-2.5 bg-[#059669] hover:bg-[#047857] text-white rounded-xl text-xs font-bold shadow-xs transition active:scale-98 shrink-0">
-                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-                </svg>
-                <span>Sinkronisasi Dapodik</span>
-            </button>
-
-            <!-- Ekspor Excel Button -->
-            <a href="{{ route('admin.rombel.export', request()->query()) }}" 
-               class="flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-xl text-xs font-semibold shadow-2xs transition active:scale-98 shrink-0">
-                <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                </svg>
-                <span>Ekspor Excel</span>
-            </a>
-        </div>
-        </div>
     </div>
-
     <!-- Main Table Card -->
     <div class="bg-white rounded-2xl border border-slate-200/80 shadow-2xs overflow-hidden">
         <div class="overflow-x-auto">
@@ -297,7 +273,7 @@
                                     </svg>
                                 </div>
                                 <div class="font-bold text-slate-700 text-sm">Tidak ada data rombel ditemukan</div>
-                                <div class="text-xs text-slate-400 mt-1">Silakan ubah filter pencarian atau sinkronisasi dengan Dapodik.</div>
+                                <div class="text-xs text-slate-400 mt-1">Silakan ubah filter pencarian data rombel.</div>
                             </td>
                         </tr>
                     @endforelse
@@ -355,11 +331,6 @@
         </div>
     </div>
 
-    <!-- Bottom Page Footer Signature -->
-    <div class="flex flex-col sm:flex-row items-center justify-between text-[11px] text-slate-400 gap-2 pt-2">
-        <div>Sistem Informasi Prakerin (SIPRAK) terintegrasi dengan Dapodikdasmen Kemendikbudristek RI</div>
-        <div>Terakhir sinkronisasi: Hari ini, 08:30 WIB oleh Endang Supriyatna, S.AP.</div>
-    </div>
 
     <!-- Floating Batch Action Bar -->
     <div x-show="selectedIds.length > 0" 
@@ -894,18 +865,6 @@
                 this.isDeleteModalOpen = true;
             },
 
-            syncDapodik() {
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = '{{ route("admin.rombel.syncDapodik") }}';
-                const csrf = document.createElement('input');
-                csrf.type = 'hidden';
-                csrf.name = '_token';
-                csrf.value = document.querySelector('meta[name="csrf-token"]').content;
-                form.appendChild(csrf);
-                document.body.appendChild(form);
-                form.submit();
-            },
 
             exportSelected() {
                 window.location.href = '{{ route("admin.rombel.export") }}?selected=' + this.selectedIds.join(',');

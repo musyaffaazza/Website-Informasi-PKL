@@ -11,7 +11,8 @@ class LogAktivitasController extends Controller
 {
     public function index(Request $request)
     {
-        $query = LogAktivitas::with('user');
+        $visibleLogs = LogAktivitas::where('aksi', '!=', 'Sinkronisasi');
+        $query = (clone $visibleLogs)->with('user');
         $this->applyFilters($query, $request);
 
         $perPage = (int) $request->input('per_page', 8);
@@ -23,20 +24,20 @@ class LogAktivitasController extends Controller
                       ->paginate($perPage)
                       ->withQueryString();
 
-        $totalLog = LogAktivitas::count();
-        $logHariIni = LogAktivitas::whereDate('dibuat_pada', today())->count();
-        $penggunaAktif = LogAktivitas::distinct('user_id')->count('user_id');
-        $otorisasiCount = LogAktivitas::whereIn('aksi', ['Ubah Status', 'Persetujuan', 'Menyetujui'])->count();
-        $mutasiCount = LogAktivitas::whereIn('aksi', ['Tambah Data', 'Edit Data', 'Hapus Data', 'Impor Data', 'Ekspor Data'])->count();
-        $securityCount = LogAktivitas::where('modul', 'Autentikasi')->count();
+        $totalLog = (clone $visibleLogs)->count();
+        $logHariIni = (clone $visibleLogs)->whereDate('dibuat_pada', today())->count();
+        $penggunaAktif = (clone $visibleLogs)->distinct('user_id')->count('user_id');
+        $otorisasiCount = (clone $visibleLogs)->whereIn('aksi', ['Ubah Status', 'Persetujuan', 'Menyetujui', 'Otorisasi'])->count();
+        $mutasiCount = (clone $visibleLogs)->whereIn('aksi', ['Tambah Data', 'Edit Data', 'Hapus Data', 'Impor Data', 'Ekspor Data'])->count();
+        $securityCount = (clone $visibleLogs)->where('modul', 'Autentikasi')->count();
 
-        $modulList = LogAktivitas::select('modul')
+        $modulList = (clone $visibleLogs)->select('modul')
                         ->whereNotNull('modul')
                         ->distinct()
                         ->orderBy('modul')
                         ->pluck('modul');
 
-        $aksiList = LogAktivitas::select('aksi')
+        $aksiList = (clone $visibleLogs)->select('aksi')
                         ->distinct()
                         ->orderBy('aksi')
                         ->pluck('aksi');
@@ -57,7 +58,7 @@ class LogAktivitasController extends Controller
 
     public function export(Request $request): StreamedResponse
     {
-        $query = LogAktivitas::with('user')->orderBy('dibuat_pada', 'desc');
+        $query = LogAktivitas::where('aksi', '!=', 'Sinkronisasi')->with('user')->orderBy('dibuat_pada', 'desc');
         $this->applyFilters($query, $request);
         $logs = $query->get();
         $filename = 'log_aktivitas_' . now()->format('Ymd_His') . '.csv';
