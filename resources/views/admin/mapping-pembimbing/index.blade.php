@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
 @section('title', 'SIPRAK SMKN 1 GUNUNGPUTRI - Mapping Pembimbing')
-@section('header_search_placeholder', 'Cari siswa, NIS, atau pembimbing...')
+@section('header_search_placeholder', 'Search')
 
 @section('content')
 <div x-data="mappingApp()" class="space-y-6">
@@ -26,7 +26,7 @@
 
             <!-- Top Right Action Button -->
             <div class="flex flex-wrap items-center gap-2.5 shrink-0">
-                <a href="{{ route('admin.mapping-pembimbing.export', request()->query()) }}" 
+                <a href="{{ route('admin.mapping-pembimbing.export', request()->query()) }}"
                    class="flex items-center gap-2 px-3.5 py-2.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-xl text-xs font-semibold shadow-2xs transition active:scale-98">
                     <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -34,7 +34,7 @@
                     <span>Ekspor Data</span>
                 </a>
 
-                <button type="button" 
+                <button type="button"
                         @click="openCreateModal()"
                         class="flex items-center gap-2 px-4 py-2.5 bg-[#0f2942] hover:bg-[#1a385c] text-white rounded-xl text-xs font-bold shadow-xs transition active:scale-98">
                     <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -343,9 +343,9 @@
                             @if($isMapped)
                             <div class="flex items-center justify-center gap-1.5">
                                 <!-- View Detail -->
-                                <button type="button" 
+                                <button type="button"
                                         @click="openDetailModal({{ json_encode($p->load(['siswa.rombel', 'siswa.jurusan', 'industri', 'penugasan.pembimbing'])) }})"
-                                        class="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition" 
+                                        class="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition"
                                         title="Detail Penugasan">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -354,9 +354,9 @@
                                 </button>
 
                                 <!-- Edit -->
-                                <button type="button" 
+                                <button type="button"
                                         @click="openEditModal({{ json_encode($p->load(['siswa.rombel', 'siswa.jurusan', 'industri', 'penugasan.pembimbing'])) }})"
-                                        class="p-1.5 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition" 
+                                        class="p-1.5 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition"
                                         title="Edit Pembimbing">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -367,8 +367,8 @@
                                 <form action="{{ route('admin.mapping-pembimbing.destroy', $penugasan->id) }}" method="POST" onsubmit="return confirm('Hapus penugasan pembimbing untuk siswa {{ $siswa ? $siswa->nama : '' }}?')">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" 
-                                            class="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition" 
+                                    <button type="submit"
+                                            class="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition"
                                             title="Hapus Penugasan">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -378,7 +378,7 @@
                             </div>
                             @else
                             <!-- Tugaskan Button -->
-                            <button type="button" 
+                            <button type="button"
                                     @click="openQuickAssignModal({{ json_encode($p->load(['siswa.rombel', 'siswa.jurusan', 'industri'])) }})"
                                     class="px-3 py-1.5 bg-[#0f2942] hover:bg-[#1a385c] text-white rounded-lg text-xs font-bold shadow-2xs transition active:scale-98">
                                 Tugaskan
@@ -420,7 +420,7 @@
             Belum ada siswa yang mendapatkan guru pembimbing. Tambahkan mapping untuk mulai mengatur pembimbing PKL.
         </p>
         <div class="mt-4">
-            <button type="button" 
+            <button type="button"
                     @click="openCreateModal()"
                     class="inline-flex items-center gap-1.5 px-4 py-2 bg-[#0f2942] hover:bg-[#1a385c] text-white rounded-xl text-xs font-bold shadow-xs transition active:scale-98">
                 <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -434,9 +434,9 @@
     <!-- ==================== MODALS ==================== -->
 
     <!-- Modal 1: Tambah Mapping Pembimbing -->
-    <div x-show="createModalOpen" 
+    <div x-show="createModalOpen"
          x-cloak
-         class="fixed inset-0 z-50 overflow-y-auto" 
+         class="fixed inset-0 z-50 overflow-y-auto"
          role="dialog" aria-modal="true">
         <div class="fixed inset-0 bg-slate-900/60 transition-opacity" @click="createModalOpen = false"></div>
 
@@ -512,9 +512,9 @@
     </div>
 
     <!-- Modal 2: Quick Tugaskan Pembimbing (For unmapped rows) -->
-    <div x-show="quickAssignModalOpen" 
+    <div x-show="quickAssignModalOpen"
          x-cloak
-         class="fixed inset-0 z-50 overflow-y-auto" 
+         class="fixed inset-0 z-50 overflow-y-auto"
          role="dialog" aria-modal="true">
         <div class="fixed inset-0 bg-slate-900/60 transition-opacity" @click="quickAssignModalOpen = false"></div>
 
@@ -585,9 +585,9 @@
     </div>
 
     <!-- Modal 3: Edit Mapping Pembimbing -->
-    <div x-show="editModalOpen" 
+    <div x-show="editModalOpen"
          x-cloak
-         class="fixed inset-0 z-50 overflow-y-auto" 
+         class="fixed inset-0 z-50 overflow-y-auto"
          role="dialog" aria-modal="true">
         <div class="fixed inset-0 bg-slate-900/60 transition-opacity" @click="editModalOpen = false"></div>
 
@@ -653,9 +653,9 @@
     </div>
 
     <!-- Modal 4: Detail Mapping -->
-    <div x-show="detailModalOpen" 
+    <div x-show="detailModalOpen"
          x-cloak
-         class="fixed inset-0 z-50 overflow-y-auto" 
+         class="fixed inset-0 z-50 overflow-y-auto"
          role="dialog" aria-modal="true">
         <div class="fixed inset-0 bg-slate-900/60 transition-opacity" @click="detailModalOpen = false"></div>
 

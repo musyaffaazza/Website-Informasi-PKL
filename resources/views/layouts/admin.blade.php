@@ -68,7 +68,7 @@
 
                 <nav class="space-y-1">
                     <!-- Master Data Jurusan -->
-                    <a href="{{ route('admin.jurusan.index') }}" 
+                    <a href="{{ route('admin.jurusan.index') }}"
                        class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition {{ request()->routeIs('admin.jurusan.*') ? 'bg-[#0f2942] text-white shadow-xs' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/80' }}">
                         <svg class="w-4 h-4 {{ request()->routeIs('admin.jurusan.*') ? 'text-white' : 'text-slate-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/>
@@ -79,7 +79,7 @@
                     </a>
 
                     <!-- Master Data Rombel -->
-                    <a href="{{ route('admin.rombel.index') }}" 
+                    <a href="{{ route('admin.rombel.index') }}"
                        class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition {{ request()->routeIs('admin.rombel.*') ? 'bg-[#0f2942] text-white shadow-xs' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/80' }}">
                         <svg class="w-4 h-4 {{ request()->routeIs('admin.rombel.*') ? 'text-white' : 'text-slate-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
@@ -88,7 +88,7 @@
                     </a>
 
                     <!-- Master Data Siswa -->
-                    <a href="{{ route('admin.siswa.index') }}" 
+                    <a href="{{ route('admin.siswa.index') }}"
                        class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition {{ request()->routeIs('admin.siswa.*') ? 'bg-[#0f2942] text-white shadow-xs' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/80' }}">
                         <svg class="w-4 h-4 {{ request()->routeIs('admin.siswa.*') ? 'text-white' : 'text-slate-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
@@ -97,7 +97,7 @@
                     </a>
 
                     <!-- Master Data Guru -->
-                    <a href="{{ route('admin.guru.index') }}" 
+                    <a href="{{ route('admin.guru.index') }}"
                        class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition {{ request()->routeIs('admin.guru.*') ? 'bg-[#0f2942] text-white shadow-xs' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/80' }}">
                         <svg class="w-4 h-4 {{ request()->routeIs('admin.guru.*') ? 'text-white' : 'text-slate-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
@@ -106,7 +106,7 @@
                     </a>
 
                     <!-- Master Data Industri -->
-                    <a href="{{ route('admin.industri.index') }}" 
+                    <a href="{{ route('admin.industri.index') }}"
                        class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition {{ request()->routeIs('admin.industri.*') ? 'bg-[#0f2942] text-white shadow-xs' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/80' }}">
                         <svg class="w-4 h-4 {{ request()->routeIs('admin.industri.*') ? 'text-white' : 'text-slate-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
@@ -115,7 +115,7 @@
                     </a>
 
                     <!-- Mapping Pembimbing -->
-                    <a href="{{ route('admin.mapping-pembimbing.index') }}" 
+                    <a href="{{ route('admin.mapping-pembimbing.index') }}"
                        class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition {{ request()->routeIs('admin.mapping-pembimbing.*') ? 'bg-[#0f2942] text-white shadow-xs' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/80' }}">
                         <svg class="w-4 h-4 {{ request()->routeIs('admin.mapping-pembimbing.*') ? 'text-white' : 'text-slate-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
@@ -179,10 +179,10 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                         </svg>
                     </div>
-                    <input type="text" 
+                    <input type="text"
                            name="search"
                            value="{{ request('search') }}"
-                           placeholder="@yield('header_search_placeholder', 'Cari siswa, NIS, atau pembimbing...')" 
+                           placeholder="Search"
                            class="w-full pl-10 pr-4 py-2 bg-slate-50/80 border border-slate-200 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition">
                 </form>
             </div>
@@ -191,14 +191,30 @@
             <div class="flex items-center gap-3 sm:gap-4 shrink-0">
 
 
-                <!-- User Profile Info -->
-                <div class="flex items-center gap-2.5 sm:gap-3">
-                    <div class="w-9 h-9 rounded-full bg-slate-100 text-slate-700 border border-slate-200 font-bold text-xs flex items-center justify-center shadow-xs shrink-0">
-                        ES
-                    </div>
-                    <div class="hidden sm:block text-left">
-                        <div class="text-xs font-bold text-slate-900 leading-tight">Endang Supriyatna, S.AP.</div>
-                        <div class="text-[10px] text-slate-400">Staf Tata Usaha &amp; Admin Sistem</div>
+                <!-- User Profile Info with Dropdown -->
+                <div class="relative" x-data="{ profileOpen: false }">
+                    <button @click="profileOpen = !profileOpen" class="flex items-center gap-2.5 sm:gap-3 cursor-pointer">
+                        <div class="w-9 h-9 rounded-full bg-slate-100 text-slate-700 border border-slate-200 font-bold text-xs flex items-center justify-center shadow-xs shrink-0">
+                            AD
+                        </div>
+                        <div class="hidden sm:block text-left">
+                            <div class="text-xs font-bold text-slate-900 leading-tight">Admin Sistem</div>
+                            <div class="text-[10px] text-slate-400">Staf Tata Usaha</div>
+                        </div>
+                        <svg class="w-4 h-4 text-slate-400 hidden sm:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                    </button>
+                    <div x-show="profileOpen" @click.outside="profileOpen = false" x-transition class="absolute right-0 mt-2 w-48 bg-white rounded-xl border border-slate-200 shadow-lg z-50 py-1">
+                        <a href="{{ route('admin.profile') }}" class="flex items-center gap-2 px-4 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50">
+                            <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                            Edit Profil
+                        </a>
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit" class="flex items-center gap-2 w-full px-4 py-2.5 text-xs font-semibold text-rose-600 hover:bg-rose-50">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                                Keluar
+                            </button>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -247,7 +263,7 @@
     </div>
 
     <!-- Backdrop for mobile sidebar -->
-    <div x-show="sidebarOpen" 
+    <div x-show="sidebarOpen"
         @click="sidebarOpen = false"
         x-cloak
         class="fixed inset-0 bg-slate-900/60 z-20 lg:hidden"></div>
@@ -255,7 +271,3 @@
     @stack('scripts')
 </body>
 </html>
-
-
-
-

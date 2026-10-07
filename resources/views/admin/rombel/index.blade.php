@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
 @section('title', 'SIPRAK SMKN 1 GUNUNGPUTRI - Master Data Rombel')
-@section('header_search_placeholder', 'Cari rombel, wali kelas, atau ruang...')
+@section('header_search_placeholder', 'Search')
 
 @section('content')
 <div x-data="rombelApp()" class="space-y-6">
@@ -351,6 +351,7 @@
             </svg>
             <span>Ekspor Pilihan</span>
         </button>
+        <button type="button" @click="bulkDelete()" class="text-xs font-semibold text-rose-300 hover:text-rose-100 transition">Hapus Terpilih</button>
         <button type="button" @click="selectedIds = []" class="text-xs text-slate-400 hover:text-white transition">
             Batal
         </button>
@@ -725,7 +726,6 @@
                                         <th class="px-4 py-2.5">Nama Siswa</th>
                                         <th class="px-4 py-2.5">NIS / NISN</th>
                                         <th class="px-4 py-2.5">L/P</th>
-                                        <th class="px-4 py-2.5 text-right">Status Akun</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-slate-100">
@@ -734,13 +734,10 @@
                                             <td class="px-4 py-3 font-semibold text-slate-800" x-text="siswa.nama"></td>
                                             <td class="px-4 py-3 text-slate-500 font-mono text-[11px]" x-text="siswa.nis + (siswa.nisn ? ' / ' + siswa.nisn : '')"></td>
                                             <td class="px-4 py-3 text-slate-600" x-text="siswa.jenis_kelamin || '-'"></td>
-                                            <td class="px-4 py-3 text-right">
-                                                <span class="inline-flex px-2 py-1 rounded-md text-[10px] font-bold capitalize" :class="siswa.status_akun === 'aktif' ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-600'" x-text="(siswa.status_akun || 'belum aktivasi').replace('_', ' ')"></span>
-                                            </td>
                                         </tr>
                                     </template>
                                     <tr x-show="!(detailData.siswas || []).length">
-                                        <td colspan="4" class="px-4 py-8 text-center text-slate-400">Belum ada siswa terdaftar pada rombel ini.</td>
+                                        <td colspan="3" class="px-4 py-8 text-center text-slate-400">Belum ada siswa terdaftar pada rombel ini.</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -868,6 +865,16 @@
 
             exportSelected() {
                 window.location.href = '{{ route("admin.rombel.export") }}?selected=' + this.selectedIds.join(',');
+            },
+
+            bulkDelete() {
+                if (!this.selectedIds.length || !confirm('Hapus rombel terpilih?')) return;
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '{{ route("admin.rombel.bulkDelete") }}';
+                form.innerHTML = '<input type="hidden" name="_token" value="{{ csrf_token() }}">' + this.selectedIds.map(id => `<input type="hidden" name="ids[]" value="${id}">`).join('');
+                document.body.appendChild(form);
+                form.submit();
             }
         }
     }

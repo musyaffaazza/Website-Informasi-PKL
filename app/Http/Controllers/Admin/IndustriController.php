@@ -10,6 +10,7 @@ use App\Models\Guru;
 use App\Models\LogAktivitas;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class IndustriController extends Controller
@@ -140,7 +141,13 @@ class IndustriController extends Controller
             'pembimbing_nama' => 'nullable|string|max:150',
             'status_kemitraan' => 'required|in:aktif,baru,perlu_evaluasi',
             'jurusan_ids' => 'nullable|array',
+            'logo' => 'nullable|image|max:2048',
         ]);
+
+        if ($request->hasFile('logo')) {
+            $validated['logo_url'] = $request->file('logo')->store('logos', 'public');
+        }
+        unset($validated['logo']);
 
         $industri = Industri::create($validated);
 
@@ -172,7 +179,16 @@ class IndustriController extends Controller
             'pembimbing_nama' => 'nullable|string|max:150',
             'status_kemitraan' => 'required|in:aktif,baru,perlu_evaluasi',
             'jurusan_ids' => 'nullable|array',
+            'logo' => 'nullable|image|max:2048',
         ]);
+
+        if ($request->hasFile('logo')) {
+            if ($industri->logo_url) {
+                Storage::disk('public')->delete($industri->logo_url);
+            }
+            $validated['logo_url'] = $request->file('logo')->store('logos', 'public');
+        }
+        unset($validated['logo']);
 
         $industri->update($validated);
 
@@ -228,6 +244,28 @@ class IndustriController extends Controller
 
         return redirect()->route('admin.industri.index')
             ->with('success', "Mitra Industri {$nama} berhasil dihapus dari direktori.");
+    }
+
+    public function bulkDelete(Request $request)
+    {
+        $ids = array_filter((array) $request->input('ids', []));
+        if (!$ids) {
+            return back()->with('info', 'Pilih minimal satu data.');
+        }
+
+        DB::transaction(function () use ($ids) {
+            $industris = Industri::whereIn('id', $ids)->get();
+            foreach ($industris as $industri) {
+                $industri->jurusans()->detach();
+                if ($industri->logo_url) {
+                    Storage::disk('public')->delete($industri->logo_url);
+                }
+                $industri->delete();
+            }
+            LogAktivitas::catat('Hapus Data', 'Master Industri', 'Menghapus ' . $industris->count() . ' mitra industri');
+        });
+
+        return back()->with('success', count($ids) . ' data berhasil dihapus.');
     }
 
     public function export(Request $request): StreamedResponse

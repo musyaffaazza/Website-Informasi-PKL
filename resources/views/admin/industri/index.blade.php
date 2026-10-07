@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
 @section('title', 'SIPRAK SMKN 1 GUNUNGPUTRI - Master Data Industri & Kemitraan DU/DI')
-@section('header_search_placeholder', 'Cari nama mitra industri, PIC, bidang usaha, atau wilayah...')
+@section('header_search_placeholder', 'Search')
 
 @section('content')
 <div x-data="industriApp()" class="space-y-6">
@@ -288,6 +288,12 @@
     </div>
     <!-- ==================== MAIN CONTENT: GRID OR TABLE ==================== -->
 
+    <div x-show="selectedIds.length" class="fixed bottom-8 left-1/2 z-30 flex -translate-x-1/2 items-center gap-4 rounded-2xl border border-slate-700 bg-[#0f2942] px-5 py-3 text-white shadow-xl">
+        <span class="text-xs font-semibold"><span class="text-blue-300" x-text="selectedIds.length"></span> industri dipilih</span>
+        <button type="button" @click="bulkDelete()" class="text-xs font-bold text-rose-300 hover:text-rose-100">Hapus Terpilih</button>
+        <button type="button" @click="selectedIds = []" class="text-xs text-slate-300 hover:text-white">Batal</button>
+    </div>
+
     <!-- VIEW 1: GRID CARDS (Default) -->
     <div x-show="viewMode === 'grid'" class="grid grid-cols-1 md:grid-cols-2 gap-5">
         @forelse($industris as $ind)
@@ -328,10 +334,14 @@
                 <!-- Top Card Header -->
                 <div class="flex items-start justify-between gap-3 mb-4">
                     <div class="flex items-start gap-3 min-w-0">
-                        <!-- Company Avatar / Initials -->
-                        <div class="w-12 h-12 rounded-xl bg-[#0f2942] text-white font-extrabold text-sm tracking-wider flex items-center justify-center shrink-0 shadow-xs">
-                            {{ $ind->initials }}
-                        </div>
+                        <!-- Company Avatar / Logo -->
+                        @if($ind->logo_url)
+                            <img src="{{ asset('storage/' . $ind->logo_url) }}" alt="{{ $ind->nama }}" class="w-12 h-12 rounded-xl object-cover shrink-0 shadow-xs border border-slate-200">
+                        @else
+                            <div class="w-12 h-12 rounded-xl bg-[#0f2942] text-white font-extrabold text-sm tracking-wider flex items-center justify-center shrink-0 shadow-xs">
+                                {{ $ind->initials }}
+                            </div>
+                        @endif
 
                         <div class="min-w-0">
                             <h3 class="font-bold text-slate-900 text-sm leading-snug truncate" title="{{ $ind->nama }}">
@@ -348,6 +358,8 @@
                             </div>
                         </div>
                     </div>
+
+                    <input type="checkbox" value="{{ $ind->id }}" @change="toggleSelect('{{ $ind->id }}')" :checked="selectedIds.includes('{{ $ind->id }}')" class="w-4 h-4 rounded text-blue-600 border-slate-300 focus:ring-blue-500 cursor-pointer">
 
                     <!-- Status Pill -->
                     <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-extrabold border shrink-0 {{ $statusBadgeClass }}">
@@ -684,7 +696,7 @@
 
         <div class="flex min-h-screen items-center justify-center p-4 text-center sm:p-6">
             <div class="relative z-10 w-full max-w-2xl transform overflow-hidden rounded-2xl bg-white text-left shadow-2xl transition-all">
-                <form action="{{ route('admin.industri.store') }}" method="POST">
+                <form action="{{ route('admin.industri.store') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="p-6">
                         <!-- Header -->
@@ -709,6 +721,12 @@
                             <div class="md:col-span-2">
                                 <label class="block text-xs font-bold text-slate-700 mb-1">Nama Perusahaan / DU-DI *</label>
                                 <input type="text" name="nama" required placeholder="Contoh: PT Astra Honda Motor" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
+                            </div>
+
+                            <!-- Logo Industri -->
+                            <div class="md:col-span-2">
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Logo Perusahaan</label>
+                                <input type="file" name="logo" accept="image/*" class="w-full text-xs file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200">
                             </div>
 
                             <!-- Bidang Usaha -->
@@ -958,7 +976,7 @@
 
         <div class="flex min-h-screen items-center justify-center p-4 text-center sm:p-6">
             <div class="relative z-10 w-full max-w-2xl transform overflow-hidden rounded-2xl bg-white text-left shadow-2xl transition-all">
-                <form :action="'/admin/industri/' + editForm.id" method="POST">
+                <form :action="'/admin/industri/' + editForm.id" method="POST" enctype="multipart/form-data">
                     @csrf
                     @method('PUT')
                     <div class="p-6">
@@ -984,6 +1002,12 @@
                             <div class="md:col-span-2">
                                 <label class="block text-xs font-bold text-slate-700 mb-1">Nama Perusahaan / DU-DI *</label>
                                 <input type="text" name="nama" x-model="editForm.nama" required class="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
+                            </div>
+
+                            <!-- Logo Industri -->
+                            <div class="md:col-span-2">
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Ubah Logo Perusahaan</label>
+                                <input type="file" name="logo" accept="image/*" class="w-full text-xs file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200">
                             </div>
 
                             <!-- Bidang Usaha -->
@@ -1184,6 +1208,7 @@ function industriApp() {
 
         activeIndustri: null,
         activeKuotaIndustri: null,
+        selectedIds: [],
 
         kuotaForm: {
             kuota: 0,
@@ -1209,6 +1234,21 @@ function industriApp() {
 
         setViewMode(mode) {
             this.viewMode = mode;
+        },
+
+        toggleSelect(id) {
+            const index = this.selectedIds.indexOf(id);
+            index === -1 ? this.selectedIds.push(id) : this.selectedIds.splice(index, 1);
+        },
+
+        bulkDelete() {
+            if (!this.selectedIds.length || !confirm('Hapus industri terpilih?')) return;
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '{{ route("admin.industri.bulkDelete") }}';
+            form.innerHTML = '<input type="hidden" name="_token" value="{{ csrf_token() }}">' + this.selectedIds.map(id => `<input type="hidden" name="ids[]" value="${id}">`).join('');
+            document.body.appendChild(form);
+            form.submit();
         },
 
         openCreateModal() {

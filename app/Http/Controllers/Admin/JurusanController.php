@@ -206,6 +206,20 @@ class JurusanController extends Controller
         return redirect()->route('admin.jurusan.index')->with('success', "Jurusan {$jurusan->nama} ({$jurusan->kode}) berhasil dihapus.");
     }
 
+    public function bulkDelete(Request $request)
+    {
+        $ids = array_filter((array) $request->input('ids', []));
+        if (!$ids) {
+            return back()->with('info', 'Pilih minimal satu data.');
+        }
+
+        foreach ($ids as $id) {
+            $this->destroy($id);
+        }
+
+        return back()->with('success', count($ids) . ' data berhasil dihapus.');
+    }
+
     public function updateKurikulum(Request $request, $id)
     {
         $jurusan = Jurusan::findOrFail($id);

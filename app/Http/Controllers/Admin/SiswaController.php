@@ -121,7 +121,6 @@ class SiswaController extends Controller
             'kota' => 'nullable|string|max:100',
             'no_hp' => 'nullable|string|max:25',
             'email' => 'nullable|email|max:100',
-            'status_akun' => 'required|in:aktif,belum_aktivasi,ditangguhkan',
             'status_pkl' => 'required|string|max:50',
         ]);
 
@@ -150,7 +149,7 @@ class SiswaController extends Controller
             'kota' => $validated['kota'] ?: 'Bogor',
             'no_hp' => $validated['no_hp'] ?: null,
             'email' => $email,
-            'status_akun' => $validated['status_akun'],
+            'status_akun' => 'aktif',
             'status_pkl' => $validated['status_pkl'],
         ]);
 
@@ -174,7 +173,6 @@ class SiswaController extends Controller
             'kota' => 'nullable|string|max:100',
             'no_hp' => 'nullable|string|max:25',
             'email' => 'nullable|email|max:100',
-            'status_akun' => 'required|in:aktif,belum_aktivasi,ditangguhkan',
             'status_pkl' => 'required|string|max:50',
         ]);
 
@@ -191,7 +189,6 @@ class SiswaController extends Controller
             'kota' => $validated['kota'] ?: $siswa->kota,
             'no_hp' => $validated['no_hp'] ?: $siswa->no_hp,
             'email' => $validated['email'] ?: $siswa->email,
-            'status_akun' => $validated['status_akun'],
             'status_pkl' => $validated['status_pkl'],
         ]);
 
@@ -247,6 +244,28 @@ class SiswaController extends Controller
             }
         }
         return redirect()->back()->with('info', "Silakan pilih siswa dan rombel tujuan.");
+    }
+
+    public function bulkDelete(Request $request)
+    {
+        $ids = array_filter((array) $request->input('ids', $request->input('siswa_ids', [])));
+        if (!$ids) {
+            return back()->with('info', 'Pilih minimal satu data.');
+        }
+
+        DB::transaction(function () use ($ids) {
+            $siswas = Siswa::whereIn('id', $ids)->get();
+            foreach ($siswas as $siswa) {
+                $userId = $siswa->user_id;
+                $siswa->delete();
+                if ($userId) {
+                    DB::table('users')->where('id', $userId)->delete();
+                }
+            }
+            LogAktivitas::catat('Hapus Data', 'Master Siswa', 'Menghapus ' . $siswas->count() . ' data siswa');
+        });
+
+        return back()->with('success', count($ids) . ' data berhasil dihapus.');
     }
 
     public function invitePending()

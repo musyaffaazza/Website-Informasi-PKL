@@ -177,6 +177,25 @@ class RombelController extends Controller
             ->with('success', "Rombel {$namaRombel} berhasil dihapus dari sistem.");
     }
 
+    public function bulkDelete(Request $request)
+    {
+        $ids = array_filter((array) $request->input('ids', []));
+        if (!$ids) {
+            return back()->with('info', 'Pilih minimal satu data.');
+        }
+
+        DB::transaction(function () use ($ids) {
+            $rombels = Rombel::whereIn('id', $ids)->get();
+            foreach ($rombels as $rombel) {
+                Siswa::where('rombel_id', $rombel->id)->update(['rombel_id' => null]);
+                $rombel->delete();
+            }
+            LogAktivitas::catat('Hapus Data', 'Master Rombel', 'Menghapus ' . $rombels->count() . ' rombel');
+        });
+
+        return back()->with('success', count($ids) . ' data berhasil dihapus.');
+    }
+
 
     public function export(Request $request): StreamedResponse
     {

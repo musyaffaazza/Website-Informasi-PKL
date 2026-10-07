@@ -69,7 +69,6 @@
                 >
                 <div class="flex items-center justify-center gap-2 mb-1">
                     <span class="text-xs font-bold tracking-wider text-brand-700 uppercase">SMK Negeri 1 Gunungputri</span>
-                    <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-brand-50 text-brand-700 border border-brand-200">SKIELL</span>
                 </div>
                 <span class="text-[11px] font-medium text-slate-500 uppercase tracking-widest">Kabupaten Bogor &bull; Jawa Barat</span>
             </header>
@@ -98,8 +97,8 @@
 
                     <!-- Username / Identifier Field -->
                     <div>
-                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5" for="identifier">
-                            NISN / NIP / Username
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5" for="user_id">
+                            USER ID (NISN / NIP)
                         </label>
                         <div class="relative rounded-xl border border-slate-300 transition-all duration-200 input-focus-ring bg-white">
                             <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
@@ -108,10 +107,10 @@
                                 </svg>
                             </div>
                             <input class="block w-full pl-11 pr-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 border-0 rounded-xl focus:ring-1 focus:ring-brand-700 bg-transparent"
-                                   id="identifier"
-                                   name="identifier"
-                                   value="{{ old('identifier', old('username', old('email'))) }}"
-                                   placeholder="Masukkan NISN, NIP, atau username..."
+                                   id="user_id"
+                                   name="user_id"
+                                   value="{{ old('user_id') }}"
+                                   placeholder="Masukkan NISN atau NIP"
                                    required
                                    type="text"
                                    autofocus>
@@ -130,11 +129,11 @@
                                 </svg>
                             </div>
                             <input class="block w-full pl-11 pr-11 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 border-0 rounded-xl focus:ring-1 focus:ring-brand-700 bg-transparent"
-                                   id="password"
-                                   name="password"
-                                   placeholder="••••••••••••"
-                                   required
-                                   type="password">
+                                id="password"
+                                name="password"
+                                placeholder="••••••••••••"
+                                required
+                                type="password">
                             <button aria-label="Tampilkan atau sembunyikan kata sandi"
                                     class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 focus:outline-none"
                                     id="togglePassword"
@@ -157,8 +156,8 @@
                                    type="checkbox">
                             <span class="ml-2 text-xs font-medium text-slate-600 select-none">Ingat saya di perangkat ini</span>
                         </label>
-                        <a class="text-xs font-semibold text-brand-700 hover:text-brand-900 transition-colors duration-150" href="#">
-                            Lupa password?
+                        <a class="text-xs font-semibold text-brand-700 hover:text-brand-900 transition-colors duration-150" href="{{ route('password.request') }}">
+                            Lupa kata sandi?
                         </a>
                     </div>
 
@@ -177,7 +176,7 @@
                 <!-- Institutional Constraint Notice (Admin Provisioned Only) -->
                 <div class="mt-6 pt-5 border-t border-slate-100 text-center" data-purpose="admin-provisioned-notice">
                     <p class="text-xs text-slate-500 leading-relaxed">
-                        Belum memiliki akun atau terkendala login? 
+                        Belum memiliki akun atau terkendala login?
                         <span class="block mt-0.5 text-slate-700 font-semibold">
                             Hubungi Tim Hubin SMKN 1 Gunungputri.
                         </span>
@@ -207,7 +206,7 @@
                 toggleBtn.addEventListener('click', () => {
                     const isPassword = passwordInput.getAttribute('type') === 'password';
                     passwordInput.setAttribute('type', isPassword ? 'text' : 'password');
-                    
+
                     // Toggle eye icon styling or icon state
                     toggleBtn.classList.toggle('text-brand-700', isPassword);
                     toggleBtn.classList.toggle('text-slate-400', !isPassword);

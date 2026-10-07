@@ -123,7 +123,6 @@ class GuruController extends Controller
             'pendidikan' => 'nullable|string|max:100',
             'no_hp' => 'nullable|string|max:20',
             'email' => 'nullable|email|max:100',
-            'status_akun' => 'required|in:aktif,belum_aktivasi,nonaktif',
             'kelas_diampu' => 'nullable|string|max:255',
             'keterangan_diampu' => 'nullable|string|max:255',
             'jurusan_id' => 'nullable|exists:jurusan,id',
@@ -156,7 +155,7 @@ class GuruController extends Controller
             'pendidikan' => $validated['pendidikan'] ?: null,
             'no_hp' => $validated['no_hp'] ?: null,
             'email' => $email,
-            'status_akun' => $validated['status_akun'],
+            'status_akun' => 'aktif',
             'roles_list' => $roles,
             'kelas_diampu' => $validated['kelas_diampu'] ?: null,
             'keterangan_diampu' => $validated['keterangan_diampu'] ?: null,
@@ -181,7 +180,6 @@ class GuruController extends Controller
             'pendidikan' => 'nullable|string|max:100',
             'no_hp' => 'nullable|string|max:20',
             'email' => 'nullable|email|max:100',
-            'status_akun' => 'required|in:aktif,belum_aktivasi,nonaktif',
             'kelas_diampu' => 'nullable|string|max:255',
             'keterangan_diampu' => 'nullable|string|max:255',
             'jurusan_id' => 'nullable|exists:jurusan,id',
@@ -201,7 +199,6 @@ class GuruController extends Controller
             'pendidikan' => $validated['pendidikan'] ?: null,
             'no_hp' => $validated['no_hp'] ?: null,
             'email' => $validated['email'] ?: $guru->email,
-            'status_akun' => $validated['status_akun'],
             'roles_list' => $roles,
             'kelas_diampu' => $validated['kelas_diampu'] ?: null,
             'keterangan_diampu' => $validated['keterangan_diampu'] ?: null,
@@ -296,6 +293,30 @@ class GuruController extends Controller
             return redirect()->back()->with('success', "Akses akun dan email aktivasi berhasil dikirimkan ke " . count($ids) . " guru terpilih!");
         }
         return redirect()->back()->with('info', "Pilih minimal 1 guru untuk mengirimkan akses akun.");
+    }
+
+    public function bulkDelete(Request $request)
+    {
+        $ids = array_filter((array) $request->input('ids', $request->input('guru_ids', [])));
+        if (!$ids) {
+            return back()->with('info', 'Pilih minimal satu data.');
+        }
+
+        DB::transaction(function () use ($ids) {
+            $gurus = Guru::whereIn('id', $ids)->get();
+            foreach ($gurus as $guru) {
+                Rombel::where('wali_kelas_guru_id', $guru->id)->update(['wali_kelas_guru_id' => null]);
+                Jurusan::where('kaprog_guru_id', $guru->id)->update(['kaprog_guru_id' => null]);
+                $userId = $guru->user_id;
+                $guru->delete();
+                if ($userId) {
+                    DB::table('users')->where('id', $userId)->delete();
+                }
+            }
+            LogAktivitas::catat('Hapus Data', 'Master Guru', 'Menghapus ' . $gurus->count() . ' data guru');
+        });
+
+        return back()->with('success', count($ids) . ' data berhasil dihapus.');
     }
 
 

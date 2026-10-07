@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
 @section('title', 'SIPRAK SMKN 1 GUNUNGPUTRI - Master Data Guru & Role')
-@section('header_search_placeholder', 'Cari NISN, nama siswa, PT/DUDI, atau NIP guru...')
+@section('header_search_placeholder', 'Search')
 
 @section('content')
 <div x-data="guruApp()" class="space-y-6">
@@ -123,10 +123,10 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                     </svg>
                 </div>
-                <input type="text" 
-                       name="search" 
+                <input type="text"
+                       name="search"
                        value="{{ request('search') }}"
-                       placeholder="Cari NIP, nama guru, atau role penugasan..." 
+                       placeholder="Cari NIP, nama guru, atau role penugasan..."
                        class="w-full h-10.5 pl-10 pr-4 bg-slate-50/80 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition">
             </div>
 
@@ -136,7 +136,7 @@
                 <div class="flex flex-wrap items-center gap-2.5">
                     <!-- Role Filter Dropdown -->
                     <div class="relative min-w-[140px] flex-1 sm:flex-none sm:w-44">
-                        <select name="role" 
+                        <select name="role"
                                 onchange="document.getElementById('filterForm').submit()"
                                 class="w-full h-10.5 pl-3.5 pr-8 bg-slate-50/80 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition appearance-none cursor-pointer">
                             <option value="all" {{ request('role') == 'all' ? 'selected' : '' }}>Semua Role</option>
@@ -157,7 +157,7 @@
 
                     <!-- Jurusan Filter Dropdown -->
                     <div class="relative min-w-[140px] flex-1 sm:flex-none sm:w-44">
-                        <select name="jurusan_id" 
+                        <select name="jurusan_id"
                                 onchange="document.getElementById('filterForm').submit()"
                                 class="w-full h-10.5 pl-3.5 pr-8 bg-slate-50/80 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition appearance-none cursor-pointer">
                             <option value="all" {{ request('jurusan_id', 'all') == 'all' ? 'selected' : '' }}>Semua Jurusan</option>
@@ -174,25 +174,8 @@
                         </div>
                     </div>
 
-                    <!-- Status Akun Dropdown -->
-                    <div class="relative min-w-[140px] flex-1 sm:flex-none sm:w-44">
-                        <select name="status_akun" 
-                                onchange="document.getElementById('filterForm').submit()"
-                                class="w-full h-10.5 pl-3.5 pr-8 bg-slate-50/80 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition appearance-none cursor-pointer">
-                            <option value="all" {{ request('status_akun', 'all') == 'all' ? 'selected' : '' }}>Semua Status</option>
-                            <option value="aktif" {{ request('status_akun') == 'aktif' ? 'selected' : '' }}>Aktif</option>
-                            <option value="belum_aktivasi" {{ request('status_akun') == 'belum_aktivasi' ? 'selected' : '' }}>Belum Aktivasi</option>
-                            <option value="nonaktif" {{ request('status_akun') == 'nonaktif' ? 'selected' : '' }}>Nonaktif</option>
-                        </select>
-                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-400">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                            </svg>
-                        </div>
-                    </div>
-
                     <!-- Filter Reset Button -->
-                    <a href="{{ route('admin.guru.index') }}" 
+                    <a href="{{ route('admin.guru.index') }}"
                        title="Reset Filter"
                        class="h-10.5 w-10.5 shrink-0 rounded-xl border border-slate-200 text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition flex items-center justify-center">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -205,7 +188,7 @@
                 <div class="flex flex-wrap items-center gap-2.5 shrink-0">
 
                     <!-- Ekspor XLS -->
-                    <a href="{{ route('admin.guru.export', request()->query()) }}" 
+                    <a href="{{ route('admin.guru.export', request()->query()) }}"
                        class="h-10.5 flex items-center gap-2 px-4 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-xl text-xs font-semibold shadow-2xs transition active:scale-98">
                         <svg class="w-4 h-4 text-slate-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -214,7 +197,7 @@
                     </a>
 
                     <!-- + Tambah Guru -->
-                    <button type="button" 
+                    <button type="button"
                             @click="openCreateModal()"
                             class="h-10.5 flex items-center gap-2 px-4.5 bg-[#0f2942] hover:bg-[#1a385c] text-white rounded-xl text-xs font-bold shadow-xs transition active:scale-98">
                         <svg class="w-4 h-4 text-white shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -228,7 +211,7 @@
     </div>
 
     <!-- Collective Action Banner (Shown when items are selected) -->
-    <div x-show="selectedIds.length > 0" 
+    <div x-show="selectedIds.length > 0"
          x-transition:enter="transition ease-out duration-200"
          x-transition:enter-start="opacity-0 -translate-y-2"
          x-transition:enter-end="opacity-100 translate-y-0"
@@ -236,7 +219,7 @@
          x-transition:leave-start="opacity-100 translate-y-0"
          x-transition:leave-end="opacity-0 -translate-y-2"
          class="bg-[#eff6ff] border border-blue-200 text-slate-800 px-4 py-3 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-3 shadow-xs">
-        
+
         <div class="flex items-center gap-3">
             <span class="w-6 h-6 rounded-full bg-[#1d4ed8] text-white text-xs font-bold flex items-center justify-center shrink-0" x-text="selectedIds.length">
                 3
@@ -248,7 +231,7 @@
         </div>
 
         <div class="flex flex-wrap items-center gap-2">
-            <button type="button" 
+            <button type="button"
                     @click="openBulkRoleModal()"
                     class="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-blue-200 text-blue-700 hover:bg-blue-50 rounded-xl text-xs font-bold transition">
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -257,7 +240,7 @@
                 <span>Ubah Penugasan Role Masal</span>
             </button>
 
-            <button type="button" 
+            <button type="button"
                     @click="bulkInvite()"
                     class="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-blue-200 text-blue-700 hover:bg-blue-50 rounded-xl text-xs font-bold transition">
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -266,7 +249,7 @@
                 <span>Kirim Akses Akun</span>
             </button>
 
-            <button type="button" 
+            <button type="button"
                     @click="exportSelected()"
                     class="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-blue-200 text-blue-700 hover:bg-blue-50 rounded-xl text-xs font-bold transition">
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -274,6 +257,8 @@
                 </svg>
                 <span>Ekspor Terpilih</span>
             </button>
+
+            <button type="button" @click="bulkDelete()" class="flex items-center gap-1.5 px-3 py-1.5 bg-rose-50 border border-rose-200 text-rose-700 hover:bg-rose-100 rounded-xl text-xs font-bold transition">Hapus Terpilih</button>
 
             <button type="button" @click="clearSelection()" class="text-slate-400 hover:text-slate-600 p-1">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -290,7 +275,7 @@
                 <thead>
                     <tr class="border-b border-slate-200 bg-slate-50/50 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                         <th class="py-3.5 pl-5 pr-3 w-10">
-                            <input type="checkbox" 
+                            <input type="checkbox"
                                    @change="toggleSelectAll($event)"
                                    :checked="allSelected"
                                    class="w-4 h-4 rounded text-blue-600 border-slate-300 focus:ring-blue-500 cursor-pointer">
@@ -299,7 +284,6 @@
                         <th class="py-3.5 px-4">NAMA GURU</th>
                         <th class="py-3.5 px-4">ROLE (MULTI-PENUGASAN)</th>
                         <th class="py-3.5 px-4">KELAS / JURUSAN DIAMPU</th>
-                        <th class="py-3.5 px-4">STATUS AKUN</th>
                         <th class="py-3.5 pr-6 pl-4 text-right">AKSI</th>
                     </tr>
                 </thead>
@@ -308,7 +292,7 @@
                         <tr class="hover:bg-slate-50/80 transition group {{ in_array($g->id, [1, 2, 3]) ? 'bg-blue-50/20' : '' }}">
                             <!-- Checkbox -->
                             <td class="py-4 pl-5 pr-3">
-                                <input type="checkbox" 
+                                <input type="checkbox"
                                        value="{{ $g->id }}"
                                        data-nip="{{ $g->nip }}"
                                        @change="toggleSelect('{{ $g->id }}', '{{ $g->nip }}')"
@@ -366,7 +350,7 @@
                                         <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-medium bg-slate-100 text-slate-500 border border-slate-200">
                                             <span>•</span> Belum Diberi Role
                                         </span>
-                                        <button type="button" 
+                                        <button type="button"
                                                 @click="openManageRoleModal({{ $g->toJson() }})"
                                                 class="text-xs text-blue-600 hover:text-blue-800 font-bold ml-1 transition">
                                             + Setel Role
@@ -430,50 +414,11 @@
                                 @endif
                             </td>
 
-                            <!-- Status Akun (Toggle or Badge) -->
-                            <td class="py-4 px-4">
-                                @if($g->status_akun === 'aktif')
-                                    <div class="flex items-center gap-2">
-                                        <button type="button" 
-                                                @click="toggleStatus('{{ $g->id }}', 'nonaktif')"
-                                                class="relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-blue-600 transition-colors duration-200 ease-in-out focus:outline-none">
-                                            <span class="translate-x-4 pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out"></span>
-                                        </button>
-                                        <span class="text-[11px] font-semibold text-emerald-600 flex items-center gap-1">
-                                            <span>•</span> Aktif
-                                        </span>
-                                    </div>
-                                @elseif($g->status_akun === 'belum_aktivasi')
-                                    <div>
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
-                                            Belum Aktivasi
-                                        </span>
-                                        <div class="mt-0.5">
-                                            <form action="{{ route('admin.guru.sendEmail', $g->id) }}" method="POST" class="inline">
-                                                @csrf
-                                                <button type="submit" class="text-[11px] text-blue-600 hover:text-blue-800 font-semibold hover:underline">
-                                                    Kirim Email
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </div>
-                                @else
-                                    <div class="flex items-center gap-2">
-                                        <button type="button" 
-                                                @click="toggleStatus('{{ $g->id }}', 'aktif')"
-                                                class="relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-slate-200 transition-colors duration-200 ease-in-out focus:outline-none">
-                                            <span class="translate-x-0 pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out"></span>
-                                        </button>
-                                        <span class="text-[11px] font-medium text-slate-400">Nonaktif</span>
-                                    </div>
-                                @endif
-                            </td>
-
                             <!-- Aksi -->
                             <td class="py-4 pr-6 pl-4 text-right">
                                 <div class="inline-flex items-center gap-1">
                                     <!-- Role Penugasan Button -->
-                                    <button type="button" 
+                                    <button type="button"
                                             @click="openManageRoleModal({{ $g->toJson() }})"
                                             title="Kelola Role &amp; Penugasan"
                                             class="p-1.5 text-slate-400 hover:text-blue-600 rounded-lg hover:bg-blue-50 transition">
@@ -484,7 +429,7 @@
                                     </button>
 
                                     <!-- Edit Button -->
-                                    <button type="button" 
+                                    <button type="button"
                                             @click="openEditModal({{ $g->toJson() }})"
                                             title="Edit Data Guru"
                                             class="p-1.5 text-slate-400 hover:text-amber-600 rounded-lg hover:bg-amber-50 transition">
@@ -494,7 +439,7 @@
                                     </button>
 
                                     <!-- Delete Button -->
-                                    <button type="button" 
+                                    <button type="button"
                                             @click="confirmDelete('{{ $g->id }}', '{{ $g->nama }}')"
                                             title="Hapus Guru"
                                             class="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 transition">
@@ -526,14 +471,14 @@
         <div class="px-6 py-4 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-xs">
             <div class="flex items-center gap-2 text-slate-500 font-medium">
                 <span>
-                    Menampilkan 
-                    <strong class="text-slate-800">{{ $gurus->firstItem() ?? 0 }}</strong> - 
-                    <strong class="text-slate-800">{{ $gurus->lastItem() ?? 0 }}</strong> dari 
+                    Menampilkan
+                    <strong class="text-slate-800">{{ $gurus->firstItem() ?? 0 }}</strong> -
+                    <strong class="text-slate-800">{{ $gurus->lastItem() ?? 0 }}</strong> dari
                     <strong class="text-slate-800">{{ $gurus->total() }}</strong> Guru &amp; Tenaga Kependidikan
                 </span>
                 <span class="text-slate-300">•</span>
                 <div class="flex items-center gap-1.5">
-                    <select onchange="updatePerPage(this.value)" 
+                    <select onchange="updatePerPage(this.value)"
                             class="bg-slate-50 border border-slate-200 rounded-lg px-2 py-1 text-xs font-semibold text-slate-700 focus:outline-none focus:ring-1 focus:ring-blue-500">
                         <option value="10" {{ request('per_page', 10) == 10 ? 'selected' : '' }}>10 baris per halaman</option>
                         <option value="25" {{ request('per_page') == 25 ? 'selected' : '' }}>25 baris per halaman</option>
@@ -574,7 +519,7 @@
     </div>
 
     <!-- ==================== MODAL TAMBAH GURU ==================== -->
-    <div x-show="isCreateModalOpen" 
+    <div x-show="isCreateModalOpen"
          x-cloak
          class="fixed inset-0 z-50 overflow-y-auto"
          aria-labelledby="modal-title" role="dialog" aria-modal="true">
@@ -660,15 +605,6 @@
                                 </select>
                             </div>
 
-                            <div>
-                                <label class="block text-xs font-bold text-slate-700 mb-1">Status Akun <span class="text-rose-500">*</span></label>
-                                <select name="status_akun" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
-                                    <option value="aktif">Aktif</option>
-                                    <option value="belum_aktivasi">Belum Aktivasi</option>
-                                    <option value="nonaktif">Nonaktif</option>
-                                </select>
-                            </div>
-
                             <div class="sm:col-span-2">
                                 <label class="block text-xs font-bold text-slate-700 mb-1">Kelas / Jurusan Diampu</label>
                                 <input type="text" name="kelas_diampu" placeholder="Contoh: Rekayasa Perangkat Lunak / XII RPL 1 (Wali Kelas)" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
@@ -695,7 +631,7 @@
     </div>
 
     <!-- ==================== MODAL EDIT GURU ==================== -->
-    <div x-show="isEditModalOpen" 
+    <div x-show="isEditModalOpen"
          x-cloak
          class="fixed inset-0 z-50 overflow-y-auto"
          aria-labelledby="modal-title" role="dialog" aria-modal="true">
@@ -782,15 +718,6 @@
                                 </select>
                             </div>
 
-                            <div>
-                                <label class="block text-xs font-bold text-slate-700 mb-1">Status Akun <span class="text-rose-500">*</span></label>
-                                <select name="status_akun" x-model="editData.status_akun" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
-                                    <option value="aktif">Aktif</option>
-                                    <option value="belum_aktivasi">Belum Aktivasi</option>
-                                    <option value="nonaktif">Nonaktif</option>
-                                </select>
-                            </div>
-
                             <div class="sm:col-span-2">
                                 <label class="block text-xs font-bold text-slate-700 mb-1">Kelas / Jurusan Diampu</label>
                                 <input type="text" name="kelas_diampu" x-model="editData.kelas_diampu" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
@@ -817,7 +744,7 @@
     </div>
 
     <!-- ==================== MODAL KELOLA ROLE & PENUGASAN ==================== -->
-    <div x-show="isManageRoleModalOpen" 
+    <div x-show="isManageRoleModalOpen"
          x-cloak
          class="fixed inset-0 z-50 overflow-y-auto"
          aria-labelledby="modal-title" role="dialog" aria-modal="true">
@@ -832,7 +759,6 @@
                     <input type="hidden" name="nip" :value="manageData.nip">
                     <input type="hidden" name="nama" :value="manageData.nama">
                     <input type="hidden" name="jenis_kelamin" :value="manageData.jenis_kelamin || 'Laki-laki'">
-                    <input type="hidden" name="status_akun" :value="manageData.status_akun || 'aktif'">
 
                     <div class="p-6 bg-slate-50/70 border-b border-slate-100 flex items-center justify-between">
                         <div class="flex items-center gap-3">
@@ -897,7 +823,7 @@
     </div>
 
     <!-- ==================== MODAL UBAH ROLE MASAL ==================== -->
-    <div x-show="isBulkRoleModalOpen" 
+    <div x-show="isBulkRoleModalOpen"
          x-cloak
          class="fixed inset-0 z-50 overflow-y-auto"
          aria-labelledby="modal-title" role="dialog" aria-modal="true">
@@ -952,7 +878,7 @@
     </div>
 
     <!-- ==================== MODAL KONFIRMASI HAPUS ==================== -->
-    <div x-show="isDeleteModalOpen" 
+    <div x-show="isDeleteModalOpen"
          x-cloak
          class="fixed inset-0 z-50 overflow-y-auto"
          aria-labelledby="modal-title" role="dialog" aria-modal="true">
@@ -999,7 +925,7 @@
             selectedIds: [],
             selectedNips: [],
             allSelected: false,
-            
+
             isCreateModalOpen: false,
             isEditModalOpen: false,
             isManageRoleModalOpen: false,
@@ -1127,6 +1053,16 @@
 
             exportSelected() {
                 window.location.href = '{{ route("admin.guru.export") }}?selected=' + this.selectedIds.join(',');
+            },
+
+            bulkDelete() {
+                if (!this.selectedIds.length || !confirm('Hapus data guru terpilih?')) return;
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '{{ route("admin.guru.bulkDelete") }}';
+                form.innerHTML = '<input type="hidden" name="_token" value="{{ csrf_token() }}">' + this.selectedIds.map(id => `<input type="hidden" name="ids[]" value="${id}">`).join('');
+                document.body.appendChild(form);
+                form.submit();
             }
         }
     }

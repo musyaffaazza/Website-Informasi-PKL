@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
 @section('title', 'SIPRAK SMKN 1 GUNUNGPUTRI - Log Aktivitas Sistem')
-@section('header_search_placeholder', 'Cari nama pengguna, aksi, atau IP address...')
+@section('header_search_placeholder', 'Search')
 
 @section('content')
 <div class="space-y-6">
@@ -32,7 +32,7 @@
 
         <!-- Top Right Actions -->
         <div class="flex flex-wrap items-center gap-2.5 shrink-0">
-            <a href="{{ route('admin.log-aktivitas.export', request()->query()) }}" 
+            <a href="{{ route('admin.log-aktivitas.export', request()->query()) }}"
                class="flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-xl text-xs font-semibold shadow-2xs transition active:scale-98">
                 <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -40,8 +40,8 @@
                 <span>Ekspor Log Audit</span>
             </a>
 
-            <button type="button" 
-                    onclick="window.location.reload()" 
+            <button type="button"
+                    onclick="window.location.reload()"
                     class="flex items-center gap-2 px-4 py-2.5 bg-[#0f2942] hover:bg-[#1a385c] text-white rounded-xl text-xs font-bold shadow-xs transition active:scale-98">
                 <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -261,15 +261,15 @@
         <div class="px-6 py-4 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-xs">
             <div class="flex items-center gap-2 text-slate-500 font-medium">
                 <span>
-                    Menampilkan 
-                    <strong class="text-slate-800">{{ $logs->firstItem() ?? 0 }}</strong> - 
-                    <strong class="text-slate-800">{{ $logs->lastItem() ?? 0 }}</strong> dari 
+                    Menampilkan
+                    <strong class="text-slate-800">{{ $logs->firstItem() ?? 0 }}</strong> -
+                    <strong class="text-slate-800">{{ $logs->lastItem() ?? 0 }}</strong> dari
                     <strong class="text-slate-800">{{ $logs->total() }}</strong> entri log aktivitas
                 </span>
                 <span class="text-slate-300">|</span>
                 <div class="flex items-center gap-1.5">
                     <span>Tampilkan:</span>
-                    <select onchange="let u=new URL(location.href);u.searchParams.set('per_page',this.value);u.searchParams.delete('page');location.href=u.toString();" 
+                    <select onchange="let u=new URL(location.href);u.searchParams.set('per_page',this.value);u.searchParams.delete('page');location.href=u.toString();"
                             class="bg-slate-50 border border-slate-200 rounded-lg px-2 py-1 text-xs font-semibold text-slate-700 focus:outline-none focus:ring-1 focus:ring-blue-500">
                         <option value="8" {{ request('per_page', 8) == 8 ? 'selected' : '' }}>8 baris</option>
                         <option value="10" {{ request('per_page') == 10 ? 'selected' : '' }}>10 baris</option>

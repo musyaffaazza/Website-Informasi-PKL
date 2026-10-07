@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
 @section('title', 'SIPRAK SMKN 1 GUNUNGPUTRI - Master Data Siswa')
-@section('header_search_placeholder', 'Cari NISN, nama siswa, DUDI...')
+@section('header_search_placeholder', 'Search')
 
 @section('content')
 <div x-data="siswaApp()" class="space-y-6">
@@ -151,7 +151,6 @@
         $hasActiveFilter = request()->filled('search') 
             || (request('tingkat', 'all') !== 'all' && request('tingkat') !== null) 
             || (request('jurusan_id', 'all') !== 'all' && request('jurusan_id') !== null) 
-            || (request('status_akun', 'all') !== 'all' && request('status_akun') !== null) 
             || (request('status_pkl', 'all') !== 'all' && request('status_pkl') !== null);
     @endphp
 
@@ -216,21 +215,6 @@
                                    {{ $j->singkatan ?: $j->kode }} - {{ Str::limit($j->nama, 20) }}
                                 </option>
                             @endforeach
-                        </select>
-                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-400">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
-                        </div>
-                    </div>
-
-                    <!-- Filter Status Akun -->
-                    <div class="relative">
-                        <select name="status_akun"
-                                onchange="document.getElementById('filterForm').submit()"
-                                class="w-full h-10 pl-3.5 pr-8 {{ request('status_akun', 'all') !== 'all' && request('status_akun') !== null ? 'bg-sky-50/90 border-sky-300 text-sky-900 font-bold' : 'bg-slate-50/80 border-slate-200 text-slate-700 font-semibold' }} border rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition appearance-none cursor-pointer">
-                            <option value="all" {{ request('status_akun', 'all') == 'all' ? 'selected' : '' }}>Semua Akun</option>
-                            <option value="aktif" {{ request('status_akun') == 'aktif' ? 'selected' : '' }}>Akun Aktif</option>
-                            <option value="belum_aktivasi" {{ request('status_akun') == 'belum_aktivasi' ? 'selected' : '' }}>Belum Aktivasi</option>
-                            <option value="ditangguhkan" {{ request('status_akun') == 'ditangguhkan' ? 'selected' : '' }}>Ditangguhkan</option>
                         </select>
                         <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-400">
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
@@ -323,6 +307,8 @@
                 </svg>
                 <span>Setel Rombel Masal</span>
             </button>
+
+            <button type="button" @click="bulkDelete()" class="flex items-center gap-1.5 px-3 py-1.5 bg-rose-50 border border-rose-200 text-rose-700 hover:bg-rose-100 rounded-xl text-xs font-bold transition">Hapus Terpilih</button>
         </div>
     </div>
 
@@ -344,7 +330,6 @@
                         <th class="py-3.5 px-4">KELAS &amp; ROMBEL</th>
                         <th class="py-3.5 px-4">KONSENTRASI KEAHLIAN</th>
                         <th class="py-3.5 px-4">KONTAK SISWA</th>
-                        <th class="py-3.5 px-4">STATUS AKUN</th>
                         <th class="py-3.5 px-4">STATUS PKL</th>
                         <th class="py-3.5 pr-6 pl-4 text-right">AKSI</th>
                     </tr>
@@ -424,26 +409,6 @@
                                 <div class="text-[11px] text-slate-400 truncate max-w-[180px] mt-0.5 font-sans" title="{{ $s->email }}">
                                     {{ $s->email ?: '-' }}
                                 </div>
-                            </td>
-
-                            <!-- Status Akun -->
-                            <td class="py-4 px-4">
-                                @if($s->status_akun === 'aktif')
-                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-[#ecfdf5] text-emerald-700 border border-emerald-200">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                                        <span>Aktif</span>
-                                    </span>
-                                @elseif($s->status_akun === 'belum_aktivasi')
-                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-slate-100 text-slate-600 border border-slate-200">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
-                                        <span>Belum Aktivasi</span>
-                                    </span>
-                                @else
-                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-rose-50 text-rose-700 border border-rose-200">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
-                                        <span>Ditangguhkan</span>
-                                    </span>
-                                @endif
                             </td>
 
                             <!-- Status PKL -->
@@ -652,15 +617,6 @@
                             </div>
 
                             <div>
-                                <label class="block text-xs font-bold text-slate-700 mb-1">Status Akun <span class="text-rose-500">*</span></label>
-                                <select name="status_akun" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
-                                    <option value="aktif">Aktif</option>
-                                    <option value="belum_aktivasi">Belum Aktivasi</option>
-                                    <option value="ditangguhkan">Ditangguhkan</option>
-                                </select>
-                            </div>
-
-                            <div>
                                 <label class="block text-xs font-bold text-slate-700 mb-1">Status PKL <span class="text-rose-500">*</span></label>
                                 <select name="status_pkl" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
                                     <option value="Sudah Ditempatkan">Sudah Ditempatkan</option>
@@ -768,15 +724,6 @@
                             </div>
 
                             <div>
-                                <label class="block text-xs font-bold text-slate-700 mb-1">Status Akun <span class="text-rose-500">*</span></label>
-                                <select name="status_akun" x-model="editData.status_akun" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
-                                    <option value="aktif">Aktif</option>
-                                    <option value="belum_aktivasi">Belum Aktivasi</option>
-                                    <option value="ditangguhkan">Ditangguhkan</option>
-                                </select>
-                            </div>
-
-                            <div>
                                 <label class="block text-xs font-bold text-slate-700 mb-1">Status PKL <span class="text-rose-500">*</span></label>
                                 <select name="status_pkl" x-model="editData.status_pkl" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
                                     <option value="Sudah Ditempatkan">Sudah Ditempatkan</option>
@@ -851,10 +798,6 @@
                         <div>
                             <span class="text-slate-400 block text-[11px]">Status PKL</span>
                             <span class="inline-flex items-center gap-1 font-bold text-emerald-600" x-text="detailData.status_pkl"></span>
-                        </div>
-                        <div>
-                            <span class="text-slate-400 block text-[11px]">Status Akun</span>
-                            <span class="font-bold text-slate-800 capitalize" x-text="detailData.status_akun"></span>
                         </div>
                     </div>
 
@@ -1068,6 +1011,16 @@
 
             exportSelected() {
                 window.location.href = '{{ route("admin.siswa.export") }}?selected=' + this.selectedIds.join(',');
+            },
+
+            bulkDelete() {
+                if (!this.selectedIds.length || !confirm('Hapus data siswa terpilih?')) return;
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '{{ route("admin.siswa.bulkDelete") }}';
+                form.innerHTML = '<input type="hidden" name="_token" value="{{ csrf_token() }}">' + this.selectedIds.map(id => `<input type="hidden" name="ids[]" value="${id}">`).join('');
+                document.body.appendChild(form);
+                form.submit();
             }
         }
     }

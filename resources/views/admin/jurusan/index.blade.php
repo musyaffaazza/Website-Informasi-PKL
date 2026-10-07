@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
 @section('title', 'SIPRAK SMKN 1 GUNUNGPUTRI - Master Data Jurusan')
-@section('header_search_placeholder', 'Cari kode, nama jurusan, Kaprog, atau bidang...')
+@section('header_search_placeholder', 'Search')
 
 @section('content')
 <div x-data="jurusanApp()" class="space-y-6">
@@ -321,6 +321,8 @@
                         </div>
                     </div>
 
+                    <input type="checkbox" value="{{ $jurusan->id }}" @change="toggleSelect('{{ $jurusan->id }}')" :checked="selectedIds.includes('{{ $jurusan->id }}')" class="w-4 h-4 rounded text-blue-600 border-slate-300 focus:ring-blue-500 cursor-pointer">
+
                 </div>
 
                 <!-- Info Stack with Icons -->
@@ -424,6 +426,12 @@
                 <div class="text-xs mt-1">Ubah kata kunci atau filter untuk melihat data lainnya.</div>
             </div>
         @endforelse
+    </div>
+
+    <div x-show="selectedIds.length" class="fixed bottom-8 left-1/2 z-30 flex -translate-x-1/2 items-center gap-4 rounded-2xl border border-slate-700 bg-[#0f2942] px-5 py-3 text-white shadow-xl">
+        <span class="text-xs font-semibold"><span class="text-blue-300" x-text="selectedIds.length"></span> jurusan dipilih</span>
+        <button type="button" @click="bulkDelete()" class="text-xs font-bold text-rose-300 hover:text-rose-100">Hapus Terpilih</button>
+        <button type="button" @click="selectedIds = []" class="text-xs text-slate-300 hover:text-white">Batal</button>
     </div>
 
     <!-- Bottom Information & Pagination Bar -->
@@ -1013,6 +1021,7 @@ function jurusanApp() {
         kurikulumText: '',
         activeDudiJurusan: null,
         selectedIndustriIds: [],
+        selectedIds: [],
 
         editForm: {
             id: null,
@@ -1030,6 +1039,21 @@ function jurusanApp() {
         },
 
         resetFilters() {},
+
+        toggleSelect(id) {
+            const index = this.selectedIds.indexOf(id);
+            index === -1 ? this.selectedIds.push(id) : this.selectedIds.splice(index, 1);
+        },
+
+        bulkDelete() {
+            if (!this.selectedIds.length || !confirm('Hapus jurusan terpilih?')) return;
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '{{ route("admin.jurusan.bulkDelete") }}';
+            form.innerHTML = '<input type="hidden" name="_token" value="{{ csrf_token() }}">' + this.selectedIds.map(id => `<input type="hidden" name="ids[]" value="${id}">`).join('');
+            document.body.appendChild(form);
+            form.submit();
+        },
 
         openCreateModal() {
             this.createModalOpen = true;
