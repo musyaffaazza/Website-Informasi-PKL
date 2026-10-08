@@ -39,16 +39,7 @@ class SiswaController extends Controller
                   });
             });
         }
-
-        // Tingkat / Kelas Filter
-        $selectedTingkat = $request->input('tingkat', 'all');
-        if ($selectedTingkat === 'XII') {
-            $query->whereHas('rombel', function ($q) {
-                $q->where('tingkat', 'XII');
-            });
-        } elseif ($selectedTingkat !== 'all' && !empty($selectedTingkat)) {
-            $query->where('rombel_id', $selectedTingkat);
-        }
+        $query->whereHas('rombel', fn ($q) => $q->where('tingkat', 'XII'));
 
         // Jurusan Filter
         if ($jurusanId = $request->input('jurusan_id')) {
@@ -104,7 +95,6 @@ class SiswaController extends Controller
             'persenAktivasi',
             'jurusans',
             'rombels',
-            'selectedTingkat',
             'perPage'
         ));
     }
@@ -290,13 +280,8 @@ class SiswaController extends Controller
             });
         }
 
-        if ($tingkat = $request->input('tingkat')) {
-            if ($tingkat !== 'all' && $tingkat === 'XII') {
-                $query->whereHas('rombel', function ($q) {
-                    $q->where('tingkat', 'XII');
-                });
-            }
-        }
+        $query->whereHas('rombel', fn ($q) => $q->where('tingkat', 'XII'));
+
 
         if ($statusAkun = $request->input('status_akun')) {
             if ($statusAkun !== 'all') {
@@ -313,12 +298,13 @@ class SiswaController extends Controller
         $siswas = $query->orderBy('id', 'asc')->get();
 
         $headers = [
-            'Content-Type' => 'text/csv',
+            'Content-Type' => 'text/csv; charset=UTF-8',
             'Content-Disposition' => 'attachment; filename="master_data_siswa_' . date('Ymd_His') . '.csv"',
         ];
 
         return response()->stream(function () use ($siswas) {
             $handle = fopen('php://output', 'w');
+            fwrite($handle, "\xEF\xBB\xBF");
             fputcsv($handle, [
                 'No',
                 'NIS',
@@ -333,7 +319,7 @@ class SiswaController extends Controller
                 'Email Siswa',
                 'Status Akun',
                 'Status PKL',
-            ]);
+            ], ';');
 
             $no = 1;
             foreach ($siswas as $s) {
@@ -351,7 +337,7 @@ class SiswaController extends Controller
                     $s->email ?: '-',
                     $s->status_akun,
                     $s->status_pkl,
-                ]);
+                ], ';');
             }
 
             fclose($handle);

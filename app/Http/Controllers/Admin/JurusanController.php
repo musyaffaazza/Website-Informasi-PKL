@@ -253,12 +253,13 @@ class JurusanController extends Controller
         $jurusans = Jurusan::with(['kaprog', 'rombels.siswas', 'industris', 'siswas.pengajuanPkl'])->get();
 
         $headers = [
-            'Content-Type' => 'text/csv',
+            'Content-Type' => 'text/csv; charset=UTF-8',
             'Content-Disposition' => 'attachment; filename="master_data_jurusan_' . date('Ymd_His') . '.csv"',
         ];
 
         return response()->stream(function () use ($jurusans) {
             $handle = fopen('php://output', 'w');
+            fwrite($handle, "\xEF\xBB\xBF");
             fputcsv($handle, [
                 'ID',
                 'Kode',
@@ -273,7 +274,7 @@ class JurusanController extends Controller
                 'Persentase Keterserapan',
                 'Mitra Utama DU/DI',
                 'Status',
-            ]);
+            ], ';');
 
             foreach ($jurusans as $jurusan) {
                 $rombelsXii = $jurusan->rombels->filter(function (Rombel $rombel) {
@@ -303,7 +304,7 @@ class JurusanController extends Controller
                     $persentase,
                     $jurusan->industris->pluck('nama')->implode('; '),
                     $jurusan->status,
-                ]);
+                ], ';');
             }
 
             fclose($handle);

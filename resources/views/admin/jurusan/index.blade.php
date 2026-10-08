@@ -165,14 +165,14 @@
                    name="search"
                    value="{{ request('search') }}"
                    x-model="searchQuery"
-                   placeholder="Cari kode, nama jurusan, Kaprog, atau bidang keahlian..."
-                   class="w-full h-10.5 pl-10 pr-4 bg-slate-50/80 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition">
+                   placeholder="Search"
+                   class="w-full h-12 pl-10 pr-4 bg-slate-50/80 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition">
         </div>
 
         <div class="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-3">
             <div class="flex flex-wrap items-center gap-2.5">
                 <div class="relative min-w-[200px] flex-1 sm:flex-none sm:w-64">
-                    <select name="bidang" x-model="selectedBidang" onchange="document.getElementById('jurusanFilterForm').submit()" class="w-full h-10.5 pl-3.5 pr-8 bg-slate-50/80 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition appearance-none cursor-pointer">
+                    <select name="bidang" x-model="selectedBidang" onchange="document.getElementById('jurusanFilterForm').submit()" class="w-full h-12 pl-3.5 pr-8 bg-slate-50/80 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition appearance-none cursor-pointer">
                         <option value="all">Semua Bidang Keahlian</option>
                         @foreach($bidangList as $b)
                             <option value="{{ $b }}" {{ request('bidang') == $b ? 'selected' : '' }}>{{ $b }}</option>
@@ -182,7 +182,7 @@
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
                     </div>
                 </div>
-                <a href="{{ route('admin.jurusan.index') }}" title="Reset Filter" class="h-10.5 w-10.5 shrink-0 rounded-xl border border-slate-200 text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition flex items-center justify-center">
+                <a href="{{ route('admin.jurusan.index') }}" title="Reset Filter" class="h-12 w-12 shrink-0 rounded-xl border border-slate-200 text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition flex items-center justify-center">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011 1h16a1 1 0 011 1v2.586a1 1 0 00-.293.707l-6.414 6.414a2 2 0 00-.293.707V17l-4 4v-6.586a2 2 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
                     </svg>
@@ -321,8 +321,6 @@
                         </div>
                     </div>
 
-                    <input type="checkbox" value="{{ $jurusan->id }}" @change="toggleSelect('{{ $jurusan->id }}')" :checked="selectedIds.includes('{{ $jurusan->id }}')" class="w-4 h-4 rounded text-blue-600 border-slate-300 focus:ring-blue-500 cursor-pointer">
-
                 </div>
 
                 <!-- Info Stack with Icons -->
@@ -426,12 +424,6 @@
                 <div class="text-xs mt-1">Ubah kata kunci atau filter untuk melihat data lainnya.</div>
             </div>
         @endforelse
-    </div>
-
-    <div x-show="selectedIds.length" class="fixed bottom-8 left-1/2 z-30 flex -translate-x-1/2 items-center gap-4 rounded-2xl border border-slate-700 bg-[#0f2942] px-5 py-3 text-white shadow-xl">
-        <span class="text-xs font-semibold"><span class="text-blue-300" x-text="selectedIds.length"></span> jurusan dipilih</span>
-        <button type="button" @click="bulkDelete()" class="text-xs font-bold text-rose-300 hover:text-rose-100">Hapus Terpilih</button>
-        <button type="button" @click="selectedIds = []" class="text-xs text-slate-300 hover:text-white">Batal</button>
     </div>
 
     <!-- Bottom Information & Pagination Bar -->
@@ -666,7 +658,7 @@
 
                 <div class="bg-slate-50 px-6 py-4 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100">
                     <!-- Hapus Jurusan -->
-                    <form :action="'/admin/jurusan/' + activeJurusan?.id" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus jurusan ini secara permanen?')">
+                    <form :action="'/admin/jurusan/' + activeJurusan?.id" method="POST" onsubmit="return window.confirmDeleteAction(this, 'Apakah Anda yakin ingin menghapus jurusan ini secara permanen?')">
                         @csrf
                         @method('DELETE')
                         <button type="submit" class="flex items-center gap-1.5 px-3.5 py-2 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 text-xs font-bold rounded-xl transition shadow-2xs">
@@ -1021,8 +1013,6 @@ function jurusanApp() {
         kurikulumText: '',
         activeDudiJurusan: null,
         selectedIndustriIds: [],
-        selectedIds: [],
-
         editForm: {
             id: null,
             kode: '',
@@ -1039,22 +1029,6 @@ function jurusanApp() {
         },
 
         resetFilters() {},
-
-        toggleSelect(id) {
-            const index = this.selectedIds.indexOf(id);
-            index === -1 ? this.selectedIds.push(id) : this.selectedIds.splice(index, 1);
-        },
-
-        bulkDelete() {
-            if (!this.selectedIds.length || !confirm('Hapus jurusan terpilih?')) return;
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = '{{ route("admin.jurusan.bulkDelete") }}';
-            form.innerHTML = '<input type="hidden" name="_token" value="{{ csrf_token() }}">' + this.selectedIds.map(id => `<input type="hidden" name="ids[]" value="${id}">`).join('');
-            document.body.appendChild(form);
-            form.submit();
-        },
-
         openCreateModal() {
             this.createModalOpen = true;
         },

@@ -65,9 +65,10 @@ class LogAktivitasController extends Controller
 
         return response()->streamDownload(function () use ($logs) {
             $handle = fopen('php://output', 'w');
+            fwrite($handle, "\xEF\xBB\xBF");
             fputcsv($handle, [
                 'No', 'Pengguna', 'Tipe', 'Aksi', 'Modul', 'Deskripsi', 'IP Address', 'Waktu',
-            ]);
+            ], ';');
             foreach ($logs as $i => $log) {
                 fputcsv($handle, [
                     $i + 1,
@@ -78,10 +79,10 @@ class LogAktivitasController extends Controller
                     $log->deskripsi ?? '-',
                     $log->ip_address ?? '-',
                     $log->dibuat_pada?->format('d/m/Y H:i') ?? '-',
-                ]);
+                ], ';');
             }
             fclose($handle);
-        }, $filename, ['Content-Type' => 'text/csv']);
+        }, $filename, ['Content-Type' => 'text/csv; charset=UTF-8']);
     }
 
     private function applyFilters($query, Request $request): void

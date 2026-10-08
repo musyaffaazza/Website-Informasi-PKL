@@ -288,12 +288,13 @@ class IndustriController extends Controller
         });
 
         $headers = [
-            'Content-Type' => 'text/csv',
+            'Content-Type' => 'text/csv; charset=UTF-8',
             'Content-Disposition' => 'attachment; filename="master_data_industri_' . date('Ymd_His') . '.csv"',
         ];
 
         return response()->stream(function () use ($industris) {
             $handle = fopen('php://output', 'w');
+            fwrite($handle, "\xEF\xBB\xBF");
             fputcsv($handle, [
                 'No',
                 'Nama Industri / DU-DI',
@@ -311,7 +312,7 @@ class IndustriController extends Controller
                 'Kuota Terisi Aktual',
                 'Sisa Kursi',
                 'Status Kemitraan',
-            ]);
+            ], ';');
 
             foreach ($industris as $index => $industri) {
                 $terisiAktual = (int) $industri->kuota_terisi;
@@ -334,7 +335,7 @@ class IndustriController extends Controller
                     $terisiAktual,
                     $sisa,
                     strtoupper($industri->status_kemitraan),
-                ]);
+                ], ';');
             }
 
             fclose($handle);

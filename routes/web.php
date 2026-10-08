@@ -92,12 +92,18 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::put('/profile', function (\Illuminate\Http\Request $request) {
         $user = \Illuminate\Support\Facades\Auth::user() ?: \App\Models\User::where('username', 'admin')->firstOrFail();
         $data = $request->validate([
-            'username' => ['required', 'string', 'max:50', 'unique:users,username,' . $user->id],
             'password' => ['nullable', 'string', 'min:8', 'confirmed'],
+            'avatar' => ['nullable', 'image', 'max:2048'],
         ]);
-        $user->username = $data['username'];
+
         if (!empty($data['password'])) {
             $user->password_hash = \Illuminate\Support\Facades\Hash::make($data['password']);
+        }
+        if ($request->hasFile('avatar')) {
+            if ($user->avatar_url) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($user->avatar_url);
+            }
+            $user->avatar_url = $request->file('avatar')->store('profile', 'public');
         }
         $user->save();
         return redirect()->route('admin.profile')->with('success', 'Profil berhasil diperbarui.');

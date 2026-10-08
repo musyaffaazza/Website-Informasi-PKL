@@ -167,11 +167,8 @@
                         $searchAction = route('admin.log-aktivitas.index');
                     }
                 @endphp
-                <form action="{{ $searchAction }}" method="GET" class="relative w-full max-w-md min-w-0">
-                    @if(request('tingkat') && request()->routeIs('admin.rombel.*'))
-                        <input type="hidden" name="tingkat" value="{{ request('tingkat') }}">
-                    @endif
-                    @if(request('jurusan_id') && request()->routeIs('admin.rombel.*'))
+                <form action="{{ $searchAction }}" method="GET" class="relative w-full max-w-xl min-w-0">
+@if(request('jurusan_id') && request()->routeIs('admin.rombel.*'))
                         <input type="hidden" name="jurusan_id" value="{{ request('jurusan_id') }}">
                     @endif
                     <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
@@ -183,7 +180,7 @@
                            name="search"
                            value="{{ request('search') }}"
                            placeholder="Search"
-                           class="w-full pl-10 pr-4 py-2 bg-slate-50/80 border border-slate-200 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition">
+                           class="w-full h-12 pl-10 pr-4 bg-slate-50/80 border border-slate-200 rounded-xl text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition">
                 </form>
             </div>
 
@@ -191,15 +188,22 @@
             <div class="flex items-center gap-3 sm:gap-4 shrink-0">
 
 
+                @php
+                    $headerUser = \Illuminate\Support\Facades\Auth::user() ?: \App\Models\User::where('username', 'admin')->first();
+                    $headerInitials = strtoupper(substr($headerUser?->username ?? 'AD', 0, 2));
+                @endphp
                 <!-- User Profile Info with Dropdown -->
                 <div class="relative" x-data="{ profileOpen: false }">
                     <button @click="profileOpen = !profileOpen" class="flex items-center gap-2.5 sm:gap-3 cursor-pointer">
-                        <div class="w-9 h-9 rounded-full bg-slate-100 text-slate-700 border border-slate-200 font-bold text-xs flex items-center justify-center shadow-xs shrink-0">
-                            AD
+                        <div class="w-9 h-9 overflow-hidden rounded-full bg-slate-100 text-slate-700 border border-slate-200 font-bold text-xs flex items-center justify-center shadow-xs shrink-0">
+                            @if($headerUser?->avatar_url)
+                                <img src="{{ asset('storage/' . $headerUser->avatar_url) }}" alt="Foto profil" class="h-full w-full object-cover">
+                            @else
+                                {{ $headerInitials }}
+                            @endif
                         </div>
                         <div class="hidden sm:block text-left">
                             <div class="text-xs font-bold text-slate-900 leading-tight">Admin Sistem</div>
-                            <div class="text-[10px] text-slate-400">Staf Tata Usaha</div>
                         </div>
                         <svg class="w-4 h-4 text-slate-400 hidden sm:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                     </button>
@@ -267,6 +271,57 @@
         @click="sidebarOpen = false"
         x-cloak
         class="fixed inset-0 bg-slate-900/60 z-20 lg:hidden"></div>
+
+    <div id="deleteConfirmModal" class="fixed inset-0 z-[100] hidden" role="alertdialog" aria-modal="true" aria-labelledby="deleteConfirmTitle" aria-describedby="deleteConfirmMessage">
+        <div data-delete-cancel class="absolute inset-0 bg-slate-900/60"></div>
+        <div class="relative flex min-h-screen items-center justify-center p-4">
+            <div class="w-full max-w-md rounded-3xl border border-slate-200 bg-white p-6 text-center shadow-2xl sm:p-8">
+                <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-rose-50 text-rose-600">
+                    <svg class="h-7 w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 9v2m0 4h.01M5.07 19h13.86c1.54 0 2.5-1.67 1.73-3L13.73 4c-.77-1.33-2.69-1.33-3.46 0L3.34 16c-.77 1.33.19 3 1.73 3z" /></svg>
+                </div>
+                <h2 id="deleteConfirmTitle" class="mt-4 text-lg font-extrabold text-slate-900">Hapus Data?</h2>
+                <p id="deleteConfirmMessage" class="mt-2 text-sm leading-relaxed text-slate-500">Data yang dihapus tidak dapat dipulihkan.</p>
+                <div class="mt-7 flex gap-3">
+                    <button type="button" data-delete-cancel class="flex-1 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-bold text-slate-700 transition hover:bg-slate-100">Batal</button>
+                    <button id="deleteConfirmSubmit" type="button" class="flex-1 rounded-xl bg-rose-600 px-4 py-3 text-sm font-bold text-white transition hover:bg-rose-700">Ya, Hapus</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (() => {
+            const modal = document.getElementById('deleteConfirmModal');
+            const message = document.getElementById('deleteConfirmMessage');
+            const submit = document.getElementById('deleteConfirmSubmit');
+            let pendingForm = null;
+
+            const close = () => {
+                modal.classList.add('hidden');
+                if (pendingForm?.dataset.deleteTemporary === 'true') pendingForm.remove();
+                pendingForm = null;
+            };
+
+            window.confirmDeleteAction = (form, text = 'Data yang dihapus tidak dapat dipulihkan.') => {
+                pendingForm = form;
+                message.textContent = text;
+                modal.classList.remove('hidden');
+                submit.focus();
+                return false;
+            };
+
+            modal.querySelectorAll('[data-delete-cancel]').forEach((button) => button.addEventListener('click', close));
+            submit.addEventListener('click', () => {
+                const form = pendingForm;
+                pendingForm = null;
+                modal.classList.add('hidden');
+                form?.submit();
+            });
+            document.addEventListener('keydown', (event) => {
+                if (event.key === 'Escape' && !modal.classList.contains('hidden')) close();
+            });
+        })();
+    </script>
 
     @stack('scripts')
 </body>

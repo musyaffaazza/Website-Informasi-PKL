@@ -120,8 +120,11 @@ class RombelController extends Controller
         ]);
 
         $validated['nama_kode'] = $validated['nama_rombel'];
-        if (empty($validated['siswa_terdata'])) {
-            $validated['siswa_terdata'] = $validated['jumlah_siswa'];
+        if (!array_key_exists('siswa_terdata', $validated) || $validated['siswa_terdata'] === null) {
+            $validated['siswa_terdata'] = 0;
+        }
+        if ($validated['siswa_terdata'] > $validated['jumlah_siswa']) {
+            return back()->withErrors(['siswa_terdata' => 'Jumlah siswa terdata tidak boleh melebihi kapasitas rombel.'])->withInput();
         }
 
         $rombel = Rombel::create($validated);
@@ -150,8 +153,11 @@ class RombelController extends Controller
         ]);
 
         $validated['nama_kode'] = $validated['nama_rombel'];
-        if (empty($validated['siswa_terdata'])) {
-            $validated['siswa_terdata'] = $validated['jumlah_siswa'];
+        if (!array_key_exists('siswa_terdata', $validated) || $validated['siswa_terdata'] === null) {
+            $validated['siswa_terdata'] = 0;
+        }
+        if ($validated['siswa_terdata'] > $validated['jumlah_siswa']) {
+            return back()->withErrors(['siswa_terdata' => 'Jumlah siswa terdata tidak boleh melebihi kapasitas rombel.'])->withInput();
         }
 
         $rombel->update($validated);
@@ -201,11 +207,9 @@ class RombelController extends Controller
     {
         $query = Rombel::with(['jurusan', 'waliKelas']);
 
-        if ($tingkat = $request->input('tingkat')) {
-            $query->where('tingkat', 'XII');
-        } else {
-            $query->where('tingkat', 'XII');
-        }
+
+        $query->where('tingkat', 'XII');
+
 
         if ($jurusanId = $request->input('jurusan_id')) {
             if ($jurusanId !== 'all') {
@@ -216,12 +220,13 @@ class RombelController extends Controller
         $rombels = $query->orderBy('id', 'asc')->get();
 
         $headers = [
-            'Content-Type' => 'text/csv',
+            'Content-Type' => 'text/csv; charset=UTF-8',
             'Content-Disposition' => 'attachment; filename="master_data_rombel_' . date('Ymd_His') . '.csv"',
         ];
 
         return response()->stream(function () use ($rombels) {
             $handle = fopen('php://output', 'w');
+            fwrite($handle, "\xEF\xBB\xBF");
             fputcsv($handle, [
                 'No',
                 'Kode Rombel',
@@ -237,7 +242,7 @@ class RombelController extends Controller
                 'Tahun Ajaran',
                 'Semester',
                 'Status Rombel',
-            ]);
+            ], ';');
 
             $no = 1;
             foreach ($rombels as $r) {
@@ -260,7 +265,7 @@ class RombelController extends Controller
                     $r->tahun_ajaran,
                     $r->semester,
                     $r->status,
-                ]);
+                ], ';');
             }
 
             fclose($handle);

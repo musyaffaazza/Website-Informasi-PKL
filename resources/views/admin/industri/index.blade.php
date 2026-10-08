@@ -194,8 +194,8 @@
                 <input type="text"
                        name="search"
                        value="{{ request('search') }}"
-                       placeholder="Cari nama industri, bidang usaha, PIC, atau alamat..."
-                       class="w-full h-10.5 pl-10 pr-4 bg-slate-50/80 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition">
+                       placeholder="Search"
+                       class="w-full h-12 pl-10 pr-4 bg-slate-50/80 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition">
             </div>
 
             <div class="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-3">
@@ -203,7 +203,7 @@
                     <div class="relative min-w-[170px] flex-1 sm:flex-none sm:w-52">
                         <select name="jurusan_id"
                                 onchange="this.form.submit()"
-                                class="w-full h-10.5 pl-3.5 pr-8 bg-slate-50/80 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition appearance-none cursor-pointer">
+                                class="w-full h-12 pl-3.5 pr-8 bg-slate-50/80 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition appearance-none cursor-pointer">
                             <option value="all">Semua Konsentrasi</option>
                             @foreach($jurusans as $j)
                                 <option value="{{ $j->id }}" {{ request('jurusan_id') == $j->id ? 'selected' : '' }}>
@@ -221,7 +221,7 @@
                     <div class="relative min-w-[140px] flex-1 sm:flex-none sm:w-44">
                         <select name="wilayah"
                                 onchange="this.form.submit()"
-                                class="w-full h-10.5 pl-3.5 pr-8 bg-slate-50/80 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition appearance-none cursor-pointer">
+                                class="w-full h-12 pl-3.5 pr-8 bg-slate-50/80 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition appearance-none cursor-pointer">
                             <option value="all">Semua Wilayah</option>
                             @foreach($wilayahList as $w)
                                 <option value="{{ $w }}" {{ request('wilayah') == $w ? 'selected' : '' }}>
@@ -239,7 +239,7 @@
                     <div class="relative min-w-[150px] flex-1 sm:flex-none sm:w-48">
                         <select name="sort"
                                 onchange="this.form.submit()"
-                                class="w-full h-10.5 pl-3.5 pr-8 bg-slate-50/80 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition appearance-none cursor-pointer">
+                                class="w-full h-12 pl-3.5 pr-8 bg-slate-50/80 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition appearance-none cursor-pointer">
                             <option value="nama_asc" {{ request('sort') == 'nama_asc' ? 'selected' : '' }}>Nama Mitra (A - Z)</option>
                             <option value="nama_desc" {{ request('sort') == 'nama_desc' ? 'selected' : '' }}>Nama Mitra (Z - A)</option>
                             <option value="kuota_desc" {{ request('sort') == 'kuota_desc' ? 'selected' : '' }}>Kuota Terbanyak</option>
@@ -254,7 +254,7 @@
 
                     <a href="{{ route('admin.industri.index', ['tab' => $tab]) }}"
                        title="Reset Filter"
-                       class="h-10.5 w-10.5 shrink-0 rounded-xl border border-slate-200 text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition flex items-center justify-center">
+                       class="h-12 w-12 shrink-0 rounded-xl border border-slate-200 text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition flex items-center justify-center">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011 1h16a1 1 0 011 1v2.586a1 1 0 00-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
                         </svg>
@@ -943,7 +943,7 @@
                 <!-- Footer -->
                 <div class="bg-slate-50 px-6 py-4 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100">
                     <!-- Hapus Mitra Form -->
-                    <form :action="'/admin/industri/' + activeIndustri?.id" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus mitra industri ini secara permanen?')">
+                    <form :action="'/admin/industri/' + activeIndustri?.id" method="POST" onsubmit="return window.confirmDeleteAction(this, 'Apakah Anda yakin ingin menghapus mitra industri ini secara permanen?')">
                         @csrf
                         @method('DELETE')
                         <button type="submit" class="flex items-center gap-1.5 px-3.5 py-2 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 text-xs font-bold rounded-xl transition shadow-2xs">
@@ -1242,14 +1242,15 @@ function industriApp() {
         },
 
         bulkDelete() {
-            if (!this.selectedIds.length || !confirm('Hapus industri terpilih?')) return;
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = '{{ route("admin.industri.bulkDelete") }}';
-            form.innerHTML = '<input type="hidden" name="_token" value="{{ csrf_token() }}">' + this.selectedIds.map(id => `<input type="hidden" name="ids[]" value="${id}">`).join('');
-            document.body.appendChild(form);
-            form.submit();
-        },
+                if (!this.selectedIds.length) return;
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '{{ route('admin.industri.bulkDelete') }}';
+                form.dataset.deleteTemporary = 'true';
+                form.innerHTML = '<input type="hidden" name="_token" value="{{ csrf_token() }}">' + this.selectedIds.map(id => `<input type="hidden" name="ids[]" value="${id}">`).join('');
+                document.body.appendChild(form);
+                window.confirmDeleteAction(form, `Hapus ${this.selectedIds.length} mitra industri terpilih secara permanen?`);
+            },
 
         openCreateModal() {
             this.createModalOpen = true;

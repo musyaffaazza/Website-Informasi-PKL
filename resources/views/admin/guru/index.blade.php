@@ -126,8 +126,8 @@
                 <input type="text"
                        name="search"
                        value="{{ request('search') }}"
-                       placeholder="Cari NIP, nama guru, atau role penugasan..."
-                       class="w-full h-10.5 pl-10 pr-4 bg-slate-50/80 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition">
+                       placeholder="Search"
+                       class="w-full h-12 pl-10 pr-4 bg-slate-50/80 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition">
             </div>
 
             <!-- Row 2: Filters (Left) & Actions (Right) -->
@@ -138,7 +138,7 @@
                     <div class="relative min-w-[140px] flex-1 sm:flex-none sm:w-44">
                         <select name="role"
                                 onchange="document.getElementById('filterForm').submit()"
-                                class="w-full h-10.5 pl-3.5 pr-8 bg-slate-50/80 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition appearance-none cursor-pointer">
+                                class="w-full h-12 pl-3.5 pr-8 bg-slate-50/80 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition appearance-none cursor-pointer">
                             <option value="all" {{ request('role') == 'all' ? 'selected' : '' }}>Semua Role</option>
                             <option value="Kaprog" {{ request('role') == 'Kaprog' ? 'selected' : '' }}>Kepala Program (Kaprog)</option>
                             <option value="Pembimbing" {{ request('role') == 'Pembimbing' ? 'selected' : '' }}>Pembimbing PKL</option>
@@ -159,7 +159,7 @@
                     <div class="relative min-w-[140px] flex-1 sm:flex-none sm:w-44">
                         <select name="jurusan_id"
                                 onchange="document.getElementById('filterForm').submit()"
-                                class="w-full h-10.5 pl-3.5 pr-8 bg-slate-50/80 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition appearance-none cursor-pointer">
+                                class="w-full h-12 pl-3.5 pr-8 bg-slate-50/80 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition appearance-none cursor-pointer">
                             <option value="all" {{ request('jurusan_id', 'all') == 'all' ? 'selected' : '' }}>Semua Jurusan</option>
                             @foreach($jurusans as $j)
                                 <option value="{{ $j->id }}" {{ request('jurusan_id') == $j->id ? 'selected' : '' }}>
@@ -177,7 +177,7 @@
                     <!-- Filter Reset Button -->
                     <a href="{{ route('admin.guru.index') }}"
                        title="Reset Filter"
-                       class="h-10.5 w-10.5 shrink-0 rounded-xl border border-slate-200 text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition flex items-center justify-center">
+                       class="h-12 w-12 shrink-0 rounded-xl border border-slate-200 text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition flex items-center justify-center">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
                         </svg>
@@ -189,7 +189,7 @@
 
                     <!-- Ekspor XLS -->
                     <a href="{{ route('admin.guru.export', request()->query()) }}"
-                       class="h-10.5 flex items-center gap-2 px-4 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-xl text-xs font-semibold shadow-2xs transition active:scale-98">
+                       class="h-12 flex items-center gap-2 px-4 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-xl text-xs font-semibold shadow-2xs transition active:scale-98">
                         <svg class="w-4 h-4 text-slate-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                         </svg>
@@ -199,7 +199,7 @@
                     <!-- + Tambah Guru -->
                     <button type="button"
                             @click="openCreateModal()"
-                            class="h-10.5 flex items-center gap-2 px-4.5 bg-[#0f2942] hover:bg-[#1a385c] text-white rounded-xl text-xs font-bold shadow-xs transition active:scale-98">
+                            class="h-12 min-w-[160px] shrink-0 inline-flex items-center justify-center gap-2 px-5 whitespace-nowrap bg-[#0f2942] hover:bg-[#1a385c] text-white rounded-xl text-xs font-bold shadow-xs transition active:scale-98">
                         <svg class="w-4 h-4 text-white shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
                         </svg>
@@ -1056,13 +1056,14 @@
             },
 
             bulkDelete() {
-                if (!this.selectedIds.length || !confirm('Hapus data guru terpilih?')) return;
+                if (!this.selectedIds.length) return;
                 const form = document.createElement('form');
                 form.method = 'POST';
-                form.action = '{{ route("admin.guru.bulkDelete") }}';
+                form.action = '{{ route('admin.guru.bulkDelete') }}';
+                form.dataset.deleteTemporary = 'true';
                 form.innerHTML = '<input type="hidden" name="_token" value="{{ csrf_token() }}">' + this.selectedIds.map(id => `<input type="hidden" name="ids[]" value="${id}">`).join('');
                 document.body.appendChild(form);
-                form.submit();
+                window.confirmDeleteAction(form, `Hapus ${this.selectedIds.length} data guru terpilih secara permanen?`);
             }
         }
     }

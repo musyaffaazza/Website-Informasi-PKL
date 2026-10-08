@@ -109,15 +109,15 @@
                 <input type="text"
                        name="search"
                        value="{{ request('search') }}"
-                       placeholder="Cari nama siswa atau NIS..."
-                       class="w-full h-10.5 pl-10 pr-4 bg-slate-50/80 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition">
+                       placeholder="Search"
+                       class="w-full h-12 pl-10 pr-4 bg-slate-50/80 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition">
             </div>
 
             <div class="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-3">
                 <div class="flex flex-wrap items-center gap-2.5">
                     <div class="relative min-w-[150px] flex-1 sm:flex-none sm:w-44">
                         <select name="jurusan_id"
-                                class="w-full h-10.5 pl-3.5 pr-8 bg-slate-50/80 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition appearance-none cursor-pointer">
+                                class="w-full h-12 pl-3.5 pr-8 bg-slate-50/80 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition appearance-none cursor-pointer">
                             <option value="all">Semua Jurusan</option>
                             @foreach($jurusans as $j)
                                 <option value="{{ $j->id }}" {{ request('jurusan_id') == $j->id ? 'selected' : '' }}>
@@ -132,7 +132,7 @@
 
                     <div class="relative min-w-[150px] flex-1 sm:flex-none sm:w-48">
                         <select name="rombel_id"
-                                class="w-full h-10.5 pl-3.5 pr-8 bg-slate-50/80 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition appearance-none cursor-pointer">
+                                class="w-full h-12 pl-3.5 pr-8 bg-slate-50/80 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition appearance-none cursor-pointer">
                             <option value="all">Semua Rombel</option>
                             @foreach($rombels as $r)
                                 <option value="{{ $r->id }}" {{ request('rombel_id') == $r->id ? 'selected' : '' }}>
@@ -147,7 +147,7 @@
 
                     <div class="relative min-w-[170px] flex-1 sm:flex-none sm:w-56">
                         <select name="guru_id"
-                                class="w-full h-10.5 pl-3.5 pr-8 bg-slate-50/80 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition appearance-none cursor-pointer">
+                                class="w-full h-12 pl-3.5 pr-8 bg-slate-50/80 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition appearance-none cursor-pointer">
                             <option value="all">Semua Pembimbing</option>
                             @foreach($gurus as $g)
                                 <option value="{{ $g->id }}" {{ request('guru_id') == $g->id ? 'selected' : '' }}>
@@ -162,7 +162,7 @@
 
                     <div class="relative min-w-[160px] flex-1 sm:flex-none sm:w-48">
                         <select name="status_mapping"
-                                class="w-full h-10.5 pl-3.5 pr-8 bg-slate-50/80 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition appearance-none cursor-pointer">
+                                class="w-full h-12 pl-3.5 pr-8 bg-slate-50/80 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition appearance-none cursor-pointer">
                             <option value="all" {{ request('status_mapping') == 'all' ? 'selected' : '' }}>Semua Status</option>
                             <option value="sudah" {{ request('status_mapping') == 'sudah' ? 'selected' : '' }}>Sudah Dipetakan</option>
                             <option value="belum" {{ request('status_mapping') == 'belum' ? 'selected' : '' }}>Belum Dipetakan</option>
@@ -174,7 +174,7 @@
 
                     <a href="{{ route('admin.mapping-pembimbing.index') }}"
                        title="Reset Filter"
-                       class="h-10.5 w-10.5 shrink-0 rounded-xl border border-slate-200 text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition flex items-center justify-center">
+                       class="h-12 w-12 shrink-0 rounded-xl border border-slate-200 text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition flex items-center justify-center">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011 1h16a1 1 0 011 1v2.586a1 1 0 00-.293.707l-6.414 6.414a2 2 0 00-.293.707V17l-4 4v-6.586a2 2 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
                         </svg>
@@ -183,7 +183,7 @@
 
                 <div class="flex items-center gap-2 self-start xl:self-auto shrink-0">
                     <button type="submit"
-                            class="flex items-center gap-1.5 h-10.5 px-4 bg-[#0f2942] hover:bg-[#1a385c] text-white text-xs font-bold rounded-xl shadow-xs transition active:scale-98">
+                            class="flex items-center gap-1.5 h-12 px-4 bg-[#0f2942] hover:bg-[#1a385c] text-white text-xs font-bold rounded-xl shadow-xs transition active:scale-98">
                         <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 0114 0z" />
                         </svg>
@@ -364,7 +364,7 @@
                                 </button>
 
                                 <!-- Delete / Unassign -->
-                                <form action="{{ route('admin.mapping-pembimbing.destroy', $penugasan->id) }}" method="POST" onsubmit="return confirm('Hapus penugasan pembimbing untuk siswa {{ $siswa ? $siswa->nama : '' }}?')">
+                                <form action="{{ route('admin.mapping-pembimbing.destroy', $penugasan->id) }}" method="POST" onsubmit="return window.confirmDeleteAction(this, 'Hapus penugasan pembimbing ini? Data yang dihapus tidak dapat dipulihkan.')">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit"

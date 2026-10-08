@@ -149,7 +149,6 @@
     <!-- Filter & Search Toolbar -->
     @php
         $hasActiveFilter = request()->filled('search') 
-            || (request('tingkat', 'all') !== 'all' && request('tingkat') !== null) 
             || (request('jurusan_id', 'all') !== 'all' && request('jurusan_id') !== null) 
             || (request('status_pkl', 'all') !== 'all' && request('status_pkl') !== null);
     @endphp
@@ -166,8 +165,8 @@
                 <input type="text"
                        name="search"
                        value="{{ request('search') }}"
-                       placeholder="Cari nama siswa, NIS, NISN, atau email..."
-                       class="w-full h-11 pl-10 pr-24 sm:pr-28 bg-slate-50/80 hover:bg-slate-50 focus:bg-white border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition shadow-2xs">
+                       placeholder="Search"
+                       class="w-full h-12 pl-10 pr-24 sm:pr-28 bg-slate-50/80 hover:bg-slate-50 focus:bg-white border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition shadow-2xs">
                 
                 @if(request('search'))
                     <a href="{{ route('admin.siswa.index', request()->except(['search', 'page'])) }}" 
@@ -187,23 +186,7 @@
 
             <!-- Row 2: Filter Controls Grid & Status Info -->
             <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 pt-1 border-t border-slate-100/80">
-                <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-2.5 flex-1">
-                    <!-- Filter Tingkat / Rombel -->
-                    <div class="relative">
-                        <select name="tingkat"
-                                onchange="document.getElementById('filterForm').submit()"
-                                class="w-full h-10 pl-3.5 pr-8 {{ request('tingkat', 'all') !== 'all' && request('tingkat') !== null ? 'bg-sky-50/90 border-sky-300 text-sky-900 font-bold' : 'bg-slate-50/80 border-slate-200 text-slate-700 font-semibold' }} border rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition appearance-none cursor-pointer">
-                            <option value="all" {{ request('tingkat', 'all') == 'all' ? 'selected' : '' }}>Semua Tingkat / Rombel</option>
-                            <option value="XII" {{ request('tingkat') == 'XII' ? 'selected' : '' }}>Tingkat XII (PKL)</option>
-                            @foreach($rombels as $r)
-                                <option value="{{ $r->id }}" {{ request('tingkat') == $r->id ? 'selected' : '' }}>{{ $r->nama_rombel }}</option>
-                            @endforeach
-                        </select>
-                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-400">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
-                        </div>
-                    </div>
-
+                <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-2.5 flex-1">
                     <!-- Filter Jurusan -->
                     <div class="relative">
                         <select name="jurusan_id"
@@ -1014,13 +997,14 @@
             },
 
             bulkDelete() {
-                if (!this.selectedIds.length || !confirm('Hapus data siswa terpilih?')) return;
+                if (!this.selectedIds.length) return;
                 const form = document.createElement('form');
                 form.method = 'POST';
-                form.action = '{{ route("admin.siswa.bulkDelete") }}';
+                form.action = '{{ route('admin.siswa.bulkDelete') }}';
+                form.dataset.deleteTemporary = 'true';
                 form.innerHTML = '<input type="hidden" name="_token" value="{{ csrf_token() }}">' + this.selectedIds.map(id => `<input type="hidden" name="ids[]" value="${id}">`).join('');
                 document.body.appendChild(form);
-                form.submit();
+                window.confirmDeleteAction(form, `Hapus ${this.selectedIds.length} data siswa terpilih secara permanen?`);
             }
         }
     }

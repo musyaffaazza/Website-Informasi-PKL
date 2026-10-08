@@ -342,12 +342,13 @@ class GuruController extends Controller
         $gurus = $query->orderBy('id', 'asc')->get();
 
         $headers = [
-            'Content-Type' => 'text/csv',
+            'Content-Type' => 'text/csv; charset=UTF-8',
             'Content-Disposition' => 'attachment; filename="master_data_guru_' . date('Ymd_His') . '.csv"',
         ];
 
         return response()->stream(function () use ($gurus) {
             $handle = fopen('php://output', 'w');
+            fwrite($handle, "\xEF\xBB\xBF");
             fputcsv($handle, [
                 'No',
                 'NIP',
@@ -361,7 +362,7 @@ class GuruController extends Controller
                 'Kelas / Jurusan Diampu',
                 'Keterangan Penugasan',
                 'Status Akun',
-            ]);
+            ], ';');
 
             $no = 1;
             foreach ($gurus as $g) {
@@ -379,7 +380,7 @@ class GuruController extends Controller
                     $g->kelas_diampu ?: 'Belum teralokasi',
                     $g->keterangan_diampu ?: '-',
                     $g->status_akun,
-                ]);
+                ], ';');
             }
 
             fclose($handle);

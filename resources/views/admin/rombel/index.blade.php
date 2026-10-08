@@ -85,29 +85,16 @@
                 <input type="text"
                        name="search"
                        value="{{ request('search') }}"
-                       placeholder="Cari nama rombel, kode rombel, wali kelas, atau ruang..."
-                       class="w-full h-10.5 pl-10 pr-4 bg-slate-50/80 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition">
+                       placeholder="Search"
+                       class="w-full h-12 pl-10 pr-4 bg-slate-50/80 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition">
             </div>
 
             <div class="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-3">
                 <div class="flex flex-wrap items-center gap-2.5">
-                    <div class="relative min-w-[170px] flex-1 sm:flex-none sm:w-48">
-                        <select name="tingkat"
-                                onchange="document.getElementById('filterForm').submit()"
-                                class="w-full h-10.5 pl-3.5 pr-8 bg-slate-50/80 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition appearance-none cursor-pointer">
-                            <option value="XII" selected>Tingkat XII (PKL)</option>
-                        </select>
-                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-400">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                            </svg>
-                        </div>
-                    </div>
-
-                    <div class="relative min-w-[220px] flex-1 sm:flex-none sm:w-64">
+<div class="relative min-w-[220px] flex-1 sm:flex-none sm:w-64">
                         <select name="jurusan_id"
                                 onchange="document.getElementById('filterForm').submit()"
-                                class="w-full h-10.5 pl-3.5 pr-8 bg-slate-50/80 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition appearance-none cursor-pointer">
+                                class="w-full h-12 pl-3.5 pr-8 bg-slate-50/80 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition appearance-none cursor-pointer">
                             <option value="all" {{ request('jurusan_id', 'all') == 'all' ? 'selected' : '' }}>Semua Jurusan</option>
                             @foreach($jurusans as $j)
                                 <option value="{{ $j->id }}" {{ request('jurusan_id') == $j->id ? 'selected' : '' }}>
@@ -124,7 +111,7 @@
 
                     <a href="{{ route('admin.rombel.index') }}"
                        title="Reset Filter"
-                       class="h-10.5 w-10.5 shrink-0 rounded-xl border border-slate-200 text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition flex items-center justify-center">
+                       class="h-12 w-12 shrink-0 rounded-xl border border-slate-200 text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition flex items-center justify-center">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011 1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
                         </svg>
@@ -133,7 +120,7 @@
 
                 <div class="flex flex-wrap items-center gap-2.5 self-start xl:self-auto shrink-0">
                     <a href="{{ route('admin.rombel.export', request()->query()) }}"
-                       class="h-10.5 flex items-center gap-2 px-4 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-xl text-xs font-semibold shadow-2xs transition active:scale-98">
+                       class="h-12 flex items-center gap-2 px-4 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-xl text-xs font-semibold shadow-2xs transition active:scale-98">
                         <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                         </svg>
@@ -141,7 +128,7 @@
                     </a>
                     <button type="button"
                             @click="openCreateModal()"
-                            class="h-10.5 flex items-center gap-2 px-4.5 bg-[#0f2942] hover:bg-[#1a385c] text-white rounded-xl text-xs font-bold shadow-xs transition active:scale-98">
+                            class="h-12 min-w-[160px] shrink-0 inline-flex items-center justify-center gap-2 px-5 whitespace-nowrap bg-[#0f2942] hover:bg-[#1a385c] text-white rounded-xl text-xs font-bold shadow-xs transition active:scale-98">
                         <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
                         </svg>
@@ -158,7 +145,7 @@
                 <thead>
                     <tr class="border-b border-slate-200 bg-slate-50/50 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                         <th class="py-3.5 pl-5 pr-3 w-10">
-                            <input type="checkbox" 
+                            <input type="checkbox"
                                    @change="toggleSelectAll($event)"
                                    :checked="allSelected"
                                    class="w-4 h-4 rounded text-blue-600 border-slate-300 focus:ring-blue-500 cursor-pointer">
@@ -176,7 +163,7 @@
                         <tr class="hover:bg-slate-50/80 transition group">
                             <!-- Checkbox -->
                             <td class="py-4 pl-5 pr-3">
-                                <input type="checkbox" 
+                                <input type="checkbox"
                                        value="{{ $r->id }}"
                                        @change="toggleSelect('{{ $r->id }}')"
                                        :checked="selectedIds.includes('{{ $r->id }}')"
@@ -232,7 +219,7 @@
                             <td class="py-4 pr-6 pl-4 text-right">
                                 <div class="inline-flex items-center gap-1">
                                     <!-- View / Detail Button -->
-                                    <button type="button" 
+                                    <button type="button"
                                             @click="openDetailModal({{ $r->toJson() }}, '{{ $r->jurusan ? $r->jurusan->nama : '' }}', '{{ $r->waliKelas ? $r->waliKelas->nama : '' }}', '{{ $r->waliKelas ? $r->waliKelas->nip : '' }}')"
                                             title="Lihat Detail Rombel"
                                             class="p-1.5 text-slate-400 hover:text-blue-600 rounded-lg hover:bg-blue-50 transition">
@@ -243,7 +230,7 @@
                                     </button>
 
                                     <!-- Edit Button -->
-                                    <button type="button" 
+                                    <button type="button"
                                             @click="openEditModal({{ $r->toJson() }})"
                                             title="Edit Rombel"
                                             class="p-1.5 text-slate-400 hover:text-amber-600 rounded-lg hover:bg-amber-50 transition">
@@ -253,7 +240,7 @@
                                     </button>
 
                                     <!-- Delete Button -->
-                                    <button type="button" 
+                                    <button type="button"
                                             @click="confirmDelete('{{ $r->id }}', '{{ $r->nama_rombel ?: $r->nama_kode }}')"
                                             title="Hapus Rombel"
                                             class="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 transition">
@@ -285,15 +272,15 @@
         <div class="px-6 py-4 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-xs">
             <div class="flex items-center gap-2 text-slate-500 font-medium">
                 <span>
-                    Menampilkan 
-                    <strong class="text-slate-800">{{ $rombels->firstItem() ?? 0 }}</strong> - 
-                    <strong class="text-slate-800">{{ $rombels->lastItem() ?? 0 }}</strong> dari 
+                    Menampilkan
+                    <strong class="text-slate-800">{{ $rombels->firstItem() ?? 0 }}</strong> -
+                    <strong class="text-slate-800">{{ $rombels->lastItem() ?? 0 }}</strong> dari
                     <strong class="text-slate-800">{{ $rombels->total() }}</strong> Rombel
                 </span>
                 <span class="text-slate-300">|</span>
                 <div class="flex items-center gap-1.5">
                     <span>Tampilkan:</span>
-                    <select onchange="updatePerPage(this.value)" 
+                    <select onchange="updatePerPage(this.value)"
                             class="bg-slate-50 border border-slate-200 rounded-lg px-2 py-1 text-xs font-semibold text-slate-700 focus:outline-none focus:ring-1 focus:ring-blue-500">
                         <option value="8" {{ request('per_page') == 8 ? 'selected' : '' }}>8 baris per halaman</option>
                         <option value="10" {{ request('per_page', 10) == 10 ? 'selected' : '' }}>10 baris per halaman</option>
@@ -333,7 +320,7 @@
 
 
     <!-- Floating Batch Action Bar -->
-    <div x-show="selectedIds.length > 0" 
+    <div x-show="selectedIds.length > 0"
          x-transition:enter="transition ease-out duration-200"
          x-transition:enter-start="opacity-0 translate-y-4"
          x-transition:enter-end="opacity-100 translate-y-0"
@@ -358,7 +345,7 @@
     </div>
 
     <!-- ==================== MODAL TAMBAH ROMBEL ==================== -->
-    <div x-show="isCreateModalOpen" 
+    <div x-show="isCreateModalOpen"
          x-cloak
          class="fixed inset-0 z-50 overflow-y-auto"
          aria-labelledby="modal-title" role="dialog" aria-modal="true">
@@ -366,58 +353,58 @@
         <div class="fixed inset-0 bg-slate-900/60 transition-opacity" @click="isCreateModalOpen = false"></div>
 
         <div class="flex min-h-screen items-center justify-center p-4 text-center sm:p-6">
-            <div class="relative z-10 w-full max-w-2xl transform overflow-hidden rounded-3xl bg-white text-left shadow-2xl transition-all border border-slate-100">
+            <div class="relative z-10 w-full max-w-3xl transform overflow-hidden rounded-3xl bg-white text-left shadow-2xl transition-all border border-slate-100">
                 <form action="{{ route('admin.rombel.store') }}" method="POST">
                     @csrf
-                    <div class="p-6 bg-slate-50/70 border-b border-slate-100 flex items-center justify-between">
+                    <div class="p-7 bg-slate-50/70 border-b border-slate-100 flex items-center justify-between">
                         <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <div class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                                 </svg>
                             </div>
                             <div>
-                                <h3 class="text-base font-extrabold text-slate-900">Tambah Data Rombongan Belajar</h3>
-                                <p class="text-xs text-slate-400">Daftarkan kelas rombel baru ke dalam sistem pemetaan PKL</p>
+                                <h3 class="text-lg font-extrabold text-slate-900">Tambah Data Rombongan Belajar</h3>
+                                <p class="text-sm text-slate-500">Daftarkan kelas rombel baru ke dalam sistem pemetaan PKL</p>
                             </div>
                         </div>
                         <button type="button" @click="isCreateModalOpen = false" class="text-slate-400 hover:text-slate-600 p-2 rounded-xl hover:bg-slate-100 transition">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                             </svg>
                         </button>
                     </div>
 
-                    <div class="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
+                    <div class="p-7 space-y-5 max-h-[72vh] overflow-y-auto">
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-xs font-bold text-slate-700 mb-1">Kode Rombel <span class="text-rose-500">*</span></label>
-                                <input type="text" 
-                                       name="kode_rombel" 
+                                <label class="block text-sm font-bold text-slate-700 mb-2">Kode Rombel <span class="text-rose-500">*</span></label>
+                                <input type="text"
+                                       name="kode_rombel"
                                        required
-                                       placeholder="Contoh: RBL-XII-RPL4" 
-                                       class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
+                                       placeholder="Contoh: RBL-XII-RPL4"
+                                       class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
                             </div>
 
                             <div>
-                                <label class="block text-xs font-bold text-slate-700 mb-1">Nama Rombel <span class="text-rose-500">*</span></label>
-                                <input type="text" 
-                                       name="nama_rombel" 
+                                <label class="block text-sm font-bold text-slate-700 mb-2">Nama Rombel <span class="text-rose-500">*</span></label>
+                                <input type="text"
+                                       name="nama_rombel"
                                        required
-                                       placeholder="Contoh: XII RPL 4" 
-                                       class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
+                                       placeholder="Contoh: XII RPL 4"
+                                       class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
                             </div>
 
                             <div>
-                                <label class="block text-xs font-bold text-slate-700 mb-1">Tingkat Kelas <span class="text-rose-500">*</span></label>
-                                <select name="tingkat" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
+                                <label class="block text-sm font-bold text-slate-700 mb-2">Tingkat Kelas <span class="text-rose-500">*</span></label>
+                                <select name="tingkat" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
                                     <option value="XII" selected>Tingkat XII (PKL)</option>
                                 </select>
                             </div>
 
                             <div>
-                                <label class="block text-xs font-bold text-slate-700 mb-1">Program Keahlian (Jurusan) <span class="text-rose-500">*</span></label>
-                                <select name="jurusan_id" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
+                                <label class="block text-sm font-bold text-slate-700 mb-2">Program Keahlian (Jurusan) <span class="text-rose-500">*</span></label>
+                                <select name="jurusan_id" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
                                     @foreach($jurusans as $j)
                                         <option value="{{ $j->id }}">{{ $j->singkatan ?: $j->kode }} - {{ $j->nama }}</option>
                                     @endforeach
@@ -425,16 +412,16 @@
                             </div>
 
                             <div class="sm:col-span-2">
-                                <label class="block text-xs font-bold text-slate-700 mb-1">Ruang Kelas / Laboratorium</label>
-                                <input type="text" 
-                                       name="ruang" 
-                                       placeholder="Contoh: Ruang LAB RPL 04 / Workshop B" 
-                                       class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
+                                <label class="block text-sm font-bold text-slate-700 mb-2">Ruang Kelas / Laboratorium</label>
+                                <input type="text"
+                                       name="ruang"
+                                       placeholder="Contoh: Ruang LAB RPL 04 / Workshop B"
+                                       class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
                             </div>
 
                             <div class="sm:col-span-2">
-                                <label class="block text-xs font-bold text-slate-700 mb-1">Wali Kelas</label>
-                                <select name="wali_kelas_guru_id" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
+                                <label class="block text-sm font-bold text-slate-700 mb-2">Wali Kelas</label>
+                                <select name="wali_kelas_guru_id" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
                                     <option value="">-- Pilih Guru Wali Kelas --</option>
                                     @foreach($gurus as $g)
                                         <option value="{{ $g->id }}">{{ $g->nama }} (NIP: {{ $g->nip ?: '-' }})</option>
@@ -443,56 +430,56 @@
                             </div>
 
                             <div>
-                                <label class="block text-xs font-bold text-slate-700 mb-1">Kapasitas Siswa <span class="text-rose-500">*</span></label>
-                                <input type="number" 
-                                       name="jumlah_siswa" 
-                                       value="36" 
+                                <label class="block text-sm font-bold text-slate-700 mb-2">Kapasitas Siswa <span class="text-rose-500">*</span></label>
+                                <input type="number"
+                                       name="jumlah_siswa"
+                                       value="36"
                                        required min="1" max="50"
-                                       class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
+                                       class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
                             </div>
 
                             <div>
-                                <label class="block text-xs font-bold text-slate-700 mb-1">Siswa Terdata Saat Ini</label>
-                                <input type="number" 
-                                       name="siswa_terdata" 
-                                       value="36" 
+                                <label class="block text-sm font-bold text-slate-700 mb-2">Jumlah Siswa Terdata</label>
+                                <input type="number"
+                                       name="siswa_terdata"
+                                       value="0"
                                        min="0" max="50"
-                                       class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
+                                       class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
                             </div>
 
                             <div>
-                                <label class="block text-xs font-bold text-slate-700 mb-1">Status Aktif Rombel <span class="text-rose-500">*</span></label>
-                                <select name="status" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
+                                <label class="block text-sm font-bold text-slate-700 mb-2">Status Aktif Rombel <span class="text-rose-500">*</span></label>
+                                <select name="status" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
                                     <option value="aktif">Aktif</option>
                                     <option value="nonaktif">Nonaktif</option>
                                 </select>
                             </div>
 
                             <div>
-                                <label class="block text-xs font-bold text-slate-700 mb-1">Tahun Ajaran <span class="text-rose-500">*</span></label>
-                                <input type="text" 
-                                        name="tahun_ajaran" 
-                                        value="{{ $tahunAjaranAktif }}" 
+                                <label class="block text-sm font-bold text-slate-700 mb-2">Tahun Ajaran <span class="text-rose-500">*</span></label>
+                                <input type="text"
+                                        name="tahun_ajaran"
+                                        value="{{ $tahunAjaranAktif }}"
                                         required
-                                       class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
+                                       class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
                             </div>
 
                             <div>
-                                <label class="block text-xs font-bold text-slate-700 mb-1">Semester <span class="text-rose-500">*</span></label>
-                                <input type="text" 
-                                        name="semester" 
-                                        value="{{ $semesterAktif }}" 
+                                <label class="block text-sm font-bold text-slate-700 mb-2">Semester <span class="text-rose-500">*</span></label>
+                                <input type="text"
+                                        name="semester"
+                                        value="{{ $semesterAktif }}"
                                         required
-                                       class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
+                                       class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
                             </div>
                         </div>
                     </div>
 
-                    <div class="p-6 bg-slate-50/70 border-t border-slate-100 flex items-center justify-end gap-3">
-                        <button type="button" @click="isCreateModalOpen = false" class="px-4 py-2.5 bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 rounded-xl text-xs font-semibold transition">
+                    <div class="p-7 bg-slate-50/70 border-t border-slate-100 flex items-center justify-end gap-3">
+                        <button type="button" @click="isCreateModalOpen = false" class="px-5 py-3 bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 rounded-xl text-sm font-semibold transition">
                             Batal
                         </button>
-                        <button type="submit" class="px-5 py-2.5 bg-[#0f2942] hover:bg-[#1a385c] text-white rounded-xl text-xs font-bold shadow-xs transition">
+                        <button type="submit" class="px-6 py-3 bg-[#0f2942] hover:bg-[#1a385c] text-white rounded-xl text-sm font-bold shadow-xs transition">
                             Simpan Data Rombel
                         </button>
                     </div>
@@ -502,7 +489,7 @@
     </div>
 
     <!-- ==================== MODAL EDIT ROMBEL ==================== -->
-    <div x-show="isEditModalOpen" 
+    <div x-show="isEditModalOpen"
          x-cloak
          class="fixed inset-0 z-50 overflow-y-auto"
          aria-labelledby="modal-title" role="dialog" aria-modal="true">
@@ -538,8 +525,8 @@
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 mb-1">Kode Rombel <span class="text-rose-500">*</span></label>
-                                <input type="text" 
-                                       name="kode_rombel" 
+                                <input type="text"
+                                       name="kode_rombel"
                                        x-model="editData.kode_rombel"
                                        required
                                        class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
@@ -547,8 +534,8 @@
 
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 mb-1">Nama Rombel <span class="text-rose-500">*</span></label>
-                                <input type="text" 
-                                       name="nama_rombel" 
+                                <input type="text"
+                                       name="nama_rombel"
                                        x-model="editData.nama_rombel"
                                        required
                                        class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
@@ -572,8 +559,8 @@
 
                             <div class="sm:col-span-2">
                                 <label class="block text-xs font-bold text-slate-700 mb-1">Ruang Kelas / Laboratorium</label>
-                                <input type="text" 
-                                       name="ruang" 
+                                <input type="text"
+                                       name="ruang"
                                        x-model="editData.ruang"
                                        class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
                             </div>
@@ -590,8 +577,8 @@
 
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 mb-1">Kapasitas Siswa <span class="text-rose-500">*</span></label>
-                                <input type="number" 
-                                       name="jumlah_siswa" 
+                                <input type="number"
+                                       name="jumlah_siswa"
                                        x-model="editData.jumlah_siswa"
                                        required min="1" max="50"
                                        class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
@@ -599,8 +586,8 @@
 
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 mb-1">Siswa Terdata Saat Ini</label>
-                                <input type="number" 
-                                       name="siswa_terdata" 
+                                <input type="number"
+                                       name="siswa_terdata"
                                        x-model="editData.siswa_terdata"
                                        min="0" max="50"
                                        class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
@@ -616,8 +603,8 @@
 
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 mb-1">Tahun Ajaran <span class="text-rose-500">*</span></label>
-                                <input type="text" 
-                                       name="tahun_ajaran" 
+                                <input type="text"
+                                       name="tahun_ajaran"
                                        x-model="editData.tahun_ajaran"
                                        required
                                        class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
@@ -625,8 +612,8 @@
 
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 mb-1">Semester <span class="text-rose-500">*</span></label>
-                                <input type="text" 
-                                       name="semester" 
+                                <input type="text"
+                                       name="semester"
                                        x-model="editData.semester"
                                        required
                                        class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
@@ -648,7 +635,7 @@
     </div>
 
     <!-- ==================== MODAL DETAIL ROMBEL ==================== -->
-    <div x-show="isDetailModalOpen" 
+    <div x-show="isDetailModalOpen"
          x-cloak
          class="fixed inset-0 z-50 overflow-y-auto"
          aria-labelledby="modal-title" role="dialog" aria-modal="true">
@@ -755,7 +742,7 @@
     </div>
 
     <!-- ==================== MODAL KONFIRMASI HAPUS ==================== -->
-    <div x-show="isDeleteModalOpen" 
+    <div x-show="isDeleteModalOpen"
          x-cloak
          class="fixed inset-0 z-50 overflow-y-auto"
          aria-labelledby="modal-title" role="dialog" aria-modal="true">
@@ -805,7 +792,7 @@
             isEditModalOpen: false,
             isDetailModalOpen: false,
             isDeleteModalOpen: false,
-            
+
             editData: {},
             detailData: {},
             detailJurusanNama: '',
@@ -868,13 +855,14 @@
             },
 
             bulkDelete() {
-                if (!this.selectedIds.length || !confirm('Hapus rombel terpilih?')) return;
+                if (!this.selectedIds.length) return;
                 const form = document.createElement('form');
                 form.method = 'POST';
-                form.action = '{{ route("admin.rombel.bulkDelete") }}';
+                form.action = '{{ route('admin.rombel.bulkDelete') }}';
+                form.dataset.deleteTemporary = 'true';
                 form.innerHTML = '<input type="hidden" name="_token" value="{{ csrf_token() }}">' + this.selectedIds.map(id => `<input type="hidden" name="ids[]" value="${id}">`).join('');
                 document.body.appendChild(form);
-                form.submit();
+                window.confirmDeleteAction(form, `Hapus ${this.selectedIds.length} data rombel terpilih secara permanen?`);
             }
         }
     }

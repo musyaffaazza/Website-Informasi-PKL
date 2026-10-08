@@ -218,12 +218,13 @@ class MappingPembimbingController extends Controller
         $pengajuans = $query->orderBy('id', 'asc')->get();
 
         $headers = [
-            'Content-Type' => 'text/csv',
+            'Content-Type' => 'text/csv; charset=UTF-8',
             'Content-Disposition' => 'attachment; filename="mapping_pembimbing_pkl_' . date('Ymd_His') . '.csv"',
         ];
 
         return response()->stream(function () use ($pengajuans) {
             $handle = fopen('php://output', 'w');
+            fwrite($handle, "\xEF\xBB\xBF");
             fputcsv($handle, [
                 'No',
                 'Nama Siswa',
@@ -235,7 +236,7 @@ class MappingPembimbingController extends Controller
                 'NIP Pembimbing',
                 'Tanggal Mulai PKL',
                 'Status Mapping'
-            ]);
+            ], ';');
 
             $no = 1;
             foreach ($pengajuans as $p) {
@@ -253,7 +254,7 @@ class MappingPembimbingController extends Controller
                     $guru ? $guru->nip : '-',
                     $penugasan && $penugasan->tanggal_mulai ? $penugasan->tanggal_mulai->format('d/m/Y') : ($p->tanggal_mulai ? $p->tanggal_mulai->format('d/m/Y') : '-'),
                     $guru ? 'Sudah Dipetakan' : 'Belum Dipetakan',
-                ]);
+                ], ';');
             }
 
             fclose($handle);
