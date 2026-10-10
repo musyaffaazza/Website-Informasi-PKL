@@ -18,7 +18,7 @@ class GuruController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Guru::with(['jurusan', 'rombelWali']);
+        $query = Guru::with(['jurusan', 'rombelWali.jurusan', 'jurusanKaprog']);
 
         // Search Filter (NIP, NUPTK, Nama, Role, Kelas Diampu)
         if ($search = $request->input('search')) {
@@ -39,11 +39,13 @@ class GuruController extends Controller
 
         // Role Filter
         if ($role = $request->input('role')) {
-            if ($role === 'belum_diberi_role') {
+            if ($role === 'belum_diberi_role' || $role === 'Guru') {
                 $query->where(function ($q) {
                     $q->whereNull('roles_list')
                       ->orWhere('roles_list', '[]')
-                      ->orWhereJsonLength('roles_list', 0);
+                      ->orWhereJsonLength('roles_list', 0)
+                      ->orWhereJsonContains('roles_list', 'Guru')
+                      ->orWhere('roles_list', 'like', '%Guru%');
                 });
             } elseif ($role !== 'all') {
                 $query->where(function ($q) use ($role) {
@@ -94,7 +96,7 @@ class GuruController extends Controller
             }
         }
 
-        $jurusans = Jurusan::where('status', 'aktif')->orderBy('nama')->get();
+        $jurusans = Jurusan::where('status', 'aktif')->with('kaprog')->orderBy('nama')->get();
         $totalJurusan = $jurusans->count();
         $totalSiswaBimbingan = PembimbingPenugasan::whereHas('pengajuan', function ($q) {
             $q->where('status', 'disetujui');
@@ -122,9 +124,8 @@ class GuruController extends Controller
             'jenis_kelamin' => 'required|in:Laki-laki,Perempuan',
             'pendidikan' => 'nullable|string|max:100',
             'no_hp' => 'nullable|string|max:20',
-            'email' => 'nullable|email|max:100',
-            'kelas_diampu' => 'nullable|string|max:255',
-            'keterangan_diampu' => 'nullable|string|max:255',
+            'email' => 'required|email|max:100',
+            'password' => 'nullable|string|min:6',
             'jurusan_id' => 'nullable|exists:jurusan,id',
             'roles_input' => 'nullable|string',
         ]);
@@ -134,38 +135,72 @@ class GuruController extends Controller
             $roles = array_values(array_filter(array_map('trim', explode(',', $validated['roles_input']))));
         }
 
-        // Create User account if not exists
-        $username = 'guru_' . strtolower(preg_replace('/[^a-zA-Z0-9]/', '', explode(' ', $validated['nama'])[0])) . '_' . rand(100, 999);
-        $email = $validated['email'] ?: ($username . '@guru.sch.id');
+        $isKaprogRole = in_array('Kaprog', $roles);
+        $jurusanId = $validated['jurusan_id'] ?? null;
 
-        $userId = DB::table('users')->insertGetId([
-            'username' => $username,
-            'email' => $email,
-            'password_hash' => Hash::make('password123'),
-            'tipe_akun' => 'guru',
-            'dibuat_pada' => now(),
-        ]);
+        // Validasi jika role Kaprog dan memilih jurusan yang sudah memiliki Kaprog lain
+        if ($isKaprogRole && $jurusanId) {
+            $targetJurusan = Jurusan::find($jurusanId);
+            if ($targetJurusan && $targetJurusan->kaprog_guru_id) {
+                $existingKaprog = Guru::find($targetJurusan->kaprog_guru_id);
+                $existingName = $existingKaprog ? $existingKaprog->nama : 'Guru lain';
+                return back()->withInput()->withErrors([
+                    'jurusan_id' => "Jurusan {$targetJurusan->nama} sudah memiliki Kepala Program Keahlian ({$existingName}). Dalam 1 jurusan hanya boleh ada 1 Kaprog. Silakan pilih jurusan lain atau kosongkan pilihan jurusan."
+                ]);
+            }
+        }
+
+        // Create or find User account
+        $username = 'guru_' . strtolower(preg_replace('/[^a-zA-Z0-9]/', '', explode(' ', $validated['nama'])[0])) . '_' . substr($validated['nip'], -4);
+        if (DB::table('users')->where('username', $username)->exists()) {
+            $username .= '_' . rand(10, 99);
+        }
+
+        $password = !empty($validated['password']) ? $validated['password'] : 'password123';
+
+        // Check if user with this email already exists, otherwise create new
+        $existingUser = DB::table('users')->where('email', $validated['email'])->first();
+        if ($existingUser) {
+            $userId = $existingUser->id;
+            if (!empty($validated['password'])) {
+                DB::table('users')->where('id', $userId)->update([
+                    'password_hash' => Hash::make($password),
+                ]);
+            }
+        } else {
+            $userId = DB::table('users')->insertGetId([
+                'username' => $username,
+                'email' => $validated['email'],
+                'password_hash' => Hash::make($password),
+                'tipe_akun' => 'guru',
+                'dibuat_pada' => now(),
+            ]);
+        }
 
         $guru = Guru::create([
             'user_id' => $userId,
             'nip' => $validated['nip'],
-            'nuptk' => $validated['nuptk'] ?: null,
+            'nuptk' => $validated['nuptk'] ?? null,
             'nama' => $validated['nama'],
             'jenis_kelamin' => $validated['jenis_kelamin'],
-            'pendidikan' => $validated['pendidikan'] ?: null,
-            'no_hp' => $validated['no_hp'] ?: null,
-            'email' => $email,
+            'pendidikan' => $validated['pendidikan'] ?? null,
+            'no_hp' => $validated['no_hp'] ?? null,
+            'email' => $validated['email'],
             'status_akun' => 'aktif',
             'roles_list' => $roles,
-            'kelas_diampu' => $validated['kelas_diampu'] ?: null,
-            'keterangan_diampu' => $validated['keterangan_diampu'] ?: null,
-            'jurusan_id' => $validated['jurusan_id'] ?: null,
+            'jurusan_id' => $jurusanId,
         ]);
+
+        if ($isKaprogRole && $jurusanId) {
+            Jurusan::where('id', $jurusanId)->update(['kaprog_guru_id' => $guru->id]);
+        }
+
+        $guru->syncAssignments();
 
         LogAktivitas::catat('Tambah Data', 'Master Guru', 'Menambahkan data guru baru ' . $guru->nama . ' (' . $guru->nip . ')');
 
         return redirect()->route('admin.guru.index')
-            ->with('success', "Data Guru {$guru->nama} berhasil ditambahkan!");
+            ->with('success', "Data Guru {$guru->nama} beserta akun login berhasil ditambahkan!");
     }
 
     public function update(Request $request, $id)
@@ -179,9 +214,8 @@ class GuruController extends Controller
             'jenis_kelamin' => 'required|in:Laki-laki,Perempuan',
             'pendidikan' => 'nullable|string|max:100',
             'no_hp' => 'nullable|string|max:20',
-            'email' => 'nullable|email|max:100',
-            'kelas_diampu' => 'nullable|string|max:255',
-            'keterangan_diampu' => 'nullable|string|max:255',
+            'email' => 'required|email|max:100',
+            'password' => 'nullable|string|min:6',
             'jurusan_id' => 'nullable|exists:jurusan,id',
             'roles_input' => 'nullable|string',
         ]);
@@ -191,24 +225,75 @@ class GuruController extends Controller
             $roles = array_values(array_filter(array_map('trim', explode(',', $validated['roles_input']))));
         }
 
+        $isKaprogRole = in_array('Kaprog', $roles);
+        $jurusanId = $validated['jurusan_id'] ?? null;
+
+        // Validasi jika role Kaprog dan memilih jurusan yang sudah memiliki Kaprog lain
+        if ($isKaprogRole && $jurusanId) {
+            $targetJurusan = Jurusan::find($jurusanId);
+            if ($targetJurusan && $targetJurusan->kaprog_guru_id && $targetJurusan->kaprog_guru_id != $guru->id) {
+                $existingKaprog = Guru::find($targetJurusan->kaprog_guru_id);
+                $existingName = $existingKaprog ? $existingKaprog->nama : 'Guru lain';
+                return back()->withInput()->withErrors([
+                    'jurusan_id' => "Jurusan {$targetJurusan->nama} sudah memiliki Kepala Program Keahlian ({$existingName}). Dalam 1 jurusan hanya boleh ada 1 Kaprog. Silakan pilih jurusan lain atau kosongkan pilihan jurusan."
+                ]);
+            }
+        }
+
+        // Update / Sync User account credentials
+        if ($guru->user_id) {
+            $userUpdate = ['email' => $validated['email']];
+            if (!empty($validated['password'])) {
+                $userUpdate['password_hash'] = Hash::make($validated['password']);
+            }
+            DB::table('users')->where('id', $guru->user_id)->update($userUpdate);
+        } else {
+            $username = 'guru_' . strtolower(preg_replace('/[^a-zA-Z0-9]/', '', explode(' ', $validated['nama'])[0])) . '_' . substr($validated['nip'], -4);
+            if (DB::table('users')->where('username', $username)->exists()) {
+                $username .= '_' . rand(10, 99);
+            }
+            $userId = DB::table('users')->insertGetId([
+                'username' => $username,
+                'email' => $validated['email'],
+                'password_hash' => Hash::make(!empty($validated['password']) ? $validated['password'] : 'password123'),
+                'tipe_akun' => 'guru',
+                'dibuat_pada' => now(),
+            ]);
+            $guru->user_id = $userId;
+        }
+
         $guru->update([
             'nip' => $validated['nip'],
-            'nuptk' => $validated['nuptk'] ?: null,
+            'nuptk' => $validated['nuptk'] ?? null,
             'nama' => $validated['nama'],
             'jenis_kelamin' => $validated['jenis_kelamin'],
-            'pendidikan' => $validated['pendidikan'] ?: null,
-            'no_hp' => $validated['no_hp'] ?: null,
-            'email' => $validated['email'] ?: $guru->email,
+            'pendidikan' => $validated['pendidikan'] ?? null,
+            'no_hp' => $validated['no_hp'] ?? null,
+            'email' => $validated['email'],
             'roles_list' => $roles,
-            'kelas_diampu' => $validated['kelas_diampu'] ?: null,
-            'keterangan_diampu' => $validated['keterangan_diampu'] ?: null,
-            'jurusan_id' => $validated['jurusan_id'] ?: null,
+            'jurusan_id' => $jurusanId,
         ]);
+
+        // Sinkronisasi kaprog_guru_id pada tabel Jurusan
+        if ($isKaprogRole && $jurusanId) {
+            // Lepas dari jurusan lama jika sebelumnya kaprog jurusan lain
+            $oldJurusans = Jurusan::where('kaprog_guru_id', $guru->id)->where('id', '!=', $jurusanId)->get();
+            foreach ($oldJurusans as $oldJ) {
+                $oldJ->update(['kaprog_guru_id' => null]);
+            }
+            // Tetapkan sebagai kaprog di jurusan target
+            Jurusan::where('id', $jurusanId)->update(['kaprog_guru_id' => $guru->id]);
+        } elseif (!$isKaprogRole || !$jurusanId) {
+            // Jika role Kaprog dihapus atau jurusan dikosongkan, lepas penugasan kaprog dari jurusan
+            Jurusan::where('kaprog_guru_id', $guru->id)->update(['kaprog_guru_id' => null]);
+        }
+
+        $guru->syncAssignments();
 
         LogAktivitas::catat('Edit Data', 'Master Guru', 'Memperbarui data guru ' . $guru->nama . ' (' . $guru->nip . ')');
 
         return redirect()->route('admin.guru.index')
-            ->with('success', "Data Guru {$guru->nama} berhasil diperbarui!");
+            ->with('success', "Data Guru {$guru->nama} dan akun login berhasil diperbarui!");
     }
 
     public function destroy($id)
@@ -276,6 +361,7 @@ class GuruController extends Controller
                 }
                 $g->roles_list = $roles;
                 $g->save();
+                $g->syncAssignments();
             }
             LogAktivitas::catat('Ubah Status', 'Master Guru', 'Memperbarui role massal (' . $newRole . ') untuk ' . count($ids) . ' guru');
             return redirect()->back()->with('success', "Penugasan role '{$newRole}' berhasil diperbarui secara massal untuk " . count($ids) . " guru!");

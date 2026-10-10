@@ -1,7 +1,6 @@
 @extends('layouts.admin')
 
 @section('title', 'SIPRAK SMKN 1 GUNUNGPUTRI - Master Data Industri & Kemitraan DU/DI')
-@section('header_search_placeholder', 'Search')
 
 @section('content')
 <div x-data="industriApp()" class="space-y-6">
@@ -149,33 +148,21 @@
         <a href="{{ route('admin.industri.index', array_merge(request()->except('page'), ['tab' => 'all'])) }}"
            class="flex items-center gap-2 px-4 py-2.5 text-xs font-bold border-b-2 transition whitespace-nowrap {{ $tab === 'all' ? 'border-[#0f2942] text-[#0f2942]' : 'border-transparent text-slate-500 hover:text-slate-800 hover:border-slate-300' }}">
             <span>Semua Mitra</span>
-            <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold {{ $tab === 'all' ? 'bg-[#0f2942] text-white' : 'bg-slate-100 text-slate-600' }}">
-                {{ $countSemua }}
-            </span>
         </a>
 
         <a href="{{ route('admin.industri.index', array_merge(request()->except('page'), ['tab' => 'aktif'])) }}"
            class="flex items-center gap-2 px-4 py-2.5 text-xs font-bold border-b-2 transition whitespace-nowrap {{ $tab === 'aktif' ? 'border-[#059669] text-[#059669]' : 'border-transparent text-slate-500 hover:text-slate-800 hover:border-slate-300' }}">
             <span>Aktif Tersedia</span>
-            <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold {{ $tab === 'aktif' ? 'bg-[#059669] text-white' : 'bg-emerald-50 text-emerald-700 border border-emerald-200' }}">
-                {{ $countAktif }}
-            </span>
         </a>
 
         <a href="{{ route('admin.industri.index', array_merge(request()->except('page'), ['tab' => 'penuh'])) }}"
-        class="flex items-center gap-2 px-4 py-2.5 text-xs font-bold border-b-2 transition whitespace-nowrap {{ $tab === 'penuh' ? 'border-[#d97706] text-[#d97706]' : 'border-transparent text-slate-500 hover:text-slate-800 hover:border-slate-300' }}">
+           class="flex items-center gap-2 px-4 py-2.5 text-xs font-bold border-b-2 transition whitespace-nowrap {{ $tab === 'penuh' ? 'border-[#d97706] text-[#d97706]' : 'border-transparent text-slate-500 hover:text-slate-800 hover:border-slate-300' }}">
             <span>Kuota Penuh</span>
-            <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold {{ $tab === 'penuh' ? 'bg-[#d97706] text-white' : 'bg-amber-50 text-amber-700 border border-amber-200' }}">
-                {{ $countPenuh }}
-            </span>
         </a>
 
         <a href="{{ route('admin.industri.index', array_merge(request()->except('page'), ['tab' => 'perlu_evaluasi'])) }}"
-        class="flex items-center gap-2 px-4 py-2.5 text-xs font-bold border-b-2 transition whitespace-nowrap {{ $tab === 'perlu_evaluasi' ? 'border-[#e11d48] text-[#e11d48]' : 'border-transparent text-slate-500 hover:text-slate-800 hover:border-slate-300' }}">
+           class="flex items-center gap-2 px-4 py-2.5 text-xs font-bold border-b-2 transition whitespace-nowrap {{ $tab === 'perlu_evaluasi' ? 'border-[#e11d48] text-[#e11d48]' : 'border-transparent text-slate-500 hover:text-slate-800 hover:border-slate-300' }}">
             <span>Perlu Evaluasi</span>
-            <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold {{ $tab === 'perlu_evaluasi' ? 'bg-[#e11d48] text-white' : 'bg-rose-50 text-rose-700 border border-rose-200' }}">
-                {{ $countEvaluasi }}
-            </span>
         </a>
     </div>
 
@@ -200,55 +187,140 @@
 
             <div class="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-3">
                 <div class="flex flex-wrap items-center gap-2.5">
-                    <div class="relative min-w-[170px] flex-1 sm:flex-none sm:w-52">
-                        <select name="jurusan_id"
-                                onchange="this.form.submit()"
-                                class="w-full h-12 pl-3.5 pr-8 bg-slate-50/80 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition appearance-none cursor-pointer">
-                            <option value="all">Semua Konsentrasi</option>
+                    <!-- Jurusan Dropdown -->
+                    @php
+                        $selectedJurusan = $jurusans->firstWhere('id', request('jurusan_id'));
+                        $jurusanLabel = $selectedJurusan ? ($selectedJurusan->kode . ' - ' . Str::limit($selectedJurusan->nama, 18)) : 'Semua Konsentrasi';
+                    @endphp
+                    <div class="relative min-w-[200px] flex-1 sm:flex-none sm:w-56" x-data="{ open: false }">
+                        <input type="hidden" name="jurusan_id" id="input_jurusan_id" value="{{ request('jurusan_id', 'all') }}">
+                        <button type="button" 
+                                @click="open = !open" 
+                                class="w-full h-12 px-4 bg-slate-50/80 border {{ request('jurusan_id') && request('jurusan_id') != 'all' ? 'border-sky-300 bg-sky-50/90 text-sky-900 font-bold ring-1 ring-sky-300/50' : 'border-slate-200 text-slate-700 font-semibold' }} rounded-xl text-xs flex items-center justify-between gap-3 transition focus:outline-none shadow-2xs hover:bg-slate-100/70">
+                            <span class="truncate text-left">{{ $jurusanLabel }}</span>
+                            <svg class="w-4 h-4 text-slate-400 shrink-0 transition-transform duration-200" :class="open ? 'rotate-180 text-sky-600' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+                        <div x-show="open" 
+                             @click.outside="open = false" 
+                             x-cloak
+                             x-transition:enter="transition ease-out duration-100"
+                             x-transition:enter-start="transform opacity-0 scale-95"
+                             x-transition:enter-end="transform opacity-100 scale-100"
+                             x-transition:leave="transition ease-in duration-75"
+                             x-transition:leave-start="transform opacity-100 scale-100"
+                             x-transition:leave-end="transform opacity-0 scale-95"
+                             class="absolute left-0 mt-2 w-full min-w-[280px] max-h-72 overflow-y-auto bg-white rounded-2xl border border-slate-200/90 shadow-2xl z-50 p-2 space-y-1">
+                            <div class="px-3 py-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Konsentrasi Keahlian</div>
+                            <button type="button" 
+                                    @click="document.getElementById('input_jurusan_id').value = 'all'; document.getElementById('filterForm').submit();"
+                                    class="w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-semibold flex items-center justify-between gap-2 transition {{ request('jurusan_id', 'all') == 'all' ? 'bg-blue-50 text-blue-700 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
+                                <span>Semua Konsentrasi</span>
+                                @if(request('jurusan_id', 'all') == 'all')
+                                    <svg class="w-4 h-4 text-blue-600 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                @endif
+                            </button>
                             @foreach($jurusans as $j)
-                                <option value="{{ $j->id }}" {{ request('jurusan_id') == $j->id ? 'selected' : '' }}>
-                                    {{ $j->kode }} - {{ Str::limit($j->nama, 24) }}
-                                </option>
+                                <button type="button" 
+                                        @click="document.getElementById('input_jurusan_id').value = '{{ $j->id }}'; document.getElementById('filterForm').submit();"
+                                        class="w-full text-left px-3.5 py-2.5 rounded-xl text-xs flex items-center justify-between gap-2 transition {{ request('jurusan_id') == $j->id ? 'bg-blue-50 text-blue-700 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
+                                    <span class="truncate">{{ $j->kode }} - {{ $j->nama }}</span>
+                                    @if(request('jurusan_id') == $j->id)
+                                        <svg class="w-4 h-4 text-blue-600 shrink-0 ml-1.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                    @endif
+                                </button>
                             @endforeach
-                        </select>
-                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-400">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                            </svg>
                         </div>
                     </div>
 
-                    <div class="relative min-w-[140px] flex-1 sm:flex-none sm:w-44">
-                        <select name="wilayah"
-                                onchange="this.form.submit()"
-                                class="w-full h-12 pl-3.5 pr-8 bg-slate-50/80 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition appearance-none cursor-pointer">
-                            <option value="all">Semua Wilayah</option>
+                    <!-- Wilayah Dropdown -->
+                    @php
+                        $wilayahLabel = request('wilayah') && request('wilayah') != 'all' ? ('Wilayah ' . request('wilayah')) : 'Semua Wilayah';
+                    @endphp
+                    <div class="relative min-w-[180px] flex-1 sm:flex-none sm:w-52" x-data="{ open: false }">
+                        <input type="hidden" name="wilayah" id="input_wilayah" value="{{ request('wilayah', 'all') }}">
+                        <button type="button" 
+                                @click="open = !open" 
+                                class="w-full h-12 px-4 bg-slate-50/80 border {{ request('wilayah') && request('wilayah') != 'all' ? 'border-sky-300 bg-sky-50/90 text-sky-900 font-bold ring-1 ring-sky-300/50' : 'border-slate-200 text-slate-700 font-semibold' }} rounded-xl text-xs flex items-center justify-between gap-3 transition focus:outline-none shadow-2xs hover:bg-slate-100/70">
+                            <span class="truncate text-left">{{ $wilayahLabel }}</span>
+                            <svg class="w-4 h-4 text-slate-400 shrink-0 transition-transform duration-200" :class="open ? 'rotate-180 text-sky-600' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+                        <div x-show="open" 
+                             @click.outside="open = false" 
+                             x-cloak
+                             x-transition:enter="transition ease-out duration-100"
+                             x-transition:enter-start="transform opacity-0 scale-95"
+                             x-transition:enter-end="transform opacity-100 scale-100"
+                             x-transition:leave="transition ease-in duration-75"
+                             x-transition:leave-start="transform opacity-100 scale-100"
+                             x-transition:leave-end="transform opacity-0 scale-95"
+                             class="absolute left-0 mt-2 w-full min-w-[240px] max-h-72 overflow-y-auto bg-white rounded-2xl border border-slate-200/90 shadow-2xl z-50 p-2 space-y-1">
+                            <div class="px-3 py-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Wilayah / Kota</div>
+                            <button type="button" 
+                                    @click="document.getElementById('input_wilayah').value = 'all'; document.getElementById('filterForm').submit();"
+                                    class="w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-semibold flex items-center justify-between gap-2 transition {{ request('wilayah', 'all') == 'all' ? 'bg-blue-50 text-blue-700 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
+                                <span>Semua Wilayah</span>
+                                @if(request('wilayah', 'all') == 'all')
+                                    <svg class="w-4 h-4 text-blue-600 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                @endif
+                            </button>
                             @foreach($wilayahList as $w)
-                                <option value="{{ $w }}" {{ request('wilayah') == $w ? 'selected' : '' }}>
-                                    Wilayah {{ $w }}
-                                </option>
+                                <button type="button" 
+                                        @click="document.getElementById('input_wilayah').value = '{{ $w }}'; document.getElementById('filterForm').submit();"
+                                        class="w-full text-left px-3.5 py-2.5 rounded-xl text-xs flex items-center justify-between gap-2 transition {{ request('wilayah') == $w ? 'bg-blue-50 text-blue-700 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
+                                    <span class="truncate">Wilayah {{ $w }}</span>
+                                    @if(request('wilayah') == $w)
+                                        <svg class="w-4 h-4 text-blue-600 shrink-0 ml-1.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                    @endif
+                                </button>
                             @endforeach
-                        </select>
-                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-400">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                            </svg>
                         </div>
                     </div>
 
-                    <div class="relative min-w-[150px] flex-1 sm:flex-none sm:w-48">
-                        <select name="sort"
-                                onchange="this.form.submit()"
-                                class="w-full h-12 pl-3.5 pr-8 bg-slate-50/80 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition appearance-none cursor-pointer">
-                            <option value="nama_asc" {{ request('sort') == 'nama_asc' ? 'selected' : '' }}>Nama Mitra (A - Z)</option>
-                            <option value="nama_desc" {{ request('sort') == 'nama_desc' ? 'selected' : '' }}>Nama Mitra (Z - A)</option>
-                            <option value="kuota_desc" {{ request('sort') == 'kuota_desc' ? 'selected' : '' }}>Kuota Terbanyak</option>
-                            <option value="kuota_tersedia" {{ request('sort') == 'kuota_tersedia' ? 'selected' : '' }}>Sisa Kursi Terbanyak</option>
-                        </select>
-                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-400">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <!-- Sort Dropdown -->
+                    @php
+                        $sortOptions = [
+                            'nama_asc' => 'Nama Mitra (A - Z)',
+                            'nama_desc' => 'Nama Mitra (Z - A)',
+                            'kuota_desc' => 'Kuota Terbanyak',
+                            'kuota_tersedia' => 'Sisa Kursi Terbanyak',
+                        ];
+                        $sortLabel = $sortOptions[request('sort', 'nama_asc')] ?? 'Urutkan';
+                    @endphp
+                    <div class="relative min-w-[180px] flex-1 sm:flex-none sm:w-52" x-data="{ open: false }">
+                        <input type="hidden" name="sort" id="input_sort" value="{{ request('sort', 'nama_asc') }}">
+                        <button type="button" 
+                                @click="open = !open" 
+                                class="w-full h-12 px-4 bg-slate-50/80 border {{ request('sort') && request('sort') != 'nama_asc' ? 'border-sky-300 bg-sky-50/90 text-sky-900 font-bold ring-1 ring-sky-300/50' : 'border-slate-200 text-slate-700 font-semibold' }} rounded-xl text-xs flex items-center justify-between gap-3 transition focus:outline-none shadow-2xs hover:bg-slate-100/70">
+                            <span class="truncate text-left">{{ $sortLabel }}</span>
+                            <svg class="w-4 h-4 text-slate-400 shrink-0 transition-transform duration-200" :class="open ? 'rotate-180 text-sky-600' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                             </svg>
+                        </button>
+                        <div x-show="open" 
+                             @click.outside="open = false" 
+                             x-cloak
+                             x-transition:enter="transition ease-out duration-100"
+                             x-transition:enter-start="transform opacity-0 scale-95"
+                             x-transition:enter-end="transform opacity-100 scale-100"
+                             x-transition:leave="transition ease-in duration-75"
+                             x-transition:leave-start="transform opacity-100 scale-100"
+                             x-transition:leave-end="transform opacity-0 scale-95"
+                             class="absolute left-0 mt-2 w-full min-w-[240px] max-h-72 overflow-y-auto bg-white rounded-2xl border border-slate-200/90 shadow-2xl z-50 p-2 space-y-1">
+                            <div class="px-3 py-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Urutan Data</div>
+                            @foreach($sortOptions as $sKey => $sTitle)
+                                <button type="button" 
+                                        @click="document.getElementById('input_sort').value = '{{ $sKey }}'; document.getElementById('filterForm').submit();"
+                                        class="w-full text-left px-3.5 py-2.5 rounded-xl text-xs flex items-center justify-between gap-2 transition {{ request('sort', 'nama_asc') == $sKey ? 'bg-blue-50 text-blue-700 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
+                                    <span class="truncate">{{ $sTitle }}</span>
+                                    @if(request('sort', 'nama_asc') == $sKey)
+                                        <svg class="w-4 h-4 text-blue-600 shrink-0 ml-1.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                    @endif
+                                </button>
+                            @endforeach
                         </div>
                     </div>
 
@@ -359,13 +431,14 @@
                         </div>
                     </div>
 
-                    <input type="checkbox" value="{{ $ind->id }}" @change="toggleSelect('{{ $ind->id }}')" :checked="selectedIds.includes('{{ $ind->id }}')" class="w-4 h-4 rounded text-blue-600 border-slate-300 focus:ring-blue-500 cursor-pointer">
-
-                    <!-- Status Pill -->
-                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-extrabold border shrink-0 {{ $statusBadgeClass }}">
-                        <span class="w-1.5 h-1.5 rounded-full {{ $isPenuh ? 'bg-amber-500' : ($isEvaluasi ? 'bg-rose-500' : 'bg-emerald-500') }}"></span>
-                        <span>{{ $statusText }}</span>
-                    </span>
+                    <div class="flex items-center gap-2 shrink-0">
+                        <!-- Status Pill -->
+                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-extrabold border shrink-0 {{ $statusBadgeClass }}">
+                            <span class="w-1.5 h-1.5 rounded-full {{ $isPenuh ? 'bg-amber-500' : ($isEvaluasi ? 'bg-rose-500' : 'bg-emerald-500') }}"></span>
+                            <span>{{ $statusText }}</span>
+                        </span>
+                        <input type="checkbox" value="{{ $ind->id }}" @change="toggleSelect('{{ $ind->id }}')" :checked="selectedIds.includes('{{ $ind->id }}')" class="w-4 h-4 rounded text-blue-600 border-slate-300 focus:ring-blue-500 cursor-pointer">
+                    </div>
                 </div>
 
                 <!-- Info Grid / Stack -->

@@ -86,6 +86,8 @@ class SiswaController extends Controller
         $jurusans = Jurusan::where('status', 'aktif')->orderBy('nama')->get();
         $rombels = Rombel::where('status', 'aktif')->where('tingkat', 'XII')->orderBy('id', 'asc')->get();
 
+        $tahunAjaranAktif = '2026/2027';
+
         return view('admin.siswa.index', compact(
             'siswas',
             'totalSiswa',
@@ -95,7 +97,8 @@ class SiswaController extends Controller
             'persenAktivasi',
             'jurusans',
             'rombels',
-            'perPage'
+            'perPage',
+            'tahunAjaranAktif'
         ));
     }
 
@@ -110,7 +113,8 @@ class SiswaController extends Controller
             'jenis_kelamin' => 'required|in:L,P',
             'kota' => 'nullable|string|max:100',
             'no_hp' => 'nullable|string|max:25',
-            'email' => 'nullable|email|max:100',
+            'email' => 'required|email|max:100',
+            'password' => 'nullable|string|min:6',
             'status_pkl' => 'required|string|max:50',
         ]);
 
@@ -118,15 +122,30 @@ class SiswaController extends Controller
         $jurusanId = $rombel->jurusan_id;
 
         $username = 'siswa_' . $validated['nis'];
-        $email = $validated['email'] ?: (strtolower(str_replace(' ', '.', $validated['nama'])) . '@smkn1gunungputri.sch.id');
+        if (DB::table('users')->where('username', $username)->exists()) {
+            $username = 'siswa_' . $validated['nisn'];
+        }
 
-        $userId = DB::table('users')->insertGetId([
-            'username' => $username,
-            'email' => $email,
-            'password_hash' => Hash::make('password123'),
-            'tipe_akun' => 'siswa',
-            'dibuat_pada' => now(),
-        ]);
+        $password = !empty($validated['password']) ? $validated['password'] : 'password123';
+
+        // Check if user with this email already exists, otherwise create new
+        $existingUser = DB::table('users')->where('email', $validated['email'])->first();
+        if ($existingUser) {
+            $userId = $existingUser->id;
+            if (!empty($validated['password'])) {
+                DB::table('users')->where('id', $userId)->update([
+                    'password_hash' => Hash::make($password),
+                ]);
+            }
+        } else {
+            $userId = DB::table('users')->insertGetId([
+                'username' => $username,
+                'email' => $validated['email'],
+                'password_hash' => Hash::make($password),
+                'tipe_akun' => 'siswa',
+                'dibuat_pada' => now(),
+            ]);
+        }
 
         $siswa = Siswa::create([
             'user_id' => $userId,
@@ -138,7 +157,7 @@ class SiswaController extends Controller
             'jenis_kelamin' => $validated['jenis_kelamin'],
             'kota' => $validated['kota'] ?: 'Bogor',
             'no_hp' => $validated['no_hp'] ?: null,
-            'email' => $email,
+            'email' => $validated['email'],
             'status_akun' => 'aktif',
             'status_pkl' => $validated['status_pkl'],
         ]);
@@ -146,7 +165,7 @@ class SiswaController extends Controller
         LogAktivitas::catat('Tambah Data', 'Master Siswa', 'Menambahkan data siswa baru ' . $siswa->nama . ' (NIS: ' . $siswa->nis . ')');
 
         return redirect()->route('admin.siswa.index')
-            ->with('success', "Data Siswa {$siswa->nama} (NIS: {$siswa->nis}) berhasil ditambahkan!");
+            ->with('success', "Data Siswa {$siswa->nama} beserta akun login berhasil ditambahkan!");
     }
 
     public function update(Request $request, $id)
@@ -162,12 +181,35 @@ class SiswaController extends Controller
             'jenis_kelamin' => 'required|in:L,P',
             'kota' => 'nullable|string|max:100',
             'no_hp' => 'nullable|string|max:25',
-            'email' => 'nullable|email|max:100',
+            'email' => 'required|email|max:100',
+            'password' => 'nullable|string|min:6',
             'status_pkl' => 'required|string|max:50',
         ]);
 
         $rombel = Rombel::findOrFail($validated['rombel_id']);
         $jurusanId = $rombel->jurusan_id;
+
+        // Update / Sync User account credentials
+        if ($siswa->user_id) {
+            $userUpdate = ['email' => $validated['email']];
+            if (!empty($validated['password'])) {
+                $userUpdate['password_hash'] = Hash::make($validated['password']);
+            }
+            DB::table('users')->where('id', $siswa->user_id)->update($userUpdate);
+        } else {
+            $username = 'siswa_' . $validated['nis'];
+            if (DB::table('users')->where('username', $username)->exists()) {
+                $username = 'siswa_' . $validated['nisn'];
+            }
+            $userId = DB::table('users')->insertGetId([
+                'username' => $username,
+                'email' => $validated['email'],
+                'password_hash' => Hash::make(!empty($validated['password']) ? $validated['password'] : 'password123'),
+                'tipe_akun' => 'siswa',
+                'dibuat_pada' => now(),
+            ]);
+            $siswa->user_id = $userId;
+        }
 
         $siswa->update([
             'nis' => $validated['nis'],
@@ -178,14 +220,14 @@ class SiswaController extends Controller
             'jenis_kelamin' => $validated['jenis_kelamin'],
             'kota' => $validated['kota'] ?: $siswa->kota,
             'no_hp' => $validated['no_hp'] ?: $siswa->no_hp,
-            'email' => $validated['email'] ?: $siswa->email,
+            'email' => $validated['email'],
             'status_pkl' => $validated['status_pkl'],
         ]);
 
         LogAktivitas::catat('Edit Data', 'Master Siswa', 'Memperbarui data siswa ' . $siswa->nama . ' (NIS: ' . $siswa->nis . ')');
 
         return redirect()->route('admin.siswa.index')
-            ->with('success', "Data Siswa {$siswa->nama} berhasil diperbarui!");
+            ->with('success', "Data Siswa {$siswa->nama} dan akun login berhasil diperbarui!");
     }
 
     public function destroy($id)

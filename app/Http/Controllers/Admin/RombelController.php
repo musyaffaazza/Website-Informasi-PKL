@@ -86,7 +86,7 @@ class RombelController extends Controller
 
         // Form selection options
         $jurusans = Jurusan::where('status', 'aktif')->orderBy('nama')->get();
-        $gurus = Guru::where('status_akun', 'aktif')->orderBy('nama')->get();
+        $gurus = Guru::where('status_akun', 'aktif')->with('rombelWali')->orderBy('nama')->get();
         $tingkatList = ['XII'];
         return view('admin.rombel.index', compact(
             'rombels',
@@ -127,7 +127,26 @@ class RombelController extends Controller
             return back()->withErrors(['siswa_terdata' => 'Jumlah siswa terdata tidak boleh melebihi kapasitas rombel.'])->withInput();
         }
 
-        $rombel = Rombel::create($validated);
+        $newWaliId = $validated['wali_kelas_guru_id'] ?? null;
+
+        $rombel = DB::transaction(function () use ($validated, $newWaliId) {
+            if (!empty($newWaliId)) {
+                // If this guru is assigned to another rombel, detach old rombel and resync
+                $otherRombels = Rombel::where('wali_kelas_guru_id', $newWaliId)->get();
+                foreach ($otherRombels as $other) {
+                    $other->update(['wali_kelas_guru_id' => null]);
+                }
+            }
+
+            $created = Rombel::create($validated);
+
+            if (!empty($newWaliId)) {
+                Guru::find($newWaliId)?->syncAssignments();
+            }
+
+            return $created;
+        });
+
         LogAktivitas::catat('Tambah Data', 'Master Rombel', 'Menambahkan rombel baru ' . ($rombel->nama_rombel ?: $rombel->kode_rombel));
 
         return redirect()->route('admin.rombel.index')
@@ -160,7 +179,31 @@ class RombelController extends Controller
             return back()->withErrors(['siswa_terdata' => 'Jumlah siswa terdata tidak boleh melebihi kapasitas rombel.'])->withInput();
         }
 
-        $rombel->update($validated);
+        $oldWaliGuruId = $rombel->wali_kelas_guru_id;
+        $newWaliGuruId = $validated['wali_kelas_guru_id'] ?? null;
+
+        DB::transaction(function () use ($rombel, $validated, $oldWaliGuruId, $newWaliGuruId) {
+            if (!empty($newWaliGuruId) && $newWaliGuruId != $oldWaliGuruId) {
+                // If new guru was assigned to another rombel, detach from that other rombel
+                $otherRombels = Rombel::where('wali_kelas_guru_id', $newWaliGuruId)
+                    ->where('id', '!=', $rombel->id)
+                    ->get();
+                foreach ($otherRombels as $other) {
+                    $other->update(['wali_kelas_guru_id' => null]);
+                }
+            }
+
+            $rombel->update($validated);
+
+            if ($oldWaliGuruId && $oldWaliGuruId != $newWaliGuruId) {
+                Guru::find($oldWaliGuruId)?->syncAssignments();
+            }
+
+            if ($newWaliGuruId) {
+                Guru::find($newWaliGuruId)?->syncAssignments();
+            }
+        });
+
         LogAktivitas::catat('Edit Data', 'Master Rombel', 'Memperbarui data rombel ' . ($rombel->nama_rombel ?: $rombel->kode_rombel));
 
         return redirect()->route('admin.rombel.index')
@@ -171,11 +214,17 @@ class RombelController extends Controller
     {
         $rombel = Rombel::findOrFail($id);
         $namaRombel = $rombel->nama_rombel ?: $rombel->nama_kode;
+        $waliGuruId = $rombel->wali_kelas_guru_id;
 
-        DB::transaction(function () use ($rombel, $namaRombel) {
+        DB::transaction(function () use ($rombel, $namaRombel, $waliGuruId) {
             // Unlink or clean up related siswas if any
             Siswa::where('rombel_id', $rombel->id)->update(['rombel_id' => null]);
             $rombel->delete();
+
+            if ($waliGuruId) {
+                Guru::find($waliGuruId)?->syncAssignments();
+            }
+
             LogAktivitas::catat('Hapus Data', 'Master Rombel', 'Menghapus rombel ' . $namaRombel);
         });
 
@@ -192,10 +241,17 @@ class RombelController extends Controller
 
         DB::transaction(function () use ($ids) {
             $rombels = Rombel::whereIn('id', $ids)->get();
+            $waliGuruIds = $rombels->pluck('wali_kelas_guru_id')->filter()->unique()->values();
+
             foreach ($rombels as $rombel) {
                 Siswa::where('rombel_id', $rombel->id)->update(['rombel_id' => null]);
                 $rombel->delete();
             }
+
+            foreach ($waliGuruIds as $wId) {
+                Guru::find($wId)?->syncAssignments();
+            }
+
             LogAktivitas::catat('Hapus Data', 'Master Rombel', 'Menghapus ' . $rombels->count() . ' rombel');
         });
 

@@ -1,7 +1,6 @@
 @extends('layouts.admin')
 
 @section('title', 'SIPRAK SMKN 1 GUNUNGPUTRI - Master Data Rombel')
-@section('header_search_placeholder', 'Search')
 
 @section('content')
 <div x-data="rombelApp()" class="space-y-6">
@@ -91,21 +90,49 @@
 
             <div class="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-3">
                 <div class="flex flex-wrap items-center gap-2.5">
-<div class="relative min-w-[220px] flex-1 sm:flex-none sm:w-64">
-                        <select name="jurusan_id"
-                                onchange="document.getElementById('filterForm').submit()"
-                                class="w-full h-12 pl-3.5 pr-8 bg-slate-50/80 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition appearance-none cursor-pointer">
-                            <option value="all" {{ request('jurusan_id', 'all') == 'all' ? 'selected' : '' }}>Semua Jurusan</option>
-                            @foreach($jurusans as $j)
-                                <option value="{{ $j->id }}" {{ request('jurusan_id') == $j->id ? 'selected' : '' }}>
-                                    {{ $j->singkatan ?: $j->kode }} - {{ $j->nama }}
-                                </option>
-                            @endforeach
-                        </select>
-                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-400">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    @php
+                        $selectedJurusan = $jurusans->firstWhere('id', request('jurusan_id'));
+                        $jurusanLabel = $selectedJurusan ? (($selectedJurusan->singkatan ?: $selectedJurusan->kode) . ' - ' . Str::limit($selectedJurusan->nama, 20)) : 'Semua Jurusan';
+                    @endphp
+                    <div class="relative min-w-[220px] flex-1 sm:flex-none sm:w-64" x-data="{ open: false }">
+                        <input type="hidden" name="jurusan_id" id="input_jurusan_id" value="{{ request('jurusan_id', 'all') }}">
+                        <button type="button" 
+                                @click="open = !open" 
+                                class="w-full h-12 px-4 bg-slate-50/80 border {{ request('jurusan_id') && request('jurusan_id') != 'all' ? 'border-sky-300 bg-sky-50/90 text-sky-900 font-bold ring-1 ring-sky-300/50' : 'border-slate-200 text-slate-700 font-semibold' }} rounded-xl text-xs flex items-center justify-between gap-3 transition focus:outline-none shadow-2xs hover:bg-slate-100/70">
+                            <span class="truncate text-left">{{ $jurusanLabel }}</span>
+                            <svg class="w-4 h-4 text-slate-400 shrink-0 transition-transform duration-200" :class="open ? 'rotate-180 text-sky-600' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                             </svg>
+                        </button>
+                        <div x-show="open" 
+                             @click.outside="open = false" 
+                             x-cloak
+                             x-transition:enter="transition ease-out duration-100"
+                             x-transition:enter-start="transform opacity-0 scale-95"
+                             x-transition:enter-end="transform opacity-100 scale-100"
+                             x-transition:leave="transition ease-in duration-75"
+                             x-transition:leave-start="transform opacity-100 scale-100"
+                             x-transition:leave-end="transform opacity-0 scale-95"
+                             class="absolute left-0 mt-2 w-full min-w-[280px] max-h-72 overflow-y-auto bg-white rounded-2xl border border-slate-200/90 shadow-2xl z-50 p-2 space-y-1">
+                            <div class="px-3 py-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Konsentrasi Keahlian</div>
+                            <button type="button" 
+                                    @click="document.getElementById('input_jurusan_id').value = 'all'; document.getElementById('filterForm').submit();"
+                                    class="w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-semibold flex items-center justify-between gap-2 transition {{ request('jurusan_id', 'all') == 'all' ? 'bg-blue-50 text-blue-700 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
+                                <span>Semua Jurusan</span>
+                                @if(request('jurusan_id', 'all') == 'all')
+                                    <svg class="w-4 h-4 text-blue-600 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                @endif
+                            </button>
+                            @foreach($jurusans as $j)
+                                <button type="button" 
+                                        @click="document.getElementById('input_jurusan_id').value = '{{ $j->id }}'; document.getElementById('filterForm').submit();"
+                                        class="w-full text-left px-3.5 py-2.5 rounded-xl text-xs flex items-center justify-between gap-2 transition {{ request('jurusan_id') == $j->id ? 'bg-blue-50 text-blue-700 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
+                                    <span class="truncate">{{ $j->singkatan ?: $j->kode }} - {{ $j->nama }}</span>
+                                    @if(request('jurusan_id') == $j->id)
+                                        <svg class="w-4 h-4 text-blue-600 shrink-0 ml-1.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                    @endif
+                                </button>
+                            @endforeach
                         </div>
                     </div>
 
@@ -420,13 +447,17 @@
                             </div>
 
                             <div class="sm:col-span-2">
-                                <label class="block text-sm font-bold text-slate-700 mb-2">Wali Kelas</label>
+                                <div class="flex items-center justify-between mb-1">
+                                    <label class="block text-sm font-bold text-slate-700">Wali Kelas</label>
+                                    <span class="text-[11px] text-sky-600 font-medium">Sinkron otomatis ke Master Data Guru</span>
+                                </div>
                                 <select name="wali_kelas_guru_id" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
-                                    <option value="">-- Pilih Guru Wali Kelas --</option>
+                                    <option value="">-- Pilih Guru Sebagai Wali Kelas --</option>
                                     @foreach($gurus as $g)
                                         <option value="{{ $g->id }}">{{ $g->nama }} (NIP: {{ $g->nip ?: '-' }})</option>
                                     @endforeach
                                 </select>
+                                <p class="text-[11px] text-slate-400 mt-1">Guru yang dipilih akan secara otomatis ditetapkan sebagai Wali Kelas dan tersinkronisasi ke Master Data Guru.</p>
                             </div>
 
                             <div>
@@ -566,13 +597,17 @@
                             </div>
 
                             <div class="sm:col-span-2">
-                                <label class="block text-xs font-bold text-slate-700 mb-1">Wali Kelas</label>
-                                <select name="wali_kelas_guru_id" x-model="editData.wali_kelas_guru_id" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
-                                    <option value="">-- Pilih Guru Wali Kelas --</option>
+                                <div class="flex items-center justify-between mb-1">
+                                    <label class="block text-xs font-bold text-slate-700">Wali Kelas</label>
+                                    <span class="text-[11px] text-sky-600 font-medium">Sinkron otomatis ke Master Data Guru</span>
+                                </div>
+                                <select name="wali_kelas_guru_id" x-model="editData.wali_kelas_guru_id" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
+                                    <option value="">-- Tanpa Wali Kelas --</option>
                                     @foreach($gurus as $g)
                                         <option value="{{ $g->id }}">{{ $g->nama }} (NIP: {{ $g->nip ?: '-' }})</option>
                                     @endforeach
                                 </select>
+                                <p class="text-[11px] text-slate-400 mt-1">Mengubah wali kelas di sini akan otomatis memperbarui role dan kelas diampu pada Master Data Guru terkait.</p>
                             </div>
 
                             <div>

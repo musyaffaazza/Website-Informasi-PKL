@@ -1,7 +1,6 @@
 @extends('layouts.admin')
 
 @section('title', 'SIPRAK SMKN 1 GUNUNGPUTRI - Master Data Siswa')
-@section('header_search_placeholder', 'Search')
 
 @section('content')
 <div x-data="siswaApp()" class="space-y-6">
@@ -14,40 +13,14 @@
             <span class="text-slate-600">Master Data Siswa (TA {{ $tahunAjaranAktif }})</span>
         </div>
 
-        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-                <div class="flex flex-wrap items-center gap-3">
-                    <h1 class="text-2xl font-extrabold text-[#0f2942] tracking-tight">
-                        Master Data Siswa
-                    </h1>
-                </div>
+                <h1 class="text-2xl font-extrabold text-[#0f2942] tracking-tight">
+                    Master Data Siswa
+                </h1>
                 <p class="text-xs text-slate-500 mt-1 max-w-3xl leading-relaxed">
                     Kelola data induk siswa tingkat akhir SMK Negeri 1 Gunungputri untuk persiapan dan penempatan PKL.
                 </p>
-            </div>
-
-            <!-- Top Right Action Buttons -->
-            <div class="flex flex-wrap items-center gap-2.5 shrink-0">
-
-
-                <!-- Ekspor CSV/Excel -->
-                <a href="{{ route('admin.siswa.export', request()->query()) }}" 
-                   class="flex items-center gap-2 px-3.5 py-2.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-xl text-xs font-semibold shadow-2xs transition active:scale-98">
-                    <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                    </svg>
-                    <span>Ekspor CSV/Excel</span>
-                </a>
-
-                <!-- + Tambah Siswa -->
-                <button type="button" 
-                        @click="openCreateModal()"
-                        class="flex items-center gap-2 px-4 py-2.5 bg-[#0f2942] hover:bg-[#1a385c] text-white rounded-xl text-xs font-bold shadow-xs transition active:scale-98">
-                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
-                    </svg>
-                    <span>Tambah Siswa</span>
-                </button>
             </div>
         </div>
     </div>
@@ -73,7 +46,7 @@
                     <svg class="w-3 h-3 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                     </svg>
-                    <span>100% Terdata</span>
+                    <span>{{ $totalSiswa > 0 ? '100% Terdata' : 'Belum Ada Siswa' }}</span>
                 </span>
             </div>
         </div>
@@ -92,7 +65,7 @@
                 </div>
             </div>
             <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px]">
-                <span class="text-slate-400">6 Konsentrasi Keahlian</span>
+                <span class="text-slate-400">{{ $jurusans->count() }} Konsentrasi Keahlian</span>
                 <span class="text-slate-600 font-semibold">Periode {{ $tahunAjaranAktif }}</span>
             </div>
         </div>
@@ -147,100 +120,158 @@
     </div>
 
     <!-- Filter & Search Toolbar -->
-    @php
-        $hasActiveFilter = request()->filled('search') 
-            || (request('jurusan_id', 'all') !== 'all' && request('jurusan_id') !== null) 
-            || (request('status_pkl', 'all') !== 'all' && request('status_pkl') !== null);
-    @endphp
-
-    <div class="bg-white rounded-2xl border border-slate-200/80 p-4 sm:p-5 shadow-2xs space-y-3.5">
-        <form action="{{ route('admin.siswa.index') }}" method="GET" id="filterForm" class="space-y-3.5">
+    <div class="bg-white rounded-2xl border border-slate-200/80 p-4 sm:p-5 shadow-2xs">
+        <form action="{{ route('admin.siswa.index') }}" method="GET" id="filterForm" class="space-y-3">
             <!-- Row 1: Search Bar -->
             <div class="relative w-full">
                 <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 111-14 0 7 7 0 0114 0z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                     </svg>
                 </div>
                 <input type="text"
                        name="search"
                        value="{{ request('search') }}"
                        placeholder="Search"
-                       class="w-full h-12 pl-10 pr-24 sm:pr-28 bg-slate-50/80 hover:bg-slate-50 focus:bg-white border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition shadow-2xs">
-                
-                @if(request('search'))
-                    <a href="{{ route('admin.siswa.index', request()->except(['search', 'page'])) }}" 
-                       class="absolute inset-y-0 right-20 sm:right-22 pr-2 flex items-center text-slate-400 hover:text-slate-600 transition"
-                       title="Hapus pencarian">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </a>
-                @endif
-
-                <button type="submit" 
-                        class="absolute inset-y-1.5 right-1.5 px-3.5 bg-[#0f2942] hover:bg-[#1a385c] text-white rounded-lg text-xs font-semibold flex items-center gap-1 transition shadow-xs cursor-pointer">
-                    <span>Cari</span>
-                </button>
+                       class="w-full h-12 pl-10 pr-4 bg-slate-50/80 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition">
             </div>
 
-            <!-- Row 2: Filter Controls Grid & Status Info -->
-            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 pt-1 border-t border-slate-100/80">
-                <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-2.5 flex-1">
-                    <!-- Filter Jurusan -->
-                    <div class="relative">
-                        <select name="jurusan_id"
-                                onchange="document.getElementById('filterForm').submit()"
-                                class="w-full h-10 pl-3.5 pr-8 {{ request('jurusan_id', 'all') !== 'all' && request('jurusan_id') !== null ? 'bg-sky-50/90 border-sky-300 text-sky-900 font-bold' : 'bg-slate-50/80 border-slate-200 text-slate-700 font-semibold' }} border rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition appearance-none cursor-pointer">
-                            <option value="all" {{ request('jurusan_id', 'all') == 'all' ? 'selected' : '' }}>Semua Jurusan</option>
+            <!-- Row 2: Filters (Left) & Actions (Right) -->
+            <div class="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-3">
+                <!-- Filters Group -->
+                <div class="flex flex-wrap items-center gap-2.5">
+                    <!-- Jurusan Filter Dropdown -->
+                    @php
+                        $selectedJurusan = $jurusans->firstWhere('id', request('jurusan_id'));
+                        $jurusanLabel = $selectedJurusan ? (($selectedJurusan->singkatan ?: $selectedJurusan->kode) . ' - ' . Str::limit($selectedJurusan->nama, 18)) : 'Semua Jurusan';
+                    @endphp
+                    <div class="relative min-w-[190px] flex-1 sm:flex-none sm:w-56" x-data="{ open: false }">
+                        <input type="hidden" name="jurusan_id" id="input_jurusan_id" value="{{ request('jurusan_id', 'all') }}">
+                        <button type="button" 
+                                @click="open = !open" 
+                                class="w-full h-12 px-4 bg-slate-50/80 border {{ request('jurusan_id') && request('jurusan_id') != 'all' ? 'border-sky-300 bg-sky-50/90 text-sky-900 font-bold ring-1 ring-sky-300/50' : 'border-slate-200 text-slate-700 font-semibold' }} rounded-xl text-xs flex items-center justify-between gap-3 transition focus:outline-none shadow-2xs hover:bg-slate-100/70">
+                            <span class="truncate text-left">{{ $jurusanLabel }}</span>
+                            <svg class="w-4 h-4 text-slate-400 shrink-0 transition-transform duration-200" :class="open ? 'rotate-180 text-sky-600' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+                        <div x-show="open" 
+                             @click.outside="open = false" 
+                             x-cloak
+                             x-transition:enter="transition ease-out duration-100"
+                             x-transition:enter-start="transform opacity-0 scale-95"
+                             x-transition:enter-end="transform opacity-100 scale-100"
+                             x-transition:leave="transition ease-in duration-75"
+                             x-transition:leave-start="transform opacity-100 scale-100"
+                             x-transition:leave-end="transform opacity-0 scale-95"
+                             class="absolute left-0 mt-2 w-full min-w-[280px] max-h-72 overflow-y-auto bg-white rounded-2xl border border-slate-200/90 shadow-2xl z-50 p-2 space-y-1">
+                            <div class="px-3 py-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Konsentrasi Keahlian</div>
+                            <button type="button" 
+                                    @click="document.getElementById('input_jurusan_id').value = 'all'; document.getElementById('filterForm').submit();"
+                                    class="w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-semibold flex items-center justify-between gap-2 transition {{ request('jurusan_id', 'all') == 'all' ? 'bg-blue-50 text-blue-700 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
+                                <span>Semua Jurusan</span>
+                                @if(request('jurusan_id', 'all') == 'all')
+                                    <svg class="w-4 h-4 text-blue-600 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                @endif
+                            </button>
                             @foreach($jurusans as $j)
-                                <option value="{{ $j->id }}" {{ request('jurusan_id') == $j->id ? 'selected' : '' }}>
-                                   {{ $j->singkatan ?: $j->kode }} - {{ Str::limit($j->nama, 20) }}
-                                </option>
+                                <button type="button" 
+                                        @click="document.getElementById('input_jurusan_id').value = '{{ $j->id }}'; document.getElementById('filterForm').submit();"
+                                        class="w-full text-left px-3.5 py-2.5 rounded-xl text-xs flex items-center justify-between gap-2 transition {{ request('jurusan_id') == $j->id ? 'bg-blue-50 text-blue-700 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
+                                    <span class="truncate">{{ $j->singkatan ?: $j->kode }} - {{ $j->nama }}</span>
+                                    @if(request('jurusan_id') == $j->id)
+                                        <svg class="w-4 h-4 text-blue-600 shrink-0 ml-1.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                    @endif
+                                </button>
                             @endforeach
-                        </select>
-                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-400">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
                         </div>
                     </div>
 
-                    <!-- Filter Status PKL -->
-                    <div class="relative">
-                        <select name="status_pkl"
-                                onchange="document.getElementById('filterForm').submit()"
-                                class="w-full h-10 pl-3.5 pr-8 {{ request('status_pkl', 'all') !== 'all' && request('status_pkl') !== null ? 'bg-sky-50/90 border-sky-300 text-sky-900 font-bold' : 'bg-slate-50/80 border-slate-200 text-slate-700 font-semibold' }} border rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition appearance-none cursor-pointer">
-                            <option value="all" {{ request('status_pkl', 'all') == 'all' ? 'selected' : '' }}>Semua Status PKL</option>
-                            <option value="Sudah Ditempatkan" {{ request('status_pkl') == 'Sudah Ditempatkan' ? 'selected' : '' }}>Sudah Ditempatkan</option>
-                            <option value="Siap Terjun" {{ request('status_pkl') == 'Siap Terjun' ? 'selected' : '' }}>Siap Terjun</option>
-                            <option value="Belum Terpetakan" {{ request('status_pkl') == 'Belum Terpetakan' ? 'selected' : '' }}>Belum Terpetakan</option>
-                            <option value="Sedang PKL" {{ request('status_pkl') == 'Sedang PKL' ? 'selected' : '' }}>Sedang PKL</option>
-                        </select>
-                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-400">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                    <!-- Status PKL Filter Dropdown -->
+                    @php
+                        $statusPklList = [
+                            'Sudah Ditempatkan' => 'text-emerald-700 bg-emerald-50 border-emerald-200',
+                            'Siap Terjun' => 'text-blue-700 bg-blue-50 border-blue-200',
+                            'Belum Terpetakan' => 'text-amber-700 bg-amber-50 border-amber-200',
+                            'Sedang PKL' => 'text-purple-700 bg-purple-50 border-purple-200',
+                        ];
+                        $statusPklLabel = request('status_pkl') && request('status_pkl') != 'all' ? request('status_pkl') : 'Semua Status PKL';
+                    @endphp
+                    <div class="relative min-w-[180px] flex-1 sm:flex-none sm:w-52" x-data="{ open: false }">
+                        <input type="hidden" name="status_pkl" id="input_status_pkl" value="{{ request('status_pkl', 'all') }}">
+                        <button type="button" 
+                                @click="open = !open" 
+                                class="w-full h-12 px-4 bg-slate-50/80 border {{ request('status_pkl') && request('status_pkl') != 'all' ? 'border-sky-300 bg-sky-50/90 text-sky-900 font-bold ring-1 ring-sky-300/50' : 'border-slate-200 text-slate-700 font-semibold' }} rounded-xl text-xs flex items-center justify-between gap-3 transition focus:outline-none shadow-2xs hover:bg-slate-100/70">
+                            <span class="truncate text-left">{{ $statusPklLabel }}</span>
+                            <svg class="w-4 h-4 text-slate-400 shrink-0 transition-transform duration-200" :class="open ? 'rotate-180 text-sky-600' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+                        <div x-show="open" 
+                             @click.outside="open = false" 
+                             x-cloak
+                             x-transition:enter="transition ease-out duration-100"
+                             x-transition:enter-start="transform opacity-0 scale-95"
+                             x-transition:enter-end="transform opacity-100 scale-100"
+                             x-transition:leave="transition ease-in duration-75"
+                             x-transition:leave-start="transform opacity-100 scale-100"
+                             x-transition:leave-end="transform opacity-0 scale-95"
+                             class="absolute left-0 mt-2 w-full min-w-[240px] max-h-72 overflow-y-auto bg-white rounded-2xl border border-slate-200/90 shadow-2xl z-50 p-2 space-y-1">
+                            <div class="px-3 py-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Status Penempatan</div>
+                            <button type="button" 
+                                    @click="document.getElementById('input_status_pkl').value = 'all'; document.getElementById('filterForm').submit();"
+                                    class="w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-semibold flex items-center justify-between gap-2 transition {{ request('status_pkl', 'all') == 'all' ? 'bg-blue-50 text-blue-700 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
+                                <span>Semua Status PKL</span>
+                                @if(request('status_pkl', 'all') == 'all')
+                                    <svg class="w-4 h-4 text-blue-600 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                @endif
+                            </button>
+                            @foreach($statusPklList as $statusVal => $badgeClass)
+                                <button type="button" 
+                                        @click="document.getElementById('input_status_pkl').value = '{{ $statusVal }}'; document.getElementById('filterForm').submit();"
+                                        class="w-full text-left px-3.5 py-2.5 rounded-xl text-xs flex items-center justify-between gap-2 transition {{ request('status_pkl') == $statusVal ? 'bg-blue-50 text-blue-700 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
+                                    <span class="inline-flex items-center gap-2 truncate">
+                                        <span class="w-2 h-2 rounded-full shrink-0 {{ str_contains($badgeClass, 'emerald') ? 'bg-emerald-500' : (str_contains($badgeClass, 'blue') ? 'bg-blue-500' : (str_contains($badgeClass, 'amber') ? 'bg-amber-500' : 'bg-purple-500')) }}"></span>
+                                        <span class="truncate">{{ $statusVal }}</span>
+                                    </span>
+                                    @if(request('status_pkl') == $statusVal)
+                                        <svg class="w-4 h-4 text-blue-600 shrink-0 ml-1.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                    @endif
+                                </button>
+                            @endforeach
                         </div>
                     </div>
+
+                    <!-- Filter Reset Button -->
+                    <a href="{{ route('admin.siswa.index') }}"
+                       title="Reset Filter"
+                       class="h-12 w-12 shrink-0 rounded-xl border border-slate-200 text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition flex items-center justify-center">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                        </svg>
+                    </a>
                 </div>
 
-                <!-- Reset Filter & Counter Badge -->
-                <div class="flex items-center justify-between sm:justify-end gap-2.5 shrink-0">
-                    @if($hasActiveFilter)
-                        <a href="{{ route('admin.siswa.index') }}"
-                           class="h-10 px-3.5 flex items-center gap-1.5 rounded-xl border border-rose-200 bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-semibold transition active:scale-98">
-                            <svg class="w-3.5 h-3.5 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                            </svg>
-                            <span>Reset Filter</span>
-                        </a>
-                    @else
-                        <span class="text-[11px] font-medium text-slate-400 hidden xl:inline-block">
-                            Filter otomatis diterapkan
-                        </span>
-                    @endif
+                <!-- Right Actions: Ekspor & Tambah Siswa -->
+                <div class="flex flex-wrap items-center gap-2.5 shrink-0">
+                    <!-- Ekspor CSV/Excel -->
+                    <a href="{{ route('admin.siswa.export', request()->query()) }}" 
+                       class="h-12 flex items-center gap-2 px-4 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-xl text-xs font-semibold shadow-2xs transition active:scale-98">
+                        <svg class="w-4 h-4 text-slate-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                        </svg>
+                        <span>Ekspor CSV/Excel</span>
+                    </a>
 
-                    <div class="flex items-center gap-1.5 px-3 py-2 bg-slate-50 border border-slate-200/80 rounded-xl text-xs font-semibold text-slate-600">
-                        <span class="w-2 h-2 rounded-full bg-blue-500"></span>
-                        <span>{{ number_format($siswas->total(), 0, ',', '.') }} Siswa</span>
-                    </div>
+                    <!-- + Tambah Siswa -->
+                    <button type="button" 
+                            @click="openCreateModal()"
+                            class="h-12 min-w-[160px] shrink-0 inline-flex items-center justify-center gap-2 px-5 whitespace-nowrap bg-[#0f2942] hover:bg-[#1a385c] text-white rounded-xl text-xs font-bold shadow-xs transition active:scale-98">
+                        <svg class="w-4 h-4 text-white shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
+                        </svg>
+                        <span>Tambah Siswa</span>
+                    </button>
                 </div>
             </div>
         </form>
@@ -590,13 +621,20 @@
                             </div>
 
                             <div>
-                                <label class="block text-xs font-bold text-slate-700 mb-1">Nomor Handphone / WhatsApp</label>
-                                <input type="text" name="no_hp" placeholder="+62 812-xxxx-xxxx" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Email Siswa <span class="text-rose-500">*</span></label>
+                                <input type="email" name="email" required placeholder="siswa@smkn1gunungputri.sch.id" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
+                                <p class="text-[10px] text-slate-400 mt-1">Digunakan untuk login ke portal siswa.</p>
                             </div>
 
                             <div>
-                                <label class="block text-xs font-bold text-slate-700 mb-1">Email Siswa</label>
-                                <input type="email" name="email" placeholder="siswa@smkn1gunungputri.sch.id" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Kata Sandi / Password</label>
+                                <input type="text" name="password" placeholder="Default: password123 (opsional)" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
+                                <p class="text-[10px] text-slate-400 mt-1">Minimal 6 karakter. Default: <span class="font-semibold text-slate-600">password123</span>.</p>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Nomor Handphone / WhatsApp</label>
+                                <input type="text" name="no_hp" placeholder="+62 812-xxxx-xxxx" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
                             </div>
 
                             <div>
@@ -697,13 +735,20 @@
                             </div>
 
                             <div>
-                                <label class="block text-xs font-bold text-slate-700 mb-1">Nomor Handphone / WhatsApp</label>
-                                <input type="text" name="no_hp" x-model="editData.no_hp" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Email Siswa <span class="text-rose-500">*</span></label>
+                                <input type="email" name="email" x-model="editData.email" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
+                                <p class="text-[10px] text-slate-400 mt-1">Email resmi login siswa.</p>
                             </div>
 
                             <div>
-                                <label class="block text-xs font-bold text-slate-700 mb-1">Email Siswa</label>
-                                <input type="email" name="email" x-model="editData.email" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Ganti Kata Sandi (Opsional)</label>
+                                <input type="password" name="password" placeholder="Kosongkan jika tidak diubah" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
+                                <p class="text-[10px] text-slate-400 mt-1">Minimal 6 karakter jika ingin mengganti.</p>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Nomor Handphone / WhatsApp</label>
+                                <input type="text" name="no_hp" x-model="editData.no_hp" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
                             </div>
 
                             <div>

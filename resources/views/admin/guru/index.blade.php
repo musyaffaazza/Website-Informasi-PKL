@@ -1,7 +1,6 @@
 @extends('layouts.admin')
 
 @section('title', 'SIPRAK SMKN 1 GUNUNGPUTRI - Master Data Guru & Role')
-@section('header_search_placeholder', 'Search')
 
 @section('content')
 <div x-data="guruApp()" class="space-y-6">
@@ -134,43 +133,154 @@
             <div class="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-3">
                 <!-- Filters Group -->
                 <div class="flex flex-wrap items-center gap-2.5">
-                    <!-- Role Filter Dropdown -->
-                    <div class="relative min-w-[140px] flex-1 sm:flex-none sm:w-44">
-                        <select name="role"
-                                onchange="document.getElementById('filterForm').submit()"
-                                class="w-full h-12 pl-3.5 pr-8 bg-slate-50/80 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition appearance-none cursor-pointer">
-                            <option value="all" {{ request('role') == 'all' ? 'selected' : '' }}>Semua Role</option>
-                            <option value="Kaprog" {{ request('role') == 'Kaprog' ? 'selected' : '' }}>Kepala Program (Kaprog)</option>
-                            <option value="Pembimbing" {{ request('role') == 'Pembimbing' ? 'selected' : '' }}>Pembimbing PKL</option>
-                            <option value="Wali Kelas" {{ request('role') == 'Wali Kelas' ? 'selected' : '' }}>Wali Kelas</option>
-                            <option value="Guru Penguji" {{ request('role') == 'Guru Penguji' ? 'selected' : '' }}>Guru Penguji</option>
-                            <option value="Koordinator Hubin" {{ request('role') == 'Koordinator Hubin' ? 'selected' : '' }}>Koordinator Hubin</option>
-                            <option value="Guru Kejuruan" {{ request('role') == 'Guru Kejuruan' ? 'selected' : '' }}>Guru Kejuruan</option>
-                            <option value="belum_diberi_role" {{ request('role') == 'belum_diberi_role' ? 'selected' : '' }}>Belum Diberi Role</option>
-                        </select>
-                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-400">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <!-- Role Filter Custom Dropdown -->
+                    @php
+                        $activeRole = request('role', 'all');
+                        $roleLabels = [
+                            'all' => 'Semua Role',
+                            'Kaprog' => 'Kaprog',
+                            'Pembimbing' => 'Pembimbing PKL',
+                            'Wali Kelas' => 'Wali Kelas',
+                            'Guru' => 'Guru',
+                            'belum_diberi_role' => 'Guru',
+                        ];
+                        $currentRoleLabel = $roleLabels[$activeRole] ?? 'Semua Role';
+                    @endphp
+                    <div class="relative min-w-[190px] flex-1 sm:flex-none sm:w-56" x-data="{ open: false }">
+                        <input type="hidden" name="role" id="input_role" value="{{ $activeRole }}">
+                        <button type="button" 
+                                @click="open = !open" 
+                                @click.outside="open = false"
+                                class="w-full h-12 px-4 {{ $activeRole !== 'all' ? 'bg-sky-50/90 border-sky-300 text-sky-900 font-bold ring-1 ring-sky-300/50' : 'bg-slate-50/80 hover:bg-slate-100/70 border-slate-200 text-slate-700 font-semibold' }} border rounded-xl text-xs flex items-center justify-between gap-3 transition cursor-pointer text-left focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 shadow-2xs">
+                            <span class="truncate text-left">{{ $currentRoleLabel }}</span>
+                            <svg class="w-4 h-4 transition-transform duration-200 shrink-0 {{ $activeRole !== 'all' ? 'text-sky-600' : 'text-slate-400' }}" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                             </svg>
+                        </button>
+                        <div x-show="open" 
+                             x-cloak 
+                             x-transition:enter="transition ease-out duration-150"
+                             x-transition:enter-start="opacity-0 translate-y-1 scale-98"
+                             x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+                             x-transition:leave="transition ease-in duration-100"
+                             x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+                             x-transition:leave-end="opacity-0 translate-y-1 scale-98"
+                             class="absolute left-0 mt-2 w-full min-w-[260px] max-h-72 overflow-y-auto bg-white rounded-2xl border border-slate-200/90 shadow-2xl z-50 p-2 space-y-1">
+                            <div class="px-3 py-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Role Guru &amp; GTK</div>
+                            
+                            <!-- Semua Role -->
+                            <button type="button"
+                                    @click="document.getElementById('input_role').value = 'all'; document.getElementById('filterForm').submit();"
+                                    class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition text-left {{ $activeRole === 'all' ? 'bg-blue-50 text-blue-700 font-bold' : 'text-slate-700 hover:bg-slate-50 hover:text-slate-900' }}">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-2 h-2 rounded-full bg-slate-300"></span>
+                                    <span>Semua Role</span>
+                                </div>
+                                @if($activeRole === 'all')
+                                    <svg class="w-4 h-4 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                @endif
+                            </button>
+
+                            <!-- Kaprog -->
+                            <button type="button"
+                                    @click="document.getElementById('input_role').value = 'Kaprog'; document.getElementById('filterForm').submit();"
+                                    class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition text-left {{ $activeRole === 'Kaprog' ? 'bg-blue-50 text-blue-700 font-bold' : 'text-slate-700 hover:bg-slate-50 hover:text-slate-900' }}">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-2 h-2 rounded-full bg-[#0f2942]"></span>
+                                    <span>Kepala Program (Kaprog)</span>
+                                </div>
+                                @if($activeRole === 'Kaprog')
+                                    <svg class="w-4 h-4 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                @endif
+                            </button>
+
+                            <!-- Pembimbing PKL -->
+                            <button type="button"
+                                    @click="document.getElementById('input_role').value = 'Pembimbing'; document.getElementById('filterForm').submit();"
+                                    class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition text-left {{ $activeRole === 'Pembimbing' ? 'bg-blue-50 text-blue-700 font-bold' : 'text-slate-700 hover:bg-slate-50 hover:text-slate-900' }}">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                                    <span>Pembimbing PKL</span>
+                                </div>
+                                @if($activeRole === 'Pembimbing')
+                                    <svg class="w-4 h-4 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                @endif
+                            </button>
+
+                            <!-- Wali Kelas -->
+                            <button type="button"
+                                    @click="document.getElementById('input_role').value = 'Wali Kelas'; document.getElementById('filterForm').submit();"
+                                    class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition text-left {{ $activeRole === 'Wali Kelas' ? 'bg-blue-50 text-blue-700 font-bold' : 'text-slate-700 hover:bg-slate-50 hover:text-slate-900' }}">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-2 h-2 rounded-full bg-sky-500"></span>
+                                    <span>Wali Kelas</span>
+                                </div>
+                                @if($activeRole === 'Wali Kelas')
+                                    <svg class="w-4 h-4 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                @endif
+                            </button>
+
+                            <!-- Guru -->
+                            <button type="button"
+                                    @click="document.getElementById('input_role').value = 'Guru'; document.getElementById('filterForm').submit();"
+                                    class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition text-left {{ $activeRole === 'Guru' || $activeRole === 'belum_diberi_role' ? 'bg-blue-50 text-blue-700 font-bold' : 'text-slate-700 hover:bg-slate-50 hover:text-slate-900' }}">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-2 h-2 rounded-full bg-slate-400"></span>
+                                    <span>Guru</span>
+                                </div>
+                                @if($activeRole === 'Guru' || $activeRole === 'belum_diberi_role')
+                                    <svg class="w-4 h-4 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                @endif
+                            </button>
                         </div>
                     </div>
 
-                    <!-- Jurusan Filter Dropdown -->
-                    <div class="relative min-w-[140px] flex-1 sm:flex-none sm:w-44">
-                        <select name="jurusan_id"
-                                onchange="document.getElementById('filterForm').submit()"
-                                class="w-full h-12 pl-3.5 pr-8 bg-slate-50/80 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition appearance-none cursor-pointer">
-                            <option value="all" {{ request('jurusan_id', 'all') == 'all' ? 'selected' : '' }}>Semua Jurusan</option>
-                            @foreach($jurusans as $j)
-                                <option value="{{ $j->id }}" {{ request('jurusan_id') == $j->id ? 'selected' : '' }}>
-                                    {{ $j->singkatan ?: $j->kode }}
-                                </option>
-                            @endforeach
-                        </select>
-                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-400">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <!-- Jurusan Filter Custom Dropdown -->
+                    @php
+                        $activeJurusanId = request('jurusan_id', 'all');
+                        $activeJurusanObj = $jurusans->firstWhere('id', $activeJurusanId);
+                        $currentJurusanLabel = $activeJurusanObj ? ($activeJurusanObj->singkatan ?: $activeJurusanObj->kode) : 'Semua Jurusan';
+                    @endphp
+                    <div class="relative min-w-[200px] flex-1 sm:flex-none sm:w-56" x-data="{ open: false }">
+                        <input type="hidden" name="jurusan_id" id="input_jurusan_id" value="{{ $activeJurusanId }}">
+                        <button type="button" 
+                                @click="open = !open" 
+                                @click.outside="open = false"
+                                class="w-full h-12 px-4 {{ $activeJurusanId !== 'all' ? 'bg-sky-50/90 border-sky-300 text-sky-900 font-bold ring-1 ring-sky-300/50' : 'bg-slate-50/80 hover:bg-slate-100/70 border-slate-200 text-slate-700 font-semibold' }} border rounded-xl text-xs flex items-center justify-between gap-3 transition cursor-pointer text-left focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 shadow-2xs">
+                            <span class="truncate text-left">{{ $currentJurusanLabel }}</span>
+                            <svg class="w-4 h-4 transition-transform duration-200 shrink-0 {{ $activeJurusanId !== 'all' ? 'text-sky-600' : 'text-slate-400' }}" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                             </svg>
+                        </button>
+                        <div x-show="open" 
+                             x-cloak 
+                             x-transition:enter="transition ease-out duration-150"
+                             x-transition:enter-start="opacity-0 translate-y-1 scale-98"
+                             x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+                             x-transition:leave="transition ease-in duration-100"
+                             x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+                             x-transition:leave-end="opacity-0 translate-y-1 scale-98"
+                             class="absolute left-0 mt-2 w-full min-w-[280px] max-h-72 overflow-y-auto bg-white rounded-2xl border border-slate-200/90 shadow-2xl z-50 p-2 space-y-1">
+                            <div class="px-3 py-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Konsentrasi Keahlian</div>
+                            <button type="button"
+                                    @click="document.getElementById('input_jurusan_id').value = 'all'; document.getElementById('filterForm').submit();"
+                                    class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition text-left {{ $activeJurusanId === 'all' ? 'bg-blue-50 text-blue-700 font-bold' : 'text-slate-700 hover:bg-slate-50 hover:text-slate-900' }}">
+                                <span>Semua Jurusan</span>
+                                @if($activeJurusanId === 'all')
+                                    <svg class="w-4 h-4 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                @endif
+                            </button>
+
+                            @foreach($jurusans as $j)
+                                <button type="button"
+                                        @click="document.getElementById('input_jurusan_id').value = '{{ $j->id }}'; document.getElementById('filterForm').submit();"
+                                        class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition text-left {{ $activeJurusanId == $j->id ? 'bg-blue-50 text-blue-700 font-bold' : 'text-slate-700 hover:bg-slate-50 hover:text-slate-900' }}">
+                                    <span class="truncate">{{ $j->singkatan ?: $j->kode }} - {{ $j->nama }}</span>
+                                    @if($activeJurusanId == $j->id)
+                                        <svg class="w-4 h-4 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                    @endif
+                                </button>
+                            @endforeach
                         </div>
                     </div>
 
@@ -347,48 +457,41 @@
                                     @endphp
 
                                     @if(empty($roles))
-                                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-medium bg-slate-100 text-slate-500 border border-slate-200">
-                                            <span>•</span> Belum Diberi Role
+                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-50 text-slate-600 border border-slate-200">
+                                            <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                            </svg>
+                                            <span>Guru</span>
                                         </span>
-                                        <button type="button"
-                                                @click="openManageRoleModal({{ $g->toJson() }})"
-                                                class="text-xs text-blue-600 hover:text-blue-800 font-bold ml-1 transition">
-                                            + Setel Role
-                                        </button>
                                     @else
                                         @foreach($roles as $r)
-                                            @if(str_contains($r, 'Kaprog'))
-                                                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-[11px] font-bold bg-[#0f2942] text-white shadow-2xs">
-                                                    <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            @if($r === 'Kaprog' || str_contains($r, 'Kaprog'))
+                                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-[#0f2942] text-white shadow-2xs">
+                                                    <svg class="w-3.5 h-3.5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                                                     </svg>
-                                                    <span>{{ $r }}</span>
+                                                    <span>Kaprog</span>
                                                 </span>
-                                            @elseif(str_contains($r, 'Wali Kelas'))
-                                                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-[11px] font-semibold bg-sky-50 text-sky-700 border border-sky-200">
-                                                    <svg class="w-3 h-3 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            @elseif($r === 'Wali Kelas' || str_contains($r, 'Wali Kelas'))
+                                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-sky-50 text-sky-700 border border-sky-200">
+                                                    <svg class="w-3.5 h-3.5 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                                                     </svg>
-                                                    <span>{{ $r }}</span>
+                                                    <span>Wali Kelas</span>
                                                 </span>
-                                            @elseif(str_contains($r, 'Koordinator'))
-                                                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-[11px] font-semibold bg-rose-50 text-rose-700 border border-rose-200">
-                                                    <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
-                                                    <span>{{ $r }}</span>
-                                                </span>
-                                            @elseif(str_contains($r, 'Pembimbing'))
-                                                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-[11px] font-semibold bg-[#f0fdf4] text-emerald-700 border border-emerald-200">
-                                                    <svg class="w-3 h-3 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            @elseif($r === 'Pembimbing PKL' || str_contains($r, 'Pembimbing'))
+                                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                                    <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                                                     </svg>
-                                                    <span>{{ $r }}</span>
+                                                    <span>Pembimbing PKL</span>
                                                 </span>
                                             @else
-                                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium bg-slate-50 text-slate-700 border border-slate-200">
-                                                    <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-50 text-slate-600 border border-slate-200">
+                                                    <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                                                     </svg>
-                                                    <span>{{ $r }}</span>
+                                                    <span>Guru</span>
                                                 </span>
                                             @endif
                                         @endforeach
@@ -408,9 +511,7 @@
                                         </div>
                                     @endif
                                 @else
-                                    <div class="text-xs text-slate-400 italic">
-                                        Belum teralokasi di Rombel/PKL
-                                    </div>
+                                    <span class="text-slate-400 font-medium text-xs">-</span>
                                 @endif
                             </td>
 
@@ -580,39 +681,50 @@
                             </div>
 
                             <div>
-                                <label class="block text-xs font-bold text-slate-700 mb-1">Email</label>
-                                <input type="email" name="email" placeholder="guru@smkn1gunungputri.sch.id" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Email Akun Login <span class="text-rose-500">*</span></label>
+                                <input type="email" name="email" required placeholder="guru@smkn1gunungputri.sch.id" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
+                                <p class="text-[10px] text-slate-400 mt-1">Digunakan untuk login dan akun resmi guru.</p>
                             </div>
 
                             <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Kata Sandi / Password</label>
+                                <input type="text" name="password" placeholder="Default: password123 (opsional)" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
+                                <p class="text-[10px] text-slate-400 mt-1">Minimal 6 karakter. Default: <span class="font-semibold text-slate-600">password123</span>.</p>
+                            </div>
+
+                            <div class="sm:col-span-2">
                                 <label class="block text-xs font-bold text-slate-700 mb-1">Nomor Handphone / WhatsApp</label>
                                 <input type="text" name="no_hp" placeholder="081234567890" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
                             </div>
 
                             <div class="sm:col-span-2">
-                                <label class="block text-xs font-bold text-slate-700 mb-1">Role Penugasan (Pisahkan dengan koma)</label>
-                                <input type="text" name="roles_input" placeholder="Contoh: Kaprog RPL, Pembimbing PKL, Guru Penguji" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
-                                <p class="text-[10px] text-slate-400 mt-1">Pilihan role umum: Kaprog, Pembimbing PKL, Wali Kelas, Guru Penguji, Koordinator Hubin, Guru Kejuruan.</p>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Role Penugasan</label>
+                                <select name="roles_input" x-model="createRoleSelected" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 cursor-pointer">
+                                    <option value="">-- Pilih Role Penugasan --</option>
+                                    <option value="Pembimbing PKL">Pembimbing PKL</option>
+                                    <option value="Kaprog">Kepala Program Keahlian (Kaprog)</option>
+                                    <option value="Wali Kelas">Wali Kelas</option>
+                                    <option value="Guru">Guru (Tanpa Role Tambahan)</option>
+                                </select>
+                                <p class="text-[10px] text-slate-400 mt-1">Pilih peran penugasan utama (Pembimbing PKL, Kaprog, Wali Kelas, dll). Penugasan spesifik kelas/jurusan disinkronkan otomatis.</p>
                             </div>
 
-                            <div>
+                            <div class="sm:col-span-2">
                                 <label class="block text-xs font-bold text-slate-700 mb-1">Jurusan / Program Keahlian</label>
-                                <select name="jurusan_id" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
+                                <select name="jurusan_id" x-model="createJurusanId" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
                                     <option value="">-- Tanpa Jurusan Tertentu --</option>
                                     @foreach($jurusans as $j)
-                                        <option value="{{ $j->id }}">{{ $j->singkatan ?: $j->kode }} - {{ $j->nama }}</option>
+                                        <option value="{{ $j->id }}">{{ $j->singkatan ?: $j->kode }} - {{ $j->nama }} {{ $j->kaprog ? '(Kaprog: ' . $j->kaprog->nama . ')' : '' }}</option>
                                     @endforeach
                                 </select>
-                            </div>
-
-                            <div class="sm:col-span-2">
-                                <label class="block text-xs font-bold text-slate-700 mb-1">Kelas / Jurusan Diampu</label>
-                                <input type="text" name="kelas_diampu" placeholder="Contoh: Rekayasa Perangkat Lunak / XII RPL 1 (Wali Kelas)" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
-                            </div>
-
-                            <div class="sm:col-span-2">
-                                <label class="block text-xs font-bold text-slate-700 mb-1">Keterangan Penugasan</label>
-                                <input type="text" name="keterangan_diampu" placeholder="Contoh: XII RPL 1, 2, 3 • Supervisi 24 Mitra DUDI" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
+                                <div x-show="isCreateJurusanKaprogOccupied()" class="p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-900 text-xs flex items-start gap-2.5 mt-2 shadow-2xs">
+                                    <svg class="w-4 h-4 text-amber-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                                    </svg>
+                                    <div>
+                                        <span class="font-extrabold text-amber-950">Peringatan:</span> Jurusan ini sudah memiliki Kepala Program Keahlian (<strong x-text="getCreateOccupiedKaprogName()"></strong>). Dalam 1 jurusan hanya boleh ada 1 Kaprog.
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -664,6 +776,42 @@
                     </div>
 
                     <div class="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
+                        <!-- Alert Locked Sync from Rombel -->
+                        <div x-show="editData.rombel_wali" class="p-3.5 bg-sky-50 border border-sky-200 rounded-2xl flex items-start gap-3 text-xs text-sky-900 shadow-2xs">
+                            <div class="w-8 h-8 rounded-xl bg-sky-100 text-sky-600 flex items-center justify-center shrink-0 mt-0.5 border border-sky-200">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <div class="font-extrabold text-sky-950 flex flex-wrap items-center gap-1.5">
+                                    <span>Penugasan Wali Kelas Resmi:</span>
+                                    <span class="px-2 py-0.5 rounded-md bg-sky-200/80 text-sky-800 text-[11px] font-bold" x-text="editData.rombel_wali?.nama_rombel || editData.rombel_wali?.kode_rombel"></span>
+                                </div>
+                                <p class="text-[11px] text-sky-700 mt-1 leading-relaxed">
+                                    Status wali kelas dan kelas diampu disinkronkan secara otomatis dari Data Rombel. Untuk memindahkan atau mengubah kelas wali, silakan kelola di menu <a href="{{ route('admin.rombel.index') }}" class="underline font-bold hover:text-sky-950">Master Data Rombel</a>.
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Alert Locked Sync from Jurusan Kaprog -->
+                        <div x-show="editData.jurusan_kaprog && !editData.rombel_wali" class="p-3.5 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-start gap-3 text-xs text-emerald-900 shadow-2xs">
+                            <div class="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0 mt-0.5 border border-emerald-200">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <div class="font-extrabold text-emerald-950 flex flex-wrap items-center gap-1.5">
+                                    <span>Penugasan Kepala Program Keahlian:</span>
+                                    <span class="px-2 py-0.5 rounded-md bg-emerald-200/80 text-emerald-800 text-[11px] font-bold" x-text="editData.jurusan_kaprog?.nama"></span>
+                                </div>
+                                <p class="text-[11px] text-emerald-700 mt-1 leading-relaxed">
+                                    Penugasan Kaprog disinkronkan secara otomatis. Untuk mengubah kaprog, silakan kelola di menu <a href="{{ route('admin.jurusan.index') }}" class="underline font-bold hover:text-emerald-950">Master Data Jurusan</a>.
+                                </p>
+                            </div>
+                        </div>
+
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 mb-1">NIP <span class="text-rose-500">*</span></label>
@@ -694,38 +842,50 @@
                             </div>
 
                             <div>
-                                <label class="block text-xs font-bold text-slate-700 mb-1">Email</label>
-                                <input type="email" name="email" x-model="editData.email" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
+                                 <label class="block text-xs font-bold text-slate-700 mb-1">Email Akun Login <span class="text-rose-500">*</span></label>
+                                 <input type="email" name="email" x-model="editData.email" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
+                                 <p class="text-[10px] text-slate-400 mt-1">Email resmi login tenaga pendidik.</p>
                             </div>
 
                             <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Ganti Kata Sandi (Opsional)</label>
+                                <input type="password" name="password" placeholder="Kosongkan jika tidak diubah" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
+                                <p class="text-[10px] text-slate-400 mt-1">Minimal 6 karakter jika ingin mengganti.</p>
+                            </div>
+
+                            <div class="sm:col-span-2">
                                 <label class="block text-xs font-bold text-slate-700 mb-1">Nomor Handphone / WhatsApp</label>
                                 <input type="text" name="no_hp" x-model="editData.no_hp" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
                             </div>
 
                             <div class="sm:col-span-2">
-                                <label class="block text-xs font-bold text-slate-700 mb-1">Role Penugasan (Pisahkan dengan koma)</label>
-                                <input type="text" name="roles_input" x-model="editData.roles_input" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Role Penugasan</label>
+                                <select name="roles_input" x-model="editData.role_selected" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 cursor-pointer">
+                                    <option value="">-- Pilih Role Penugasan --</option>
+                                    <option value="Pembimbing PKL">Pembimbing PKL</option>
+                                    <option value="Kaprog">Kepala Program Keahlian (Kaprog)</option>
+                                    <option value="Wali Kelas">Wali Kelas</option>
+                                    <option value="Guru">Guru (Tanpa Role Tambahan)</option>
+                                </select>
+                                <p class="text-[10px] text-slate-400 mt-1">Pilih peran penugasan utama (Pembimbing PKL, Kaprog, Wali Kelas, dll). Penugasan spesifik rombel/jurusan disinkronkan otomatis.</p>
                             </div>
 
-                            <div>
+                            <div class="sm:col-span-2">
                                 <label class="block text-xs font-bold text-slate-700 mb-1">Jurusan / Program Keahlian</label>
                                 <select name="jurusan_id" x-model="editData.jurusan_id" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
                                     <option value="">-- Tanpa Jurusan Tertentu --</option>
                                     @foreach($jurusans as $j)
-                                        <option value="{{ $j->id }}">{{ $j->singkatan ?: $j->kode }} - {{ $j->nama }}</option>
+                                        <option value="{{ $j->id }}">{{ $j->singkatan ?: $j->kode }} - {{ $j->nama }} {{ $j->kaprog ? '(Kaprog: ' . $j->kaprog->nama . ')' : '' }}</option>
                                     @endforeach
                                 </select>
-                            </div>
-
-                            <div class="sm:col-span-2">
-                                <label class="block text-xs font-bold text-slate-700 mb-1">Kelas / Jurusan Diampu</label>
-                                <input type="text" name="kelas_diampu" x-model="editData.kelas_diampu" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
-                            </div>
-
-                            <div class="sm:col-span-2">
-                                <label class="block text-xs font-bold text-slate-700 mb-1">Keterangan Penugasan</label>
-                                <input type="text" name="keterangan_diampu" x-model="editData.keterangan_diampu" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
+                                <div x-show="isEditJurusanKaprogOccupied()" class="p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-900 text-xs flex items-start gap-2.5 mt-2 shadow-2xs">
+                                    <svg class="w-4 h-4 text-amber-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                                    </svg>
+                                    <div>
+                                        <span class="font-extrabold text-amber-950">Peringatan:</span> Jurusan ini sudah memiliki Kepala Program Keahlian (<strong x-text="getOccupiedKaprogName()"></strong>). Dalam 1 jurusan hanya boleh ada 1 Kaprog.
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -780,10 +940,42 @@
                     </div>
 
                     <div class="p-6 space-y-4">
+                        <!-- Alert Locked Sync from Rombel -->
+                        <div x-show="manageData.rombel_wali" class="p-3 bg-sky-50 border border-sky-200 rounded-2xl flex items-start gap-2.5 text-xs text-sky-900">
+                            <svg class="w-4 h-4 text-sky-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                            </svg>
+                            <div>
+                                <span class="font-extrabold">Wali Kelas Aktif:</span> Terdaftar di <strong x-text="manageData.rombel_wali?.nama_rombel || manageData.rombel_wali?.kode_rombel"></strong>. Penugasan wali kelas terkunci otomatis dari data rombel.
+                            </div>
+                        </div>
+
                         <div>
                             <label class="block text-xs font-bold text-slate-700 mb-2">Role Penugasan Aktif</label>
                             <div class="space-y-2">
-                                <template x-for="r in ['Pembimbing PKL', 'Guru Penguji', 'Koordinator Hubin', 'Guru Kejuruan']" :key="r">
+                                <!-- Locked Wali Kelas Role Item -->
+                                <div x-show="manageData.rombel_wali" class="p-2.5 rounded-xl border border-sky-200 bg-sky-50/80 flex items-center justify-between text-xs font-bold text-sky-800">
+                                    <div class="flex items-center gap-2">
+                                        <svg class="w-4 h-4 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                                        </svg>
+                                        <span>Wali Kelas (<span x-text="manageData.rombel_wali?.nama_rombel || manageData.rombel_wali?.kode_rombel"></span>)</span>
+                                    </div>
+                                    <span class="text-[10px] font-bold uppercase bg-sky-200/80 px-2 py-0.5 rounded text-sky-800">Terkunci (Rombel)</span>
+                                </div>
+
+                                <!-- Locked Kaprog Role Item -->
+                                <div x-show="manageData.jurusan_kaprog" class="p-2.5 rounded-xl border border-emerald-200 bg-emerald-50/80 flex items-center justify-between text-xs font-bold text-emerald-800">
+                                    <div class="flex items-center gap-2">
+                                        <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                                        </svg>
+                                        <span>Kepala Program Keahlian (<span x-text="manageData.jurusan_kaprog?.singkatan || manageData.jurusan_kaprog?.kode"></span>)</span>
+                                    </div>
+                                    <span class="text-[10px] font-bold uppercase bg-emerald-200/80 px-2 py-0.5 rounded text-emerald-800">Terkunci (Jurusan)</span>
+                                </div>
+
+                                <template x-for="r in ['Pembimbing PKL']" :key="r">
                                     <label class="flex items-center gap-2 p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer text-xs font-semibold text-slate-700">
                                         <input type="checkbox" :value="r" x-model="selectedManageRoles" class="w-4 h-4 rounded text-blue-600 border-slate-300">
                                         <span x-text="r"></span>
@@ -792,21 +984,7 @@
                             </div>
                         </div>
 
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">Role Khusus Tambahan (Tulis manual pisah koma)</label>
-                            <input type="text" name="roles_input" :value="getCombinedRolesString()" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
-                            <p class="text-[10px] text-slate-400 mt-1">Misal: Kaprog RPL, Wali Kelas XII RPL 1</p>
-                        </div>
-
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">Kelas / Jurusan Diampu</label>
-                            <input type="text" name="kelas_diampu" x-model="manageData.kelas_diampu" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
-                        </div>
-
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">Keterangan Penugasan</label>
-                            <input type="text" name="keterangan_diampu" x-model="manageData.keterangan_diampu" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
-                        </div>
+                        <input type="hidden" name="roles_input" :value="getCombinedRolesString()">
                     </div>
 
                     <div class="p-6 bg-slate-50/70 border-t border-slate-100 flex items-center justify-end gap-3">
@@ -856,10 +1034,9 @@
                             <label class="block text-xs font-bold text-slate-700 mb-1">Pilih Role</label>
                             <select name="bulk_role" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500">
                                 <option value="Pembimbing PKL">Pembimbing PKL</option>
-                                <option value="Guru Penguji">Guru Penguji</option>
-                                <option value="Guru Pembimbing">Guru Pembimbing</option>
-                                <option value="Guru Kejuruan">Guru Kejuruan</option>
-                                <option value="Koordinator Hubin">Koordinator Hubin</option>
+                                <option value="Kaprog">Kepala Program (Kaprog)</option>
+                                <option value="Wali Kelas">Wali Kelas</option>
+                                <option value="Guru">Guru (Pengajar)</option>
                             </select>
                         </div>
                     </div>
@@ -936,6 +1113,34 @@
             manageData: {},
             selectedManageRoles: [],
 
+            jurusansData: @json($jurusans),
+            createRoleSelected: '',
+            createJurusanId: '',
+
+            isEditJurusanKaprogOccupied() {
+                if (this.editData.role_selected !== 'Kaprog' || !this.editData.jurusan_id) return false;
+                const jur = this.jurusansData.find(j => j.id == this.editData.jurusan_id);
+                return jur && jur.kaprog_guru_id && jur.kaprog_guru_id != this.editData.id;
+            },
+
+            getOccupiedKaprogName() {
+                if (!this.editData.jurusan_id) return '';
+                const jur = this.jurusansData.find(j => j.id == this.editData.jurusan_id);
+                return jur?.kaprog?.nama || 'Guru lain';
+            },
+
+            isCreateJurusanKaprogOccupied() {
+                if (this.createRoleSelected !== 'Kaprog' || !this.createJurusanId) return false;
+                const jur = this.jurusansData.find(j => j.id == this.createJurusanId);
+                return jur && jur.kaprog_guru_id;
+            },
+
+            getCreateOccupiedKaprogName() {
+                if (!this.createJurusanId) return '';
+                const jur = this.jurusansData.find(j => j.id == this.createJurusanId);
+                return jur?.kaprog?.nama || 'Guru lain';
+            },
+
             deleteId: '',
             deleteName: '',
 
@@ -985,20 +1190,44 @@
 
             openEditModal(data) {
                 this.editData = Object.assign({}, data);
+                let selectedRole = 'Guru';
                 if (Array.isArray(data.roles_list)) {
-                    this.editData.roles_input = data.roles_list.join(', ');
+                    if (data.roles_list.some(r => r.includes('Pembimbing PKL') || r === 'Pembimbing PKL')) {
+                        selectedRole = 'Pembimbing PKL';
+                    } else if (data.roles_list.some(r => r.includes('Kaprog') || r.includes('Kepala Program'))) {
+                        selectedRole = 'Kaprog';
+                    } else if (data.roles_list.some(r => r.includes('Wali Kelas'))) {
+                        selectedRole = 'Wali Kelas';
+                    } else if (data.roles_list.length > 0 && data.roles_list[0] === 'Guru') {
+                        selectedRole = 'Guru';
+                    }
                 }
+                this.editData.role_selected = selectedRole;
                 this.isEditModalOpen = true;
             },
 
             openManageRoleModal(data) {
                 this.manageData = Object.assign({}, data);
-                this.selectedManageRoles = Array.isArray(data.roles_list) ? [...data.roles_list] : [];
+                const baseRoles = ['Pembimbing PKL'];
+                this.selectedManageRoles = Array.isArray(data.roles_list)
+                    ? data.roles_list.filter(r => baseRoles.includes(r))
+                    : [];
                 this.isManageRoleModalOpen = true;
             },
 
             getCombinedRolesString() {
-                return this.selectedManageRoles.join(', ');
+                const roles = [...this.selectedManageRoles];
+                if (this.manageData.rombel_wali) {
+                    const rName = this.manageData.rombel_wali.nama_rombel || this.manageData.rombel_wali.kode_rombel;
+                    if (!roles.includes('Wali Kelas')) roles.unshift('Wali Kelas');
+                    if (rName && !roles.includes('Wali Kelas ' + rName)) roles.push('Wali Kelas ' + rName);
+                }
+                if (this.manageData.jurusan_kaprog) {
+                    const jName = this.manageData.jurusan_kaprog.singkatan || this.manageData.jurusan_kaprog.kode;
+                    if (!roles.includes('Kaprog')) roles.unshift('Kaprog');
+                    if (jName && !roles.includes('Kepala Program Keahlian ' + jName)) roles.push('Kepala Program Keahlian ' + jName);
+                }
+                return roles.join(', ');
             },
 
             openBulkRoleModal() {

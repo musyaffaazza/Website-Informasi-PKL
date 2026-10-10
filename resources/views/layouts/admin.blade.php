@@ -142,46 +142,13 @@
     <div class="admin-main min-h-screen flex flex-col min-w-0 transition-all duration-200">
         <!-- Top Navbar -->
         <header class="h-16 min-w-0 bg-white border-b border-slate-200 px-4 sm:px-6 flex items-center justify-between sticky top-0 z-20 shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
-            <!-- Mobile Toggle + Global Search -->
-            <div class="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
+            <!-- Mobile Toggle -->
+            <div class="flex items-center gap-3 sm:gap-4">
                 <button @click="sidebarOpen = !sidebarOpen" class="lg:hidden p-2 rounded-lg text-slate-500 hover:bg-slate-100 shrink-0">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
                     </svg>
                 </button>
-
-                <!-- Search Input Form -->
-                @php
-                    $searchAction = route('admin.jurusan.index');
-                    if (request()->routeIs('admin.industri.*')) {
-                        $searchAction = route('admin.industri.index');
-                    } elseif (request()->routeIs('admin.mapping-pembimbing.*')) {
-                        $searchAction = route('admin.mapping-pembimbing.index');
-                    } elseif (request()->routeIs('admin.siswa.*')) {
-                        $searchAction = route('admin.siswa.index');
-                    } elseif (request()->routeIs('admin.guru.*')) {
-                        $searchAction = route('admin.guru.index');
-                    } elseif (request()->routeIs('admin.rombel.*')) {
-                        $searchAction = route('admin.rombel.index');
-                    } elseif (request()->routeIs('admin.log-aktivitas.*')) {
-                        $searchAction = route('admin.log-aktivitas.index');
-                    }
-                @endphp
-                <form action="{{ $searchAction }}" method="GET" class="relative w-full max-w-xl min-w-0">
-@if(request('jurusan_id') && request()->routeIs('admin.rombel.*'))
-                        <input type="hidden" name="jurusan_id" value="{{ request('jurusan_id') }}">
-                    @endif
-                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                        </svg>
-                    </div>
-                    <input type="text"
-                           name="search"
-                           value="{{ request('search') }}"
-                           placeholder="Search"
-                           class="w-full h-12 pl-10 pr-4 bg-slate-50/80 border border-slate-200 rounded-xl text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition">
-                </form>
             </div>
 
             <!-- Right Actions -->

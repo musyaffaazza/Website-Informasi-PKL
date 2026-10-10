@@ -91,6 +91,9 @@ class JurusanController extends Controller
         $gurus = Guru::where('status_akun', 'aktif')->orderBy('nama')->get();
         $allIndustris = Industri::orderBy('nama')->get();
 
+        $semesterAktif = 'Ganjil';
+        $tahunAjaranAktif = '2026/2027';
+
         return view('admin.jurusan.index', compact(
             'jurusans',
             'totalPrograms',
@@ -100,7 +103,9 @@ class JurusanController extends Controller
             'bidangList',
             'gurus',
             'allIndustris',
-            'perPage'
+            'perPage',
+            'semesterAktif',
+            'tahunAjaranAktif'
         ));
     }
 
@@ -136,7 +141,22 @@ class JurusanController extends Controller
                 fn (string $color) => !in_array($color, $usedColors, true)
             ) ?? $colors[array_rand($colors)];
         }
-        $jurusan = Jurusan::create($validated);
+
+        $newKaprogId = $validated['kaprog_guru_id'] ?? null;
+
+        $jurusan = DB::transaction(function () use ($validated, $newKaprogId) {
+            $created = Jurusan::create($validated);
+            if (!empty($newKaprogId)) {
+                // If this guru was kaprog of another jurusan, detach
+                Jurusan::where('kaprog_guru_id', $newKaprogId)
+                    ->where('id', '!=', $created->id)
+                    ->update(['kaprog_guru_id' => null]);
+
+                Guru::find($newKaprogId)?->syncAssignments();
+            }
+            return $created;
+        });
+
         LogAktivitas::catat('Tambah Data', 'Master Jurusan', 'Menambahkan jurusan baru ' . $jurusan->nama . ' (' . $jurusan->kode . ')');
 
         return redirect()->route('admin.jurusan.index')->with('success', 'Jurusan ' . $jurusan->nama . ' berhasil ditambahkan!');
@@ -168,7 +188,28 @@ class JurusanController extends Controller
 
         $validated['mitra_utama'] = [];
 
-        $jurusan->update($validated);
+        $oldKaprogId = $jurusan->kaprog_guru_id;
+        $newKaprogId = $validated['kaprog_guru_id'] ?? null;
+
+        DB::transaction(function () use ($jurusan, $validated, $oldKaprogId, $newKaprogId) {
+            if (!empty($newKaprogId) && $newKaprogId != $oldKaprogId) {
+                // If new guru was kaprog of another jurusan, detach
+                Jurusan::where('kaprog_guru_id', $newKaprogId)
+                    ->where('id', '!=', $jurusan->id)
+                    ->update(['kaprog_guru_id' => null]);
+            }
+
+            $jurusan->update($validated);
+
+            if ($oldKaprogId && $oldKaprogId != $newKaprogId) {
+                Guru::find($oldKaprogId)?->syncAssignments();
+            }
+
+            if ($newKaprogId) {
+                Guru::find($newKaprogId)?->syncAssignments();
+            }
+        });
+
         LogAktivitas::catat('Edit Data', 'Master Jurusan', 'Memperbarui data jurusan ' . $jurusan->nama . ' (' . $jurusan->kode . ')');
 
         return redirect()->route('admin.jurusan.index')->with('success', 'Data jurusan ' . $jurusan->nama . ' berhasil diperbarui!');
@@ -178,8 +219,9 @@ class JurusanController extends Controller
     {
         $jurusan = Jurusan::findOrFail($id);
         $nama = $jurusan->nama . ' (' . $jurusan->kode . ')';
+        $kaprogId = $jurusan->kaprog_guru_id;
 
-        DB::transaction(function () use ($jurusan, $nama) {
+        DB::transaction(function () use ($jurusan, $nama, $kaprogId) {
             $jurusan->industris()->detach();
 
             $siswaIds = $jurusan->siswas()->pluck('id');
@@ -200,6 +242,11 @@ class JurusanController extends Controller
 
             $jurusan->rombels()->delete();
             $jurusan->delete();
+
+            if ($kaprogId) {
+                Guru::find($kaprogId)?->syncAssignments();
+            }
+
             LogAktivitas::catat('Hapus Data', 'Master Jurusan', 'Menghapus data jurusan ' . $nama);
         });
 

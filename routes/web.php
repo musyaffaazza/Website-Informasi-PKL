@@ -6,6 +6,10 @@ use App\Http\Controllers\Admin\GuruController;
 use App\Http\Controllers\Admin\SiswaController;
 use App\Http\Controllers\Admin\LogAktivitasController;
 use App\Http\Controllers\Admin\IndustriController;
+use App\Http\Controllers\Kaprog\MuridPklController;
+use App\Http\Controllers\Kaprog\PersetujuanPklController;
+use App\Http\Controllers\Kaprog\PenempatanIndustriController;
+use App\Http\Controllers\Kaprog\LaporanPklController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', fn() => redirect()->route('login'));
@@ -21,18 +25,28 @@ Route::post('/login', function (\Illuminate\Http\Request $request) {
     $userId = trim($request->input('user_id'));
     $password = $request->input('password');
 
-    $account = \App\Models\User::where('username', $userId)->first();
+    $account = \App\Models\User::where('username', $userId)->orWhere('email', $userId)->first();
     if (!$account) {
-        $account = \App\Models\Guru::where('nip', $userId)->with('user')->first()?->user;
+        $account = \App\Models\Guru::where('nip', $userId)->orWhere('email', $userId)->with('user')->first()?->user;
     }
     if (!$account) {
         $account = \App\Models\Siswa::where(function ($query) use ($userId) {
-            $query->where('nisn', $userId)->orWhere('nis', $userId);
+            $query->where('nisn', $userId)->orWhere('nis', $userId)->orWhere('email', $userId);
         })->with('user')->first()?->user;
     }
 
     if ($account && \Illuminate\Support\Facades\Auth::attempt(['username' => $account->username, 'password' => $password], $request->boolean('remember'))) {
         $request->session()->regenerate();
+
+        $user = \Illuminate\Support\Facades\Auth::user();
+        if (str_contains(strtolower($user->username), 'kaprog')) {
+            return redirect()->route('kaprog.murid-pkl.index');
+        }
+        $guru = \App\Models\Guru::where('user_id', $user->id)->first();
+        if ($guru && ($guru->jurusanKaprog()->exists() || in_array('Kaprog', (array) $guru->roles_list))) {
+            return redirect()->route('kaprog.murid-pkl.index');
+        }
+
         return redirect()->route('admin.jurusan.index');
     }
 
@@ -173,4 +187,33 @@ Route::prefix('admin')->name('admin.')->group(function () {
     // Dapodik Sync
     Route::post('/dapodik/sync', fn() => redirect()->back()->with('success', 'Sinkronisasi data berhasil!'))->name('dapodik.sync');
 });
+
+// Kaprog Routes
+Route::prefix('kaprog')->name('kaprog.')->group(function () {
+    Route::get('/', fn() => redirect()->route('kaprog.murid-pkl.index'));
+
+    // Murid PKL
+    Route::get('/murid-pkl', [MuridPklController::class, 'index'])->name('murid-pkl.index');
+    Route::get('/murid-pkl/export', [MuridPklController::class, 'export'])->name('murid-pkl.export');
+    Route::post('/murid-pkl/store-penempatan', [MuridPklController::class, 'storePenempatan'])->name('murid-pkl.store-penempatan');
+    Route::post('/murid-pkl/verifikasi', [MuridPklController::class, 'verifikasi'])->name('murid-pkl.verifikasi');
+
+    // Persetujuan PKL
+    Route::get('/persetujuan', [PersetujuanPklController::class, 'index'])->name('persetujuan.index');
+    Route::get('/persetujuan/export', [PersetujuanPklController::class, 'export'])->name('persetujuan.export');
+    Route::post('/persetujuan/batch-approve', [PersetujuanPklController::class, 'batchApprove'])->name('persetujuan.batch-approve');
+    Route::post('/persetujuan/{id}/approve', [PersetujuanPklController::class, 'approve'])->name('persetujuan.approve');
+    Route::post('/persetujuan/{id}/reject', [PersetujuanPklController::class, 'reject'])->name('persetujuan.reject');
+    Route::post('/persetujuan/{id}/dispensasi', [PersetujuanPklController::class, 'dispensasi'])->name('persetujuan.dispensasi');
+
+    // Penempatan Industri
+    Route::get('/penempatan-industri', [PenempatanIndustriController::class, 'index'])->name('penempatan-industri.index');
+    Route::post('/penempatan-industri', [PenempatanIndustriController::class, 'store'])->name('penempatan-industri.store');
+    Route::get('/penempatan-industri/export', [PenempatanIndustriController::class, 'export'])->name('penempatan-industri.export');
+
+    // Laporan PKL
+    Route::get('/laporan', [LaporanPklController::class, 'index'])->name('laporan.index');
+    Route::get('/laporan/export', [LaporanPklController::class, 'export'])->name('laporan.export');
+});
+
 
