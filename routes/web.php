@@ -10,6 +10,7 @@ use App\Http\Controllers\Kaprog\MuridPklController;
 use App\Http\Controllers\Kaprog\PersetujuanPklController;
 use App\Http\Controllers\Kaprog\PenempatanIndustriController;
 use App\Http\Controllers\Kaprog\LaporanPklController;
+use App\Http\Controllers\WaliKelas\MuridController as WaliKelasMuridController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', fn() => redirect()->route('login'));
@@ -39,10 +40,16 @@ Route::post('/login', function (\Illuminate\Http\Request $request) {
         $request->session()->regenerate();
 
         $user = \Illuminate\Support\Facades\Auth::user();
+        if (str_contains(strtolower($user->username), 'walikelas') || str_contains(strtolower($user->username), 'wali')) {
+            return redirect()->route('wali-kelas.murid.index');
+        }
         if (str_contains(strtolower($user->username), 'kaprog')) {
             return redirect()->route('kaprog.murid-pkl.index');
         }
         $guru = \App\Models\Guru::where('user_id', $user->id)->first();
+        if ($guru && ($guru->rombelWali()->exists() || in_array('Wali Kelas', (array) $guru->roles_list))) {
+            return redirect()->route('wali-kelas.murid.index');
+        }
         if ($guru && ($guru->jurusanKaprog()->exists() || in_array('Kaprog', (array) $guru->roles_list))) {
             return redirect()->route('kaprog.murid-pkl.index');
         }
@@ -184,6 +191,12 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/log-aktivitas', [LogAktivitasController::class, 'index'])->name('log-aktivitas.index');
     Route::get('/log-aktivitas-export', [LogAktivitasController::class, 'export'])->name('log-aktivitas.export');
 
+    // Monitoring Jurnal & Absensi
+    Route::get('/jurnal/{siswa_id?}', [WaliKelasMuridController::class, 'jurnal'])->name('jurnal.index');
+    Route::post('/jurnal/{id}/catatan', [WaliKelasMuridController::class, 'simpanCatatanJurnal'])->name('jurnal.catatan');
+    Route::get('/absensi/{siswa_id?}', [WaliKelasMuridController::class, 'absensi'])->name('absensi.index');
+    Route::get('/absensi/{siswa_id}/pdf', [WaliKelasMuridController::class, 'unduhAbsensiPdf'])->name('absensi.pdf');
+
     // Dapodik Sync
     Route::post('/dapodik/sync', fn() => redirect()->back()->with('success', 'Sinkronisasi data berhasil!'))->name('dapodik.sync');
 });
@@ -214,6 +227,29 @@ Route::prefix('kaprog')->name('kaprog.')->group(function () {
     // Laporan PKL
     Route::get('/laporan', [LaporanPklController::class, 'index'])->name('laporan.index');
     Route::get('/laporan/export', [LaporanPklController::class, 'export'])->name('laporan.export');
+});
+
+// Wali Kelas Routes
+Route::prefix('wali-kelas')->name('wali-kelas.')->group(function () {
+    Route::get('/', fn() => redirect()->route('wali-kelas.murid.index'));
+
+    // Murid PKL Dashboard
+    Route::get('/daftar-murid', [WaliKelasMuridController::class, 'index'])->name('murid.index');
+    Route::get('/daftar-murid/export', [WaliKelasMuridController::class, 'export'])->name('murid.export');
+    Route::get('/daftar-murid/cetak', [WaliKelasMuridController::class, 'cetak'])->name('murid.cetak');
+
+    // Persetujuan PKL
+    Route::get('/persetujuan', [WaliKelasMuridController::class, 'persetujuan'])->name('persetujuan.index');
+    Route::post('/persetujuan/batch-approve', [WaliKelasMuridController::class, 'batchApprove'])->name('persetujuan.batch-approve');
+    Route::post('/persetujuan/{id}/approve', [WaliKelasMuridController::class, 'approve'])->name('persetujuan.approve');
+    Route::post('/persetujuan/{id}/reject', [WaliKelasMuridController::class, 'reject'])->name('persetujuan.reject');
+
+    // Monitoring Jurnal & Absensi
+    Route::get('/jurnal/{siswa_id?}', [WaliKelasMuridController::class, 'jurnal'])->name('jurnal.index');
+    Route::post('/jurnal/{id}/catatan', [WaliKelasMuridController::class, 'simpanCatatanJurnal'])->name('jurnal.catatan');
+    Route::get('/absensi/{siswa_id?}', [WaliKelasMuridController::class, 'absensi'])->name('absensi.index');
+    Route::post('/absensi/{siswa_id}/supervisi', [WaliKelasMuridController::class, 'simpanSupervisi'])->name('absensi.supervisi');
+    Route::get('/absensi/{siswa_id}/pdf', [WaliKelasMuridController::class, 'unduhAbsensiPdf'])->name('absensi.pdf');
 });
 
 
