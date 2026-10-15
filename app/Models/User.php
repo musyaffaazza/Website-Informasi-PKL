@@ -40,6 +40,15 @@ class User extends Authenticatable
         return $this->password_hash;
     }
 
+    /**
+     * Determine whether this account is the administrator account.
+     */
+    public function isAdminAkun(): bool
+    {
+        return strtolower((string) $this->username) === 'admin'
+            || strtolower((string) $this->email) === 'admin@smkn1gunungputri.sch.id';
+    }
+
     public function getRememberTokenName()
     {
         return '';

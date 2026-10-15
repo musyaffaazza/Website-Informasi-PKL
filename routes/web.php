@@ -40,21 +40,38 @@ Route::post('/login', function (\Illuminate\Http\Request $request) {
         $request->session()->regenerate();
 
         $user = \Illuminate\Support\Facades\Auth::user();
-        if (str_contains(strtolower($user->username), 'walikelas') || str_contains(strtolower($user->username), 'wali')) {
-            return redirect()->route('wali-kelas.murid.index');
-        }
-        if (str_contains(strtolower($user->username), 'kaprog')) {
-            return redirect()->route('kaprog.murid-pkl.index');
-        }
         $guru = \App\Models\Guru::where('user_id', $user->id)->first();
-        if ($guru && ($guru->rombelWali()->exists() || in_array('Wali Kelas', (array) $guru->roles_list))) {
+
+        $isWaliKelas = str_contains(strtolower($user->username), 'walikelas')
+            || str_contains(strtolower($user->username), 'wali')
+            || ($guru && ($guru->rombelWali()->exists() || in_array('Wali Kelas', (array) $guru->roles_list)));
+
+        $isKaprog = str_contains(strtolower($user->username), 'kaprog')
+            || ($guru && ($guru->jurusanKaprog()->exists() || in_array('Kaprog', (array) $guru->roles_list)));
+
+        if ($isWaliKelas) {
             return redirect()->route('wali-kelas.murid.index');
         }
-        if ($guru && ($guru->jurusanKaprog()->exists() || in_array('Kaprog', (array) $guru->roles_list))) {
+
+        if ($isKaprog) {
             return redirect()->route('kaprog.murid-pkl.index');
         }
 
-        return redirect()->route('admin.jurusan.index');
+        // Akun administrator (akun 'admin' bawaan, atau akun non-guru) tetap
+        // diarahkan ke panel admin.
+        if ($user->isAdminAkun() || $guru === null) {
+            return redirect()->route('admin.jurusan.index');
+        }
+
+        // Guru dengan data & role selain Wali Kelas/Kaprog (mis. Pembimbing PKL
+        // atau Guru) belum punya halaman sendiri. Jangan jatuh ke panel admin.
+        \Illuminate\Support\Facades\Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect()->route('login')->withErrors([
+            'user_id' => 'Akun Anda belum memiliki halaman sesuai role (Wali Kelas / Kaprog), sehingga tidak dapat mengakses panel admin. Silakan hubungi administrator.',
+        ]);
     }
 
     return back()->withErrors(['user_id' => 'USER ID atau kata sandi salah.'])->onlyInput('user_id');
@@ -104,7 +121,7 @@ Route::post('/forgot-password', function (\Illuminate\Http\Request $request) {
     return redirect()->route('login')->with('success', 'Kata sandi berhasil diubah. Silakan login dengan kata sandi baru.');
 })->name('password.reset');
 
-Route::prefix('admin')->name('admin.')->group(function () {
+Route::prefix('admin')->name('admin.')->middleware('admin.only')->group(function () {
     Route::get('/', fn() => redirect()->route('admin.jurusan.index'));
     Route::get('/profile', function () {
         $user = \Illuminate\Support\Facades\Auth::user() ?: \App\Models\User::where('username', 'admin')->firstOrFail();

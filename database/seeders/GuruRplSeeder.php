@@ -29,7 +29,12 @@ class GuruRplSeeder extends Seeder
         }
 
         $keepUserIds = DB::table('guru')->pluck('user_id')->all();
-        DB::table('users')->where('tipe_akun', 'guru')->whereNotIn('id', $keepUserIds)->delete();
+        DB::table('users')
+            ->where('tipe_akun', 'guru')
+            ->whereNotIn('id', $keepUserIds)
+            ->where('username', '!=', 'admin')
+            ->where('email', '!=', 'admin@smkn1gunungputri.sch.id')
+            ->delete();
 
         DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
