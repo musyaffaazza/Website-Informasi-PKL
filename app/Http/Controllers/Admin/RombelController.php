@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Support\ExcelExporter;
 use App\Models\Guru;
 use App\Models\Jurusan;
 use App\Models\Rombel;
@@ -275,56 +276,54 @@ class RombelController extends Controller
 
         $rombels = $query->orderBy('id', 'asc')->get();
 
-        $headers = [
-            'Content-Type' => 'text/csv; charset=UTF-8',
-            'Content-Disposition' => 'attachment; filename="master_data_rombel_' . date('Ymd_His') . '.csv"',
+        $columns = [
+            ['label' => 'No', 'width' => 6, 'type' => 'number', 'align' => 'center'],
+            ['label' => 'Kode Rombel', 'width' => 16, 'align' => 'center'],
+            ['label' => 'Nama Rombel', 'width' => 20, 'align' => 'center'],
+            ['label' => 'Tingkat', 'width' => 10, 'align' => 'center'],
+            ['label' => 'Program Keahlian (Jurusan)', 'width' => 30],
+            ['label' => 'Ruang Kelas / Lab', 'width' => 20],
+            ['label' => 'Wali Kelas', 'width' => 28],
+            ['label' => 'NIP Wali Kelas', 'width' => 22, 'align' => 'center'],
+            ['label' => 'Jumlah Siswa', 'width' => 13, 'type' => 'number', 'align' => 'center'],
+            ['label' => 'Siswa Terdata', 'width' => 13, 'type' => 'number', 'align' => 'center'],
+            ['label' => 'Status PKL', 'width' => 14, 'align' => 'center'],
+            ['label' => 'Tahun Ajaran', 'width' => 14, 'align' => 'center'],
+            ['label' => 'Semester', 'width' => 12, 'align' => 'center'],
+            ['label' => 'Status Rombel', 'width' => 14, 'align' => 'center'],
         ];
 
-        return response()->stream(function () use ($rombels) {
-            $handle = fopen('php://output', 'w');
-            fwrite($handle, "\xEF\xBB\xBF");
-            fputcsv($handle, [
-                'No',
-                'Kode Rombel',
-                'Nama Rombel',
-                'Tingkat',
-                'Program Keahlian (Jurusan)',
-                'Ruang Kelas / Lab',
-                'Wali Kelas',
-                'NIP Wali Kelas',
-                'Jumlah Siswa',
-                'Siswa Terdata',
-                'Status PKL',
-                'Tahun Ajaran',
-                'Semester',
-                'Status Rombel',
-            ], ';');
+        $no = 1;
+        $rows = [];
+        foreach ($rombels as $r) {
+            $jurusanNama = $r->jurusan ? $r->jurusan->nama : '-';
+            $waliNama = $r->waliKelas ? $r->waliKelas->nama : 'Belum Ditentukan';
+            $waliNip = $r->waliKelas ? $r->waliKelas->nip : '-';
 
-            $no = 1;
-            foreach ($rombels as $r) {
-                $jurusanNama = $r->jurusan ? $r->jurusan->nama : '-';
-                $waliNama = $r->waliKelas ? $r->waliKelas->nama : 'Belum Ditentukan';
-                $waliNip = $r->waliKelas ? $r->waliKelas->nip : '-';
+            $rows[] = [
+                $no++,
+                $r->kode_rombel ?: $r->nama_kode,
+                $r->nama_rombel ?: $r->nama_kode,
+                $r->tingkat,
+                $jurusanNama,
+                $r->ruang ?: '-',
+                $waliNama,
+                $waliNip,
+                $r->jumlah_siswa,
+                $r->siswa_terdata,
+                $r->status_pkl,
+                $r->tahun_ajaran,
+                $r->semester,
+                ucfirst($r->status),
+            ];
+        }
 
-                fputcsv($handle, [
-                    $no++,
-                    $r->kode_rombel ?: $r->nama_kode,
-                    $r->nama_rombel ?: $r->nama_kode,
-                    $r->tingkat,
-                    $jurusanNama,
-                    $r->ruang ?: '-',
-                    $waliNama,
-                    $waliNip,
-                    $r->jumlah_siswa,
-                    $r->siswa_terdata,
-                    $r->status_pkl,
-                    $r->tahun_ajaran,
-                    $r->semester,
-                    $r->status,
-                ], ';');
-            }
-
-            fclose($handle);
-        }, 200, $headers);
+        return ExcelExporter::download(
+            'master_data_rombel_' . date('Ymd_His') . '.xls',
+            'Data Rombel',
+            $columns,
+            $rows,
+            ['title' => 'MASTER DATA ROMBONGAN BELAJAR', 'brand' => '0F766E']
+        );
     }
 }

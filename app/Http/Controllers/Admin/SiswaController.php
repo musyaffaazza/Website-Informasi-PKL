@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Support\ExcelExporter;
 use App\Models\Siswa;
 use App\Models\Rombel;
 use App\Models\Jurusan;
@@ -339,50 +340,48 @@ class SiswaController extends Controller
 
         $siswas = $query->orderBy('id', 'asc')->get();
 
-        $headers = [
-            'Content-Type' => 'text/csv; charset=UTF-8',
-            'Content-Disposition' => 'attachment; filename="master_data_siswa_' . date('Ymd_His') . '.csv"',
+        $columns = [
+            ['label' => 'No', 'width' => 6, 'type' => 'number', 'align' => 'center'],
+            ['label' => 'NIS', 'width' => 16, 'align' => 'center'],
+            ['label' => 'NISN', 'width' => 18, 'align' => 'center'],
+            ['label' => 'Nama Lengkap Siswa', 'width' => 32],
+            ['label' => 'Jenis Kelamin', 'width' => 14, 'align' => 'center'],
+            ['label' => 'Kota Asal', 'width' => 18],
+            ['label' => 'Kelas & Rombel', 'width' => 20, 'align' => 'center'],
+            ['label' => 'Konsentrasi Keahlian', 'width' => 28],
+            ['label' => 'Kampus', 'width' => 18],
+            ['label' => 'No. HP Siswa', 'width' => 16, 'align' => 'center'],
+            ['label' => 'Email Siswa', 'width' => 30],
+            ['label' => 'Status Akun', 'width' => 14, 'align' => 'center'],
+            ['label' => 'Status PKL', 'width' => 18, 'align' => 'center'],
         ];
 
-        return response()->stream(function () use ($siswas) {
-            $handle = fopen('php://output', 'w');
-            fwrite($handle, "\xEF\xBB\xBF");
-            fputcsv($handle, [
-                'No',
-                'NIS',
-                'NISN',
-                'Nama Lengkap Siswa',
-                'Jenis Kelamin',
-                'Kota Asal',
-                'Kelas & Rombel',
-                'Konsentrasi Keahlian',
-                'Kampus',
-                'No. HP Siswa',
-                'Email Siswa',
-                'Status Akun',
-                'Status PKL',
-            ], ';');
+        $no = 1;
+        $rows = [];
+        foreach ($siswas as $s) {
+            $rows[] = [
+                $no++,
+                $s->nis,
+                $s->nisn,
+                $s->nama,
+                $s->jenis_kelamin,
+                $s->kota ?: '-',
+                $s->rombel ? $s->rombel->nama_rombel : '-',
+                $s->jurusan ? $s->jurusan->nama : '-',
+                $s->kampus ?: 'Kampus Pusat',
+                $s->no_hp ?: '-',
+                $s->email ?: '-',
+                ucfirst($s->status_akun),
+                $s->status_pkl,
+            ];
+        }
 
-            $no = 1;
-            foreach ($siswas as $s) {
-                fputcsv($handle, [
-                    $no++,
-                    $s->nis,
-                    $s->nisn,
-                    $s->nama,
-                    $s->jenis_kelamin,
-                    $s->kota ?: '-',
-                    $s->rombel ? $s->rombel->nama_rombel : '-',
-                    $s->jurusan ? $s->jurusan->nama : '-',
-                    $s->kampus ?: 'Kampus Pusat',
-                    $s->no_hp ?: '-',
-                    $s->email ?: '-',
-                    $s->status_akun,
-                    $s->status_pkl,
-                ], ';');
-            }
-
-            fclose($handle);
-        }, 200, $headers);
+        return ExcelExporter::download(
+            'master_data_siswa_' . date('Ymd_His') . '.xls',
+            'Data Siswa',
+            $columns,
+            $rows,
+            ['title' => 'MASTER DATA SISWA', 'brand' => '1D4ED8']
+        );
     }
 }

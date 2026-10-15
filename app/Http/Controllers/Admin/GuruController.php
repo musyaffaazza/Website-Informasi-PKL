@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Support\ExcelExporter;
 use App\Models\Guru;
 use App\Models\Jurusan;
 use App\Models\PembimbingPenugasan;
@@ -427,50 +428,49 @@ class GuruController extends Controller
 
         $gurus = $query->orderBy('id', 'asc')->get();
 
-        $headers = [
-            'Content-Type' => 'text/csv; charset=UTF-8',
-            'Content-Disposition' => 'attachment; filename="master_data_guru_' . date('Ymd_His') . '.csv"',
+        $columns = [
+            ['label' => 'No', 'width' => 6, 'type' => 'number', 'align' => 'center'],
+            ['label' => 'NIP', 'width' => 22, 'align' => 'center'],
+            ['label' => 'NUPTK', 'width' => 22, 'align' => 'center'],
+            ['label' => 'Nama Lengkap Guru / GTK', 'width' => 34],
+            ['label' => 'Jenis Kelamin', 'width' => 14, 'align' => 'center'],
+            ['label' => 'Pendidikan Terakhir', 'width' => 26],
+            ['label' => 'Email', 'width' => 30],
+            ['label' => 'No. HP', 'width' => 16, 'align' => 'center'],
+            ['label' => 'Role Penugasan', 'width' => 30],
+            ['label' => 'Kelas / Jurusan Diampu', 'width' => 24, 'align' => 'center'],
+            ['label' => 'Keterangan Penugasan', 'width' => 28],
+            ['label' => 'Status Akun', 'width' => 14, 'align' => 'center'],
         ];
 
-        return response()->stream(function () use ($gurus) {
-            $handle = fopen('php://output', 'w');
-            fwrite($handle, "\xEF\xBB\xBF");
-            fputcsv($handle, [
-                'No',
-                'NIP',
-                'NUPTK',
-                'Nama Lengkap Guru / GTK',
-                'Jenis Kelamin',
-                'Pendidikan Terakhir',
-                'Email',
-                'No. HP',
-                'Role Penugasan (Multi-Role)',
-                'Kelas / Jurusan Diampu',
-                'Keterangan Penugasan',
-                'Status Akun',
-            ], ';');
+        $no = 1;
+        $rows = [];
+        foreach ($gurus as $g) {
+            $roles = is_array($g->roles_list) ? implode('; ', $g->roles_list) : '';
 
-            $no = 1;
-            foreach ($gurus as $g) {
-                $roles = is_array($g->roles_list) ? implode('; ', $g->roles_list) : '';
-                fputcsv($handle, [
-                    $no++,
-                    $g->nip,
-                    $g->nuptk ?: '-',
-                    $g->nama,
-                    $g->jenis_kelamin,
-                    $g->pendidikan ?: '-',
-                    $g->email ?: '-',
-                    $g->no_hp ?: '-',
-                    $roles ?: 'Belum Diberi Role',
-                    $g->kelas_diampu ?: 'Belum teralokasi',
-                    $g->keterangan_diampu ?: '-',
-                    $g->status_akun,
-                ], ';');
-            }
+            $rows[] = [
+                $no++,
+                $g->nip,
+                $g->nuptk ?: '-',
+                $g->nama,
+                $g->jenis_kelamin,
+                $g->pendidikan ?: '-',
+                $g->email ?: '-',
+                $g->no_hp ?: '-',
+                $roles ?: 'Belum Diberi Role',
+                $g->kelas_diampu ?: 'Belum teralokasi',
+                $g->keterangan_diampu ?: '-',
+                ucfirst($g->status_akun),
+            ];
+        }
 
-            fclose($handle);
-        }, 200, $headers);
+        return ExcelExporter::download(
+            'master_data_guru_' . date('Ymd_His') . '.xls',
+            'Data Guru',
+            $columns,
+            $rows,
+            ['title' => 'MASTER DATA GURU & TENAGA KEPENDIDIKAN', 'brand' => '0F2942']
+        );
     }
 }
 

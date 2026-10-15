@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Support\ExcelExporter;
 use App\Models\PembimbingPenugasan;
 use App\Models\PengajuanPkl;
 use App\Models\Siswa;
@@ -217,47 +218,45 @@ class MappingPembimbingController extends Controller
 
         $pengajuans = $query->orderBy('id', 'asc')->get();
 
-        $headers = [
-            'Content-Type' => 'text/csv; charset=UTF-8',
-            'Content-Disposition' => 'attachment; filename="mapping_pembimbing_pkl_' . date('Ymd_His') . '.csv"',
+        $columns = [
+            ['label' => 'No', 'width' => 6, 'type' => 'number', 'align' => 'center'],
+            ['label' => 'Nama Siswa', 'width' => 30],
+            ['label' => 'NIS', 'width' => 16, 'align' => 'center'],
+            ['label' => 'Rombel', 'width' => 18, 'align' => 'center'],
+            ['label' => 'Jurusan', 'width' => 14, 'align' => 'center'],
+            ['label' => 'Industri Mitra DUDI', 'width' => 30],
+            ['label' => 'Guru Pembimbing', 'width' => 28],
+            ['label' => 'NIP Pembimbing', 'width' => 22, 'align' => 'center'],
+            ['label' => 'Tanggal Mulai PKL', 'width' => 16, 'align' => 'center'],
+            ['label' => 'Status Mapping', 'width' => 18, 'align' => 'center'],
         ];
 
-        return response()->stream(function () use ($pengajuans) {
-            $handle = fopen('php://output', 'w');
-            fwrite($handle, "\xEF\xBB\xBF");
-            fputcsv($handle, [
-                'No',
-                'Nama Siswa',
-                'NIS',
-                'Rombel',
-                'Jurusan',
-                'Industri Mitra DUDI',
-                'Guru Pembimbing',
-                'NIP Pembimbing',
-                'Tanggal Mulai PKL',
-                'Status Mapping'
-            ], ';');
+        $no = 1;
+        $rows = [];
+        foreach ($pengajuans as $p) {
+            $penugasan = $p->penugasan;
+            $guru = $penugasan ? $penugasan->pembimbing : null;
 
-            $no = 1;
-            foreach ($pengajuans as $p) {
-                $penugasan = $p->penugasan;
-                $guru = $penugasan ? $penugasan->pembimbing : null;
+            $rows[] = [
+                $no++,
+                $p->siswa ? $p->siswa->nama : '-',
+                $p->siswa ? $p->siswa->nis : '-',
+                $p->siswa && $p->siswa->rombel ? $p->siswa->rombel->nama_kode : '-',
+                $p->siswa && $p->siswa->jurusan ? $p->siswa->jurusan->kode : '-',
+                $p->industri ? $p->industri->nama : '-',
+                $guru ? $guru->nama : 'Belum Dipetakan',
+                $guru ? $guru->nip : '-',
+                $penugasan && $penugasan->tanggal_mulai ? $penugasan->tanggal_mulai->format('d/m/Y') : ($p->tanggal_mulai ? $p->tanggal_mulai->format('d/m/Y') : '-'),
+                $guru ? 'Sudah Dipetakan' : 'Belum Dipetakan',
+            ];
+        }
 
-                fputcsv($handle, [
-                    $no++,
-                    $p->siswa ? $p->siswa->nama : '-',
-                    $p->siswa ? $p->siswa->nis : '-',
-                    $p->siswa && $p->siswa->rombel ? $p->siswa->rombel->nama_kode : '-',
-                    $p->siswa && $p->siswa->jurusan ? $p->siswa->jurusan->kode : '-',
-                    $p->industri ? $p->industri->nama : '-',
-                    $guru ? $guru->nama : 'Belum Dipetakan',
-                    $guru ? $guru->nip : '-',
-                    $penugasan && $penugasan->tanggal_mulai ? $penugasan->tanggal_mulai->format('d/m/Y') : ($p->tanggal_mulai ? $p->tanggal_mulai->format('d/m/Y') : '-'),
-                    $guru ? 'Sudah Dipetakan' : 'Belum Dipetakan',
-                ], ';');
-            }
-
-            fclose($handle);
-        }, 200, $headers);
+        return ExcelExporter::download(
+            'mapping_pembimbing_pkl_' . date('Ymd_His') . '.xls',
+            'Mapping Pembimbing',
+            $columns,
+            $rows,
+            ['title' => 'MAPPING PEMBIMBING PKL SISWA', 'brand' => '4338CA']
+        );
     }
 }

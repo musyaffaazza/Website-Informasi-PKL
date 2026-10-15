@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Support\ExcelExporter;
 use App\Models\Guru;
 use App\Models\Industri;
 use App\Models\Jurusan;
@@ -299,63 +300,61 @@ class JurusanController extends Controller
     {
         $jurusans = Jurusan::with(['kaprog', 'rombels.siswas', 'industris', 'siswas.pengajuanPkl'])->get();
 
-        $headers = [
-            'Content-Type' => 'text/csv; charset=UTF-8',
-            'Content-Disposition' => 'attachment; filename="master_data_jurusan_' . date('Ymd_His') . '.csv"',
+        $columns = [
+            ['label' => 'ID', 'width' => 6, 'type' => 'number', 'align' => 'center'],
+            ['label' => 'Kode', 'width' => 12, 'align' => 'center'],
+            ['label' => 'Nama Program Keahlian', 'width' => 32],
+            ['label' => 'Singkatan', 'width' => 12, 'align' => 'center'],
+            ['label' => 'Bidang Keahlian', 'width' => 26],
+            ['label' => 'Kaprog (Kepala Program)', 'width' => 28],
+            ['label' => 'Jumlah Rombel XII', 'width' => 15, 'type' => 'number', 'align' => 'center'],
+            ['label' => 'Kuota Kursi Industri', 'width' => 15, 'type' => 'number', 'align' => 'center'],
+            ['label' => 'Kuota Terisi', 'width' => 13, 'type' => 'number', 'align' => 'center'],
+            ['label' => 'Sisa Kuota', 'width' => 12, 'type' => 'number', 'align' => 'center'],
+            ['label' => 'Persentase Keterserapan', 'width' => 16, 'align' => 'center'],
+            ['label' => 'Mitra Utama DU/DI', 'width' => 36],
+            ['label' => 'Status', 'width' => 12, 'align' => 'center'],
         ];
 
-        return response()->stream(function () use ($jurusans) {
-            $handle = fopen('php://output', 'w');
-            fwrite($handle, "\xEF\xBB\xBF");
-            fputcsv($handle, [
-                'ID',
-                'Kode',
-                'Nama Program Keahlian',
-                'Singkatan',
-                'Bidang Keahlian',
-                'Kaprog (Kepala Program)',
-                'Jumlah Rombel Tingkat XII',
-                'Kuota Kursi Industri',
-                'Kuota Terisi',
-                'Sisa Kuota',
-                'Persentase Keterserapan',
-                'Mitra Utama DU/DI',
-                'Status',
-            ], ';');
+        $rows = [];
+        foreach ($jurusans as $jurusan) {
+            $rombelsXii = $jurusan->rombels->filter(function (Rombel $rombel) {
+                return $rombel->tingkat === 'XII' && ($rombel->status ?? 'aktif') === 'aktif';
+            });
+            $rombelCount = $rombelsXii->count();
+            $kuotaTotal = (int) $jurusan->industris->sum('kuota');
+            $kuotaTerisi = $jurusan->siswas
+                ->filter(fn (Siswa $siswa) => $siswa->pengajuanPkl?->status === 'disetujui')
+                ->count();
+            $sisaKuota = max(0, $kuotaTotal - $kuotaTerisi);
+            $persentase = $kuotaTotal > 0
+                ? round(($kuotaTerisi / $kuotaTotal) * 100, 1) . '%'
+                : '0%';
 
-            foreach ($jurusans as $jurusan) {
-                $rombelsXii = $jurusan->rombels->filter(function (Rombel $rombel) {
-                    return $rombel->tingkat === 'XII' && ($rombel->status ?? 'aktif') === 'aktif';
-                });
-                $rombelCount = $rombelsXii->count();
-                $kuotaTotal = (int) $jurusan->industris->sum('kuota');
-                $kuotaTerisi = $jurusan->siswas
-                    ->filter(fn (Siswa $siswa) => $siswa->pengajuanPkl?->status === 'disetujui')
-                    ->count();
-                $sisaKuota = max(0, $kuotaTotal - $kuotaTerisi);
-                $persentase = $kuotaTotal > 0
-                    ? round(($kuotaTerisi / $kuotaTotal) * 100, 1) . '%'
-                    : '0%';
+            $rows[] = [
+                $jurusan->id,
+                $jurusan->kode,
+                $jurusan->nama,
+                $jurusan->singkatan,
+                $jurusan->bidang,
+                $jurusan->kaprog?->nama ?? '-',
+                $rombelCount,
+                $kuotaTotal,
+                $kuotaTerisi,
+                $sisaKuota,
+                $persentase,
+                $jurusan->industris->pluck('nama')->implode('; '),
+                ucfirst($jurusan->status),
+            ];
+        }
 
-                fputcsv($handle, [
-                    $jurusan->id,
-                    $jurusan->kode,
-                    $jurusan->nama,
-                    $jurusan->singkatan,
-                    $jurusan->bidang,
-                    $jurusan->kaprog?->nama ?? '-',
-                    $rombelCount,
-                    $kuotaTotal,
-                    $kuotaTerisi,
-                    $sisaKuota,
-                    $persentase,
-                    $jurusan->industris->pluck('nama')->implode('; '),
-                    $jurusan->status,
-                ], ';');
-            }
-
-            fclose($handle);
-        }, 200, $headers);
+        return ExcelExporter::download(
+            'master_data_jurusan_' . date('Ymd_His') . '.xls',
+            'Data Jurusan',
+            $columns,
+            $rows,
+            ['title' => 'MASTER DATA JURUSAN / PROGRAM KEAHLIAN', 'brand' => '047857']
+        );
     }
 }
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Support\ExcelExporter;
 use App\Models\Industri;
 use App\Models\PengajuanPkl;
 use App\Models\Jurusan;
@@ -287,59 +288,57 @@ class IndustriController extends Controller
             $industri->setAttribute('kuota_terisi', (int) $industri->kuota_terisi_aktual);
         });
 
-        $headers = [
-            'Content-Type' => 'text/csv; charset=UTF-8',
-            'Content-Disposition' => 'attachment; filename="master_data_industri_' . date('Ymd_His') . '.csv"',
+        $columns = [
+            ['label' => 'No', 'width' => 6, 'type' => 'number', 'align' => 'center'],
+            ['label' => 'Nama Industri / DU-DI', 'width' => 30],
+            ['label' => 'Bidang Usaha', 'width' => 28],
+            ['label' => 'No. MoU Kemitraan', 'width' => 20, 'align' => 'center'],
+            ['label' => 'Masa Berlaku MoU', 'width' => 16, 'align' => 'center'],
+            ['label' => 'Alamat Lengkap', 'width' => 36],
+            ['label' => 'Wilayah', 'width' => 16, 'align' => 'center'],
+            ['label' => 'Nama PIC / Mentor', 'width' => 24],
+            ['label' => 'Jabatan PIC', 'width' => 20],
+            ['label' => 'No. HP / WA', 'width' => 16, 'align' => 'center'],
+            ['label' => 'Email PIC', 'width' => 28],
+            ['label' => 'Pembimbing Sekolah', 'width' => 24],
+            ['label' => 'Kuota Total', 'width' => 12, 'type' => 'number', 'align' => 'center'],
+            ['label' => 'Kuota Terisi Aktual', 'width' => 15, 'type' => 'number', 'align' => 'center'],
+            ['label' => 'Sisa Kursi', 'width' => 12, 'type' => 'number', 'align' => 'center'],
+            ['label' => 'Status Kemitraan', 'width' => 16, 'align' => 'center'],
         ];
 
-        return response()->stream(function () use ($industris) {
-            $handle = fopen('php://output', 'w');
-            fwrite($handle, "\xEF\xBB\xBF");
-            fputcsv($handle, [
-                'No',
-                'Nama Industri / DU-DI',
-                'Bidang Usaha',
-                'No. MoU Kemitraan',
-                'Masa Berlaku MoU',
-                'Alamat Lengkap',
-                'Wilayah',
-                'Nama PIC / Mentor',
-                'Jabatan PIC',
-                'No. HP / WA',
-                'Email PIC',
-                'Pembimbing Sekolah',
-                'Kuota Total',
-                'Kuota Terisi Aktual',
-                'Sisa Kursi',
-                'Status Kemitraan',
-            ], ';');
+        $rows = [];
+        foreach ($industris as $index => $industri) {
+            $terisiAktual = (int) $industri->kuota_terisi;
+            $sisa = max(0, $industri->kuota - $terisiAktual);
 
-            foreach ($industris as $index => $industri) {
-                $terisiAktual = (int) $industri->kuota_terisi;
-                $sisa = max(0, $industri->kuota - $terisiAktual);
+            $rows[] = [
+                $index + 1,
+                $industri->nama,
+                $industri->bidang_usaha ?: '-',
+                $industri->no_mou ?: '-',
+                $industri->mou_berlaku_sampai ? $industri->mou_berlaku_sampai->format('d/m/Y') : '-',
+                $industri->alamat ?: '-',
+                $industri->wilayah ?: 'Bogor',
+                $industri->kontak_nama ?: '-',
+                $industri->kontak_jabatan ?: '-',
+                $industri->kontak_no_hp ?: '-',
+                $industri->kontak_email ?: '-',
+                $industri->pembimbing_nama ?: '-',
+                $industri->kuota,
+                $terisiAktual,
+                $sisa,
+                strtoupper($industri->status_kemitraan),
+            ];
+        }
 
-                fputcsv($handle, [
-                    $index + 1,
-                    $industri->nama,
-                    $industri->bidang_usaha ?: '-',
-                    $industri->no_mou ?: '-',
-                    $industri->mou_berlaku_sampai ? $industri->mou_berlaku_sampai->format('d/m/Y') : '-',
-                    $industri->alamat ?: '-',
-                    $industri->wilayah ?: 'Bogor',
-                    $industri->kontak_nama ?: '-',
-                    $industri->kontak_jabatan ?: '-',
-                    $industri->kontak_no_hp ?: '-',
-                    $industri->kontak_email ?: '-',
-                    $industri->pembimbing_nama ?: '-',
-                    $industri->kuota,
-                    $terisiAktual,
-                    $sisa,
-                    strtoupper($industri->status_kemitraan),
-                ], ';');
-            }
-
-            fclose($handle);
-        }, 200, $headers);
+        return ExcelExporter::download(
+            'master_data_industri_' . date('Ymd_His') . '.xls',
+            'Data Industri',
+            $columns,
+            $rows,
+            ['title' => 'MASTER DATA INDUSTRI / DU-DI', 'brand' => 'B45309']
+        );
     }
 
     private function withRealtimeKuota($query)

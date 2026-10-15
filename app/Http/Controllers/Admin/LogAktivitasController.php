@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Support\ExcelExporter;
 use App\Models\LogAktivitas;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -61,28 +62,39 @@ class LogAktivitasController extends Controller
         $query = LogAktivitas::where('aksi', '!=', 'Sinkronisasi')->with('user')->orderBy('dibuat_pada', 'desc');
         $this->applyFilters($query, $request);
         $logs = $query->get();
-        $filename = 'log_aktivitas_' . now()->format('Ymd_His') . '.csv';
 
-        return response()->streamDownload(function () use ($logs) {
-            $handle = fopen('php://output', 'w');
-            fwrite($handle, "\xEF\xBB\xBF");
-            fputcsv($handle, [
-                'No', 'Pengguna', 'Tipe', 'Aksi', 'Modul', 'Deskripsi', 'IP Address', 'Waktu',
-            ], ';');
-            foreach ($logs as $i => $log) {
-                fputcsv($handle, [
-                    $i + 1,
-                    $log->user?->username ?? '-',
-                    $log->user?->tipe_akun ?? '-',
-                    $log->aksi,
-                    $log->modul ?? '-',
-                    $log->deskripsi ?? '-',
-                    $log->ip_address ?? '-',
-                    $log->dibuat_pada?->format('d/m/Y H:i') ?? '-',
-                ], ';');
-            }
-            fclose($handle);
-        }, $filename, ['Content-Type' => 'text/csv; charset=UTF-8']);
+        $columns = [
+            ['label' => 'No', 'width' => 6, 'type' => 'number', 'align' => 'center'],
+            ['label' => 'Pengguna', 'width' => 20],
+            ['label' => 'Tipe', 'width' => 12, 'align' => 'center'],
+            ['label' => 'Aksi', 'width' => 20],
+            ['label' => 'Modul', 'width' => 20],
+            ['label' => 'Deskripsi', 'width' => 46],
+            ['label' => 'IP Address', 'width' => 16, 'align' => 'center'],
+            ['label' => 'Waktu', 'width' => 18, 'align' => 'center'],
+        ];
+
+        $rows = [];
+        foreach ($logs as $i => $log) {
+            $rows[] = [
+                $i + 1,
+                $log->user?->username ?? '-',
+                $log->user?->tipe_akun ?? '-',
+                $log->aksi,
+                $log->modul ?? '-',
+                $log->deskripsi ?? '-',
+                $log->ip_address ?? '-',
+                $log->dibuat_pada?->format('d/m/Y H:i') ?? '-',
+            ];
+        }
+
+        return ExcelExporter::download(
+            'log_aktivitas_' . now()->format('Ymd_His') . '.xls',
+            'Log Aktivitas',
+            $columns,
+            $rows,
+            ['title' => 'LOG AKTIVITAS SISTEM', 'brand' => '334155']
+        );
     }
 
     private function applyFilters($query, Request $request): void
