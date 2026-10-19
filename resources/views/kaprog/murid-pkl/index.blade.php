@@ -565,24 +565,124 @@
                         </div>
 
                         <div class="space-y-4 mt-4">
-                            <div>
+                            <!-- Search Siswa (Searchable) -->
+                            <div x-data="{
+                                searchSiswa: '',
+                                selectedSiswaId: '',
+                                openDropdown: false,
+                                siswas: {{ Js::from($allSiswaJurusan->map(function($s) { return ['id' => $s->id, 'nama' => $s->nama, 'nisn' => $s->nisn ?? '', 'nis' => $s->nis ?? '', 'rombel' => $s->rombel ? $s->rombel->nama_kode : '']; })->values()) }},
+                                get filtered() {
+                                    if (!this.searchSiswa.trim()) return [];
+                                    const q = this.searchSiswa.toLowerCase();
+                                    return this.siswas.filter(s =>
+                                        s.nama.toLowerCase().includes(q) ||
+                                        s.nisn.toLowerCase().includes(q) ||
+                                        s.nis.toLowerCase().includes(q) ||
+                                        s.rombel.toLowerCase().includes(q)
+                                    ).slice(0, 10);
+                                },
+                                selectSiswa(s) {
+                                    this.selectedSiswaId = s.id;
+                                    this.searchSiswa = s.nama + ' (' + s.nisn + ' - ' + s.rombel + ')';
+                                    this.openDropdown = false;
+                                },
+                                clearSiswa() {
+                                    this.selectedSiswaId = '';
+                                    this.searchSiswa = '';
+                                    this.openDropdown = false;
+                                }
+                            }" class="relative">
                                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Pilih Siswa (RPL)</label>
-                                <select name="siswa_id" required class="w-full h-11 px-3.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500">
-                                    <option value="">-- Pilih Siswa --</option>
-                                    @foreach(\App\Models\Siswa::where('jurusan_id', 1)->orderBy('nama')->get() as $s)
-                                        <option value="{{ $s->id }}">{{ $s->nama }} ({{ $s->nisn }} - {{ $s->rombel?->nama_kode }})</option>
-                                    @endforeach
-                                </select>
+                                <input type="hidden" name="siswa_id" :value="selectedSiswaId" required>
+                                <div class="relative">
+                                    <input
+                                        type="text"
+                                        x-model="searchSiswa"
+                                        @input="openDropdown = true; if(!searchSiswa) clearSiswa();"
+                                        @focus="openDropdown = true"
+                                        @click.outside="openDropdown = false"
+                                        @keydown.escape="openDropdown = false"
+                                        placeholder="Ketik nama / NISN / NIS siswa..."
+                                        autocomplete="off"
+                                        class="w-full h-11 px-3.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 pr-8"
+                                        :class="selectedSiswaId ? 'text-slate-800' : 'text-slate-400 font-normal'"
+                                    >
+                                    <button type="button" x-show="selectedSiswaId" @click="clearSiswa()" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-red-500 text-base leading-none">&times;</button>
+                                </div>
+                                <!-- Dropdown Hasil -->
+                                <div x-show="openDropdown && filtered.length > 0" x-cloak
+                                    class="absolute z-50 mt-1 w-full bg-white border border-slate-200 rounded-xl shadow-lg max-h-52 overflow-y-auto">
+                                    <template x-for="s in filtered" :key="s.id">
+                                        <div @click="selectSiswa(s)" class="px-3.5 py-2.5 cursor-pointer hover:bg-sky-50 border-b border-slate-50 last:border-0">
+                                            <div class="text-xs font-bold text-slate-800" x-text="s.nama"></div>
+                                            <div class="text-[10px] text-slate-500 mt-0.5" x-text="'NISN: ' + s.nisn + (s.rombel ? ' • ' + s.rombel : '')"></div>
+                                        </div>
+                                    </template>
+                                </div>
+                                <!-- Tidak Ditemukan -->
+                                <div x-show="openDropdown && searchSiswa.trim().length > 0 && filtered.length === 0" x-cloak
+                                    class="absolute z-50 mt-1 w-full bg-white border border-slate-100 rounded-xl shadow-lg px-3.5 py-2.5 text-xs text-slate-400">
+                                    Siswa tidak ditemukan. Coba kata kunci lain.
+                                </div>
                             </div>
 
-                            <div>
+                            <!-- Search Industri (Searchable) -->
+                            <div x-data="{
+                                searchIndustri: '',
+                                selectedIndustriId: '',
+                                openIndustriDropdown: false,
+                                industris: {{ Js::from($industris->map(function($ind) { return ['id' => $ind->id, 'nama' => $ind->nama, 'wilayah' => $ind->wilayah ?? '']; })->values()) }},
+                                get filteredIndustri() {
+                                    if (!this.searchIndustri.trim()) return [];
+                                    const q = this.searchIndustri.toLowerCase();
+                                    return this.industris.filter(i =>
+                                        i.nama.toLowerCase().includes(q) ||
+                                        i.wilayah.toLowerCase().includes(q)
+                                    ).slice(0, 10);
+                                },
+                                selectIndustri(i) {
+                                    this.selectedIndustriId = i.id;
+                                    this.searchIndustri = i.nama + ' (' + i.wilayah + ')';
+                                    this.openIndustriDropdown = false;
+                                },
+                                clearIndustri() {
+                                    this.selectedIndustriId = '';
+                                    this.searchIndustri = '';
+                                    this.openIndustriDropdown = false;
+                                }
+                            }" class="relative">
                                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Mitra Industri (DU/DI)</label>
-                                <select name="industri_id" required class="w-full h-11 px-3.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500">
-                                    <option value="">-- Pilih Perusahaan / Industri --</option>
-                                    @foreach($industris as $ind)
-                                        <option value="{{ $ind->id }}">{{ $ind->nama }} ({{ $ind->wilayah }})</option>
-                                    @endforeach
-                                </select>
+                                <input type="hidden" name="industri_id" :value="selectedIndustriId" required>
+                                <div class="relative">
+                                    <input
+                                        type="text"
+                                        x-model="searchIndustri"
+                                        @input="openIndustriDropdown = true; if(!searchIndustri) clearIndustri();"
+                                        @focus="openIndustriDropdown = true"
+                                        @click.outside="openIndustriDropdown = false"
+                                        @keydown.escape="openIndustriDropdown = false"
+                                        placeholder="Ketik nama perusahaan / wilayah..."
+                                        autocomplete="off"
+                                        class="w-full h-11 px-3.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 pr-8"
+                                        :class="selectedIndustriId ? 'text-slate-800' : 'text-slate-400 font-normal'"
+                                    >
+                                    <button type="button" x-show="selectedIndustriId" @click="clearIndustri()" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-red-500 text-base leading-none">&times;</button>
+                                </div>
+                                <!-- Dropdown Hasil -->
+                                <div x-show="openIndustriDropdown && filteredIndustri.length > 0" x-cloak
+                                    class="absolute z-50 mt-1 w-full bg-white border border-slate-200 rounded-xl shadow-lg max-h-52 overflow-y-auto">
+                                    <template x-for="i in filteredIndustri" :key="i.id">
+                                        <div @click="selectIndustri(i)" class="px-3.5 py-2.5 cursor-pointer hover:bg-sky-50 border-b border-slate-50 last:border-0">
+                                            <div class="text-xs font-bold text-slate-800" x-text="i.nama"></div>
+                                            <div class="text-[10px] text-slate-500 mt-0.5" x-text="i.wilayah"></div>
+                                        </div>
+                                    </template>
+                                </div>
+                                <!-- Tidak Ditemukan -->
+                                <div x-show="openIndustriDropdown && searchIndustri.trim().length > 0 && filteredIndustri.length === 0" x-cloak
+                                    class="absolute z-50 mt-1 w-full bg-white border border-slate-100 rounded-xl shadow-lg px-3.5 py-2.5 text-xs text-slate-400">
+                                    Industri tidak ditemukan. Coba kata kunci lain.
+                                </div>
                             </div>
 
                             <div>

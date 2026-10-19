@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+﻿@extends('layouts.admin')
 
 @section('title', 'SIPRAK SMKN 1 GUNUNGPUTRI - Master Data Jurusan')
 
@@ -572,14 +572,6 @@
                                 </div>
                             </div>
 
-                            <div>
-                                <label class="block text-xs font-bold text-slate-700 mb-1">Status Jurusan *</label>
-                                <select name="status" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white">
-                                    <option value="aktif" selected>Aktif</option>
-                                    <option value="nonaktif">Nonaktif</option>
-                                </select>
-                            </div>
-
                             <div class="md:col-span-2">
                                 <label class="block text-xs font-bold text-slate-700 mb-1">Mitra Utama DU/DI (Pisahkan dengan koma)</label>
                                 <input type="text" name="mitra_utama" placeholder="Contoh: PT Telkom Akses, Tokopedia, PT Astra Honda Motor" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
@@ -652,9 +644,6 @@
                             </div>
                             <div class="text-[11px] text-emerald-600 font-semibold mt-1">
                                 Sisa Slot Tersedia: <span x-text="Math.max(0, (activeJurusan?.kuota_industri_aktual || 0) - (activeJurusan?.kuota_terisi_aktual || 0))"></span>
-                            </div>
-                            <div class="text-[11px] text-slate-500 mt-0.5">
-                                Status: <span class="capitalize font-bold" :class="activeJurusan?.status === 'aktif' ? 'text-emerald-600' : 'text-rose-600'" x-text="activeJurusan?.status"></span>
                             </div>
                         </div>
 
@@ -774,14 +763,6 @@
                                 <p class="mt-1 text-[11px] leading-relaxed text-sky-700">Atur mitra melalui tombol <span class="font-semibold">Daftar DU/DI</span>. Kapasitas mengikuti total kuota mitra, sedangkan keterisian mengikuti pengajuan PKL yang disetujui.</p>
                                 <input type="hidden" name="kuota_industri" x-model="editForm.kuota_industri">
                                 <input type="hidden" name="kuota_terisi" x-model="editForm.kuota_terisi">
-                            </div>
-
-                            <div>
-                                <label class="block text-xs font-bold text-slate-700 mb-1">Status Jurusan *</label>
-                                <select name="status" x-model="editForm.status" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white">
-                                    <option value="aktif">Aktif</option>
-                                    <option value="nonaktif">Nonaktif</option>
-                                </select>
                             </div>
 
 
@@ -1051,7 +1032,6 @@ function jurusanApp() {
             kaprog_guru_id: '',
             kuota_industri: 100,
             kuota_terisi: 0,
-            status: 'aktif',
             badge_color: 'blue',
             mitra_utama: '',
             capaian_kurikulum: '',
@@ -1078,7 +1058,6 @@ function jurusanApp() {
                 kaprog_guru_id: jurusan.kaprog_guru_id || '',
                 kuota_industri: jurusan.kuota_industri || 0,
                 kuota_terisi: jurusan.kuota_terisi || 0,
-                status: jurusan.status || 'aktif',
                 badge_color: (function(c) {
                     const hexToKey = { '#3b82f6': 'blue', '#10b981': 'emerald', '#ef4444': 'red', '#64748b': 'gray', '#ffffff': 'white', '#f1f5f9': 'white' };
                     const validKeys = ['blue','emerald','red','gray','white'];

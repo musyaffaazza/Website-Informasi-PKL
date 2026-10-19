@@ -99,9 +99,8 @@ class MappingPembimbingController extends Controller
             $q->where('status', 'disetujui')->whereDoesntHave('penugasan');
         })->with(['rombel', 'jurusan', 'pengajuanPkl.industri'])->get();
 
-        $semuaSiswaPkl = Siswa::whereHas('pengajuanPkl', function ($q) {
-            $q->where('status', 'disetujui');
-        })->with(['rombel', 'jurusan', 'pengajuanPkl.industri', 'penugasanPembimbing'])->get();
+        // Semua siswa aktif untuk search modal (tidak dibatasi hanya yang punya PKL)
+        $semuaSiswaPkl = Siswa::with(['rombel', 'jurusan', 'pengajuanPkl.industri', 'penugasanPembimbing'])->orderBy('nama')->get();
 
         return view('admin.mapping-pembimbing.index', compact(
             'pengajuans',

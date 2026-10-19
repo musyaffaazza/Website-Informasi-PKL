@@ -73,8 +73,8 @@ class JurusanController extends Controller
                 ->count());
         });
         // KPI stats
-        $totalPrograms = Jurusan::where('status', 'aktif')->count();
-        $allMajors = Jurusan::where('status', 'aktif')->with('rombels')->get();
+        $totalPrograms = Jurusan::count();
+        $allMajors = Jurusan::with('rombels')->get();
 
         $totalSiswaMagang = Siswa::whereHas('rombel', function ($q) {
             $q->where('tingkat', 'XII')->where('status', 'aktif');
@@ -123,7 +123,6 @@ class JurusanController extends Controller
             'badge_color' => 'nullable|in:blue,emerald,red,gray,white',
             'mitra_utama' => 'nullable|string',
             'capaian_kurikulum' => 'nullable|string',
-            'status' => 'required|in:aktif,nonaktif',
         ]);
 
         if (empty($validated['singkatan'])) {
@@ -178,7 +177,6 @@ class JurusanController extends Controller
             'badge_color' => 'nullable|in:blue,emerald,red,gray,white',
             'mitra_utama' => 'nullable|string',
             'capaian_kurikulum' => 'nullable|string',
-            'status' => 'required|in:aktif,nonaktif',
         ]);
 
         if (empty($validated['singkatan'])) {
@@ -313,7 +311,6 @@ class JurusanController extends Controller
             ['label' => 'Sisa Kuota', 'width' => 12, 'type' => 'number', 'align' => 'center'],
             ['label' => 'Persentase Keterserapan', 'width' => 16, 'align' => 'center'],
             ['label' => 'Mitra Utama DU/DI', 'width' => 36],
-            ['label' => 'Status', 'width' => 12, 'align' => 'center'],
         ];
 
         $rows = [];
@@ -344,7 +341,6 @@ class JurusanController extends Controller
                 $sisaKuota,
                 $persentase,
                 $jurusan->industris->pluck('nama')->implode('; '),
-                ucfirst($jurusan->status),
             ];
         }
 

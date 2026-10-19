@@ -599,30 +599,144 @@
 
                         <!-- Fields -->
                         <div class="space-y-4 mt-4">
-                            <!-- Select Siswa -->
-                            <div>
+                            <!-- Search Siswa (Searchable) -->
+                            <div x-data="{
+                                searchSiswa: '',
+                                selectedSiswaId: '',
+                                selectedSiswaLabel: '',
+                                openDropdown: false,
+                                siswas: {{ Js::from($semuaSiswaPkl->map(function($sw) { return ['id' => $sw->id, 'nama' => $sw->nama, 'nis' => $sw->nis, 'rombel' => $sw->rombel ? $sw->rombel->nama_kode : '', 'industri' => ($sw->pengajuanPkl && $sw->pengajuanPkl->industri) ? $sw->pengajuanPkl->industri->nama : '']; })->values()) }},
+                                get filtered() {
+                                    if (!this.searchSiswa.trim()) return [];
+                                    const q = this.searchSiswa.toLowerCase();
+                                    return this.siswas.filter(s =>
+                                        s.nama.toLowerCase().includes(q) ||
+                                        s.nis.toLowerCase().includes(q) ||
+                                        s.rombel.toLowerCase().includes(q)
+                                    ).slice(0, 10);
+                                },
+                                selectSiswa(s) {
+                                    this.selectedSiswaId = s.id;
+                                    this.selectedSiswaLabel = s.nama + ' (NIS: ' + s.nis + ') - ' + s.rombel + ' [' + s.industri + ']';
+                                    this.searchSiswa = this.selectedSiswaLabel;
+                                    this.openDropdown = false;
+                                },
+                                clearSelection() {
+                                    this.selectedSiswaId = '';
+                                    this.selectedSiswaLabel = '';
+                                    this.searchSiswa = '';
+                                    this.openDropdown = false;
+                                }
+                            }" class="relative">
                                 <label class="block text-xs font-bold text-slate-700 mb-1">Pilih Siswa PKL *</label>
-                                <select name="siswa_id" required class="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white">
-                                    <option value="">-- Pilih Siswa yang Melaksanakan PKL --</option>
-                                    @foreach($semuaSiswaPkl as $sw)
-                                    <option value="{{ $sw->id }}">
-                                        {{ $sw->nama }} (NIS: {{ $sw->nis }}) - {{ $sw->rombel ? $sw->rombel->nama_kode : '' }} [{{ $sw->pengajuanPkl && $sw->pengajuanPkl->industri ? $sw->pengajuanPkl->industri->nama : 'Mitra DUDI' }}]
-                                    </option>
-                                    @endforeach
-                                </select>
+                                <input type="hidden" name="siswa_id" :value="selectedSiswaId" required>
+                                <div class="relative">
+                                    <input
+                                        type="text"
+                                        x-model="searchSiswa"
+                                        @input="openDropdown = true; if(!searchSiswa) clearSelection();"
+                                        @focus="openDropdown = true"
+                                        @click.outside="openDropdown = false"
+                                        @keydown.escape="openDropdown = false"
+                                        placeholder="Ketik nama / NIS siswa..."
+                                        autocomplete="off"
+                                        class="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white pr-8"
+                                        :class="selectedSiswaId ? 'text-slate-800 font-semibold' : 'text-slate-400'"
+                                    >
+                                    <button type="button" x-show="selectedSiswaId" @click="clearSelection()" class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-red-500 text-base leading-none">&times;</button>
+                                </div>
+                                <!-- Dropdown Results -->
+                                <div
+                                    x-show="openDropdown && filtered.length > 0"
+                                    x-cloak
+                                    class="absolute z-50 mt-1 w-full bg-white border border-slate-200 rounded-xl shadow-lg max-h-52 overflow-y-auto"
+                                >
+                                    <template x-for="s in filtered" :key="s.id">
+                                        <div
+                                            @click="selectSiswa(s)"
+                                            class="px-3 py-2 cursor-pointer hover:bg-blue-50 border-b border-slate-50 last:border-0"
+                                        >
+                                            <div class="text-xs font-bold text-slate-800" x-text="s.nama"></div>
+                                            <div class="text-[10px] text-slate-500 mt-0.5" x-text="'NIS: ' + s.nis + (s.rombel ? ' • ' + s.rombel : '') + (s.industri ? ' • ' + s.industri : '')"></div>
+                                        </div>
+                                    </template>
+                                </div>
+                                <!-- No result hint -->
+                                <div
+                                    x-show="openDropdown && searchSiswa.trim().length > 0 && filtered.length === 0"
+                                    x-cloak
+                                    class="absolute z-50 mt-1 w-full bg-white border border-slate-100 rounded-xl shadow-lg px-3 py-2 text-xs text-slate-400"
+                                >
+                                    Siswa tidak ditemukan. Coba kata kunci lain.
+                                </div>
                             </div>
 
-                            <!-- Select Guru Pembimbing -->
-                            <div>
+                            <!-- Search Guru Pembimbing (Searchable) -->
+                            <div x-data="{
+                                searchGuru: '',
+                                selectedGuruId: '',
+                                openGuruDropdown: false,
+                                gurus: {{ Js::from($gurus->map(function($g) { return ['id' => $g->id, 'nama' => $g->nama, 'nip' => $g->nip ?: '-']; })->values()) }},
+                                get filteredGuru() {
+                                    if (!this.searchGuru.trim()) return [];
+                                    const q = this.searchGuru.toLowerCase();
+                                    return this.gurus.filter(g =>
+                                        g.nama.toLowerCase().includes(q) ||
+                                        g.nip.toLowerCase().includes(q)
+                                    ).slice(0, 10);
+                                },
+                                selectGuru(g) {
+                                    this.selectedGuruId = g.id;
+                                    this.searchGuru = g.nama + ' (NIP: ' + g.nip + ')';
+                                    this.openGuruDropdown = false;
+                                },
+                                clearGuru() {
+                                    this.selectedGuruId = '';
+                                    this.searchGuru = '';
+                                    this.openGuruDropdown = false;
+                                }
+                            }" class="relative">
                                 <label class="block text-xs font-bold text-slate-700 mb-1">Guru Pembimbing Sekolah *</label>
-                                <select name="pembimbing_guru_id" required class="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white">
-                                    <option value="">-- Pilih Guru Pembimbing --</option>
-                                    @foreach($gurus as $g)
-                                    <option value="{{ $g->id }}">
-                                        {{ $g->nama }} (NIP: {{ $g->nip ?: '-' }})
-                                    </option>
-                                    @endforeach
-                                </select>
+                                <input type="hidden" name="pembimbing_guru_id" :value="selectedGuruId" required>
+                                <div class="relative">
+                                    <input
+                                        type="text"
+                                        x-model="searchGuru"
+                                        @input="openGuruDropdown = true; if(!searchGuru) clearGuru();"
+                                        @focus="openGuruDropdown = true"
+                                        @click.outside="openGuruDropdown = false"
+                                        @keydown.escape="openGuruDropdown = false"
+                                        placeholder="Ketik nama / NIP guru..."
+                                        autocomplete="off"
+                                        class="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white pr-8"
+                                        :class="selectedGuruId ? 'text-slate-800 font-semibold' : 'text-slate-400'"
+                                    >
+                                    <button type="button" x-show="selectedGuruId" @click="clearGuru()" class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-red-500 text-base leading-none">&times;</button>
+                                </div>
+                                <!-- Dropdown Results -->
+                                <div
+                                    x-show="openGuruDropdown && filteredGuru.length > 0"
+                                    x-cloak
+                                    class="absolute z-50 mt-1 w-full bg-white border border-slate-200 rounded-xl shadow-lg max-h-52 overflow-y-auto"
+                                >
+                                    <template x-for="g in filteredGuru" :key="g.id">
+                                        <div
+                                            @click="selectGuru(g)"
+                                            class="px-3 py-2 cursor-pointer hover:bg-blue-50 border-b border-slate-50 last:border-0"
+                                        >
+                                            <div class="text-xs font-bold text-slate-800" x-text="g.nama"></div>
+                                            <div class="text-[10px] text-slate-500 mt-0.5" x-text="'NIP: ' + g.nip"></div>
+                                        </div>
+                                    </template>
+                                </div>
+                                <!-- No result hint -->
+                                <div
+                                    x-show="openGuruDropdown && searchGuru.trim().length > 0 && filteredGuru.length === 0"
+                                    x-cloak
+                                    class="absolute z-50 mt-1 w-full bg-white border border-slate-100 rounded-xl shadow-lg px-3 py-2 text-xs text-slate-400"
+                                >
+                                    Guru tidak ditemukan. Coba kata kunci lain.
+                                </div>
                             </div>
 
                             <!-- Tanggal Mulai -->

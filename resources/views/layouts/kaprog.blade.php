@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Murid PKL — Rekayasa Perangkat Lunak | SIPRAK')</title>
-    <link rel="icon" type="image/jpeg" href="{{ asset('image/logo_skiell.jpeg') }}">
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
 
     <!-- Google Fonts: Plus Jakarta Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -130,7 +130,7 @@
                     $jurusanSingkatan = $guru?->jurusanKaprog?->singkatan ?: ($guru?->jurusan?->singkatan ?: ($guru?->jurusanKaprog?->kode ?: ''));
                     $headerRole = $jurusanSingkatan ? ('Kaprog ' . $jurusanSingkatan) : (in_array('Kaprog', (array)($guru?->roles_list ?? [])) ? 'Kepala Program' : ($authUser?->tipe_akun ? ucfirst($authUser->tipe_akun) : 'Kaprog'));
                     $headerInitials = $guru?->initials ?: strtoupper(substr($headerName, 0, 2));
-                    $avatarUrl = $guru?->avatar_url ? asset('storage/' . $guru->avatar_url) : ($authUser?->avatar_url ? asset('storage/' . $authUser->avatar_url) : null);
+                    $avatarUrl = $authUser?->avatar_url ? asset('storage/' . $authUser->avatar_url) : ($guru?->avatar_url ? asset('storage/' . $guru->avatar_url) : null);
                 @endphp
 
                 <!-- User Profile Dropdown -->
@@ -161,7 +161,7 @@
                             <div class="text-xs font-bold text-slate-900 truncate">{{ $headerName }}</div>
                             <div class="text-[10px] text-slate-500">{{ $headerRole }}</div>
                         </div>
-                        <a href="{{ route('admin.profile') }}" class="flex items-center gap-2 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50">
+                        <a href="{{ route('kaprog.profile') }}" class="flex items-center gap-2 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50">
                             <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
                             Edit Profil
                         </a>

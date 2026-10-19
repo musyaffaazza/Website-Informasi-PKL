@@ -19,7 +19,6 @@ class Jurusan extends Model
         'badge_color',
         'mitra_utama',
         'capaian_kurikulum',
-        'status',
     ];
 
     protected function casts(): array

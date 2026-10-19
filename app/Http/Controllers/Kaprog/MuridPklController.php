@@ -279,10 +279,14 @@ class MuridPklController extends Controller
             ['path' => $request->url(), 'query' => $request->query()]
         );
 
+        // Semua siswa jurusan untuk modal Tambah
+        $allSiswaJurusan = Siswa::where('jurusan_id', $jurusanId)->with('rombel')->orderBy('nama')->get();
+
         return view('kaprog.murid-pkl.index', compact(
             'jurusan',
             'rombels',
             'industris',
+            'allSiswaJurusan',
             'paginatedSiswa',
             'totalSiswa',
             'sudahDitempatkan',

@@ -10,22 +10,17 @@ use Symfony\Component\HttpFoundation\Response;
 class EnsureAdmin
 {
     /**
-     * Prevent teacher accounts from entering the admin panel.
-     *
-     * The administrator is the dedicated "admin" account (or any non-teacher
-     * account). Teachers linked to a guru record — including Wali Kelas,
-     * Kaprog, and Pembimbing PKL — are blocked except for the profile routes,
-     * which their own layouts link to.
+     * Prevent guests and teacher accounts from entering the admin panel.
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if ($request->routeIs('admin.profile', 'admin.profile.update')) {
-            return $next($request);
-        }
-
         $user = Auth::user();
 
-        if ($user === null || $user->isAdminAkun()) {
+        if ($user === null) {
+            return redirect()->route('login');
+        }
+
+        if ($user->isAdminAkun()) {
             return $next($request);
         }
 

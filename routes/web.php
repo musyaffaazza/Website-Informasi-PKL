@@ -124,11 +124,11 @@ Route::post('/forgot-password', function (\Illuminate\Http\Request $request) {
 Route::prefix('admin')->name('admin.')->middleware('admin.only')->group(function () {
     Route::get('/', fn() => redirect()->route('admin.jurusan.index'));
     Route::get('/profile', function () {
-        $user = \Illuminate\Support\Facades\Auth::user() ?: \App\Models\User::where('username', 'admin')->firstOrFail();
+        $user = \Illuminate\Support\Facades\Auth::user();
         return view('admin.profile', compact('user'));
     })->name('profile');
     Route::put('/profile', function (\Illuminate\Http\Request $request) {
-        $user = \Illuminate\Support\Facades\Auth::user() ?: \App\Models\User::where('username', 'admin')->firstOrFail();
+        $user = \Illuminate\Support\Facades\Auth::user();
         $data = $request->validate([
             'password' => ['nullable', 'string', 'min:8', 'confirmed'],
             'avatar' => ['nullable', 'image', 'max:2048'],
@@ -219,8 +219,34 @@ Route::prefix('admin')->name('admin.')->middleware('admin.only')->group(function
 });
 
 // Kaprog Routes
-Route::prefix('kaprog')->name('kaprog.')->group(function () {
+Route::prefix('kaprog')->name('kaprog.')->middleware(['auth', 'role.only:kaprog'])->group(function () {
     Route::get('/', fn() => redirect()->route('kaprog.murid-pkl.index'));
+
+    // Profile
+    Route::get('/profile', function () {
+        $user = \Illuminate\Support\Facades\Auth::user();
+        return view('kaprog.profile', compact('user'));
+    })->name('profile');
+    Route::put('/profile', function (\Illuminate\Http\Request $request) {
+        $user = \Illuminate\Support\Facades\Auth::user();
+        $data = $request->validate([
+            'password' => ['nullable', 'string', 'min:8', 'confirmed'],
+            'avatar' => ['nullable', 'image', 'max:2048'],
+        ]);
+
+        if (!empty($data['password'])) {
+            $user->password_hash = \Illuminate\Support\Facades\Hash::make($data['password']);
+        }
+        if ($request->hasFile('avatar')) {
+            if ($user->avatar_url) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($user->avatar_url);
+            }
+            $user->avatar_url = $request->file('avatar')->store('profile', 'public');
+        }
+        $user->save();
+
+        return redirect()->route('kaprog.profile')->with('success', 'Profil berhasil diperbarui.');
+    })->name('profile.update');
 
     // Murid PKL
     Route::get('/murid-pkl', [MuridPklController::class, 'index'])->name('murid-pkl.index');
@@ -247,7 +273,7 @@ Route::prefix('kaprog')->name('kaprog.')->group(function () {
 });
 
 // Wali Kelas Routes
-Route::prefix('wali-kelas')->name('wali-kelas.')->group(function () {
+Route::prefix('wali-kelas')->name('wali-kelas.')->middleware(['auth', 'role.only:wali-kelas'])->group(function () {
     Route::get('/', fn() => redirect()->route('wali-kelas.murid.index'));
 
     // Murid PKL Dashboard
